@@ -179,3 +179,9 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 }
 
 .line-button:active { background: #048b3c; border-color: #048b3c; color: #fff; }
+
+/* Carmap identity beside the footer service name. */
+#footer-carmap-title { display: flex; align-items: center; gap: 12px; }
+.carmap-heading-icon { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
+.footer-carmap-link { display: inline-flex; align-items: center; gap: 8px; }
+.footer-carmap-link img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; border-radius: 4px; }
