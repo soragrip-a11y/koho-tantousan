@@ -134,8 +134,8 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 }
 
 /* Entry plan and always-visible contact routes. */
-.line-button { background: #08783e; border-color: #08783e; color: #fff; }
-.line-button:hover { background: #065c30; border-color: #065c30; color: #fff; }
+.line-button { background: #06C755; border-color: #06C755; color: #fff; }
+.line-button:hover { background: #05b34d; border-color: #05b34d; color: #fff; }
 .line-button span { color: #fff; }
 .header-line { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 16px; border-radius: var(--radius-control); font-weight: 700; white-space: nowrap; order: 2; }
 .site-header nav { order: 1; }
@@ -177,3 +177,5 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
  .service-qr { width: 128px; }
  .service-qr img { width: 128px; height: 128px; }
 }
+
+.line-button:active { background: #048b3c; border-color: #048b3c; color: #fff; }
