@@ -132,3 +132,48 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
   .site-header { padding-inline: 1rem; gap: .5rem; }
   .hero, .section, .section.soft, .page-head, .prose-section { padding-inline: 1rem; }
 }
+
+/* Entry plan and always-visible contact routes. */
+.line-button { background: #08783e; border-color: #08783e; color: #fff; }
+.line-button:hover { background: #065c30; border-color: #065c30; color: #fff; }
+.line-button span { color: #fff; }
+.header-line { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 16px; border-radius: var(--radius-control); font-weight: 700; white-space: nowrap; order: 2; }
+.site-header nav { order: 1; }
+.site-header { gap: 20px; }
+.contact-qr { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; gap: 8px; color: var(--ink); }
+.contact-qr img { background: #fff; width: 176px; height: 176px; }
+.contact-qr span { font-size: .875rem; }
+.footer-brand { display: inline-block; }
+.footer-brand img { width: 220px; height: 110px; object-fit: contain; }
+.footer-carmap { padding-bottom: 40px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+.footer-service-heading h2 { font-size: 1.5rem; margin-bottom: 12px; }
+.footer-service-heading p { font-size: 1rem; }
+.footer-service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+.footer-service-card { display: grid; grid-template-columns: minmax(0,1fr) 128px; gap: 16px; align-items: center; padding: 24px; border: 1px solid var(--line); border-radius: 8px; }
+.footer-service-card h3 { font-size: 1.125rem; }
+.footer-service-card p { font-size: .875rem; }
+.footer-service-card .button { font-size: .875rem; padding: 12px; gap: 8px; margin-top: 12px; }
+.service-qr { display: block; background: #fff; }
+.service-qr img { width: 128px; height: 128px; }
+@media (min-width: 761px) and (max-width: 1250px) {
+ .site-header { height: auto; flex-wrap: wrap; padding-block: 8px; }
+ .site-header nav { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; gap: 8px 24px; }
+ .header-line { margin-left: auto; }
+}
+@media (max-width: 1000px) { .footer-service-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+ .site-header { display: grid; grid-template-columns: minmax(80px,1fr) auto auto; gap: 8px; padding: 8px 16px; }
+ .site-header .brand { width: 110px; max-width: 100%; grid-column: 1; grid-row: 1; }
+ .site-header .brand img { width: 110px; max-width: 100%; height: 60px; }
+ .header-line { grid-column: 2; grid-row: 1; padding: 10px; font-size: .875rem; }
+ .menu-toggle { grid-column: 3; grid-row: 1; padding: 8px; gap: 4px; font-size: .875rem; }
+ .site-header nav { width: 100%; }
+ .contact-qr { margin-top: 24px; width: max-content; max-width: 100%; }
+ .footer-service-card { padding: 20px; grid-template-columns: minmax(0,1fr) 112px; }
+ .service-qr img { width: 112px; height: 112px; }
+}
+@media (max-width: 380px) {
+ .footer-service-card { grid-template-columns: 1fr; }
+ .service-qr { width: 128px; }
+ .service-qr img { width: 128px; height: 128px; }
+}
