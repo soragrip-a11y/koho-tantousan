@@ -1,4 +1,4 @@
-import {calculatePrice} from './pricing.mjs';
+import {calculatePrice} from './pricing.mjs?v=20261009-2315';
 const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('#navigation');
 menu?.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('is-open',open)});
 nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menu.setAttribute('aria-expanded','false');nav.classList.remove('is-open')}));
@@ -38,7 +38,7 @@ function updateQuote(){
  const rows=[['基本料金',r.base],[r.plan==='single'?'動画制作費':'追加動画制作費',r.production],['最低発注額への調整',r.minimumAdjustment],['出張日当',r.visit],['交通費（入力額）',r.travel],['宿泊費（入力額）',r.hotel]];
  document.querySelector('#quote-breakdown').replaceChildren(...rows.map(([label,amount])=>{const d=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=yen(amount);d.append(dt,dd);return d}));
  document.querySelector('#quote-context').textContent=r.plan==='pause'?'休会中の月額です。制作再開時は別途日程と条件を確認します。':r.plan==='single'&&r.shorts+r.longs===0&&r.visitDays===0?'本数または訪問日数を入力してください。制作費のない0円の受注を意味するものではありません。':`訪問${r.visitDays}日 / 日当込み${r.includedDays}日。${r.plan==='single'?'単発依頼':'月額契約'}の概算です。基本内訳変更や特殊な制作は含みません。`;
- document.querySelector('#quote-consult').href='contact.html?estimate='+encodeURIComponent(quoteText(r));
+ document.querySelector('#quote-consult').href='contact.html?v=20261009-2315&estimate='+encodeURIComponent(quoteText(r));
  document.querySelector('#quote-status').textContent='';
 }
 if(sim){const q=new URLSearchParams(location.search),key=q.get('plan');if(['standard','light','pause','single'].includes(key))document.querySelector('#sim-plan').value=key;sim.addEventListener('input',updateQuote);sim.addEventListener('change',updateQuote);sim.addEventListener('reset',()=>requestAnimationFrame(updateQuote));updateQuote();document.querySelector('#quote-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(quoteText(currentQuote));document.querySelector('#quote-status').textContent='試算内容をコピーしました。'}catch{document.querySelector('#quote-status').textContent='コピーできませんでした。「この内容で相談する」からフォームに引き継げます。'}})}
