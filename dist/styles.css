@@ -185,3 +185,14 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 .carmap-heading-icon { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
 .footer-carmap-link { display: inline-flex; align-items: center; gap: 8px; }
 .footer-carmap-link img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; border-radius: 4px; }
+
+/* Pricing comparison: retain the established typography and mobile layout. */
+.pricing-table-scroll{overflow-x:auto;margin:1.5rem 0 2.5rem;max-width:100%}
+.pricing-compare{border-collapse:collapse;width:100%;min-width:620px;font-size:1rem}
+.pricing-compare th,.pricing-compare td{border:1px solid #d7d7d7;padding:1rem;text-align:left;vertical-align:top;line-height:1.7}
+.pricing-compare thead th{background:#f7f3ec;font-weight:700}
+.pricing-compare tbody th{background:#fafafa;min-width:125px}
+#production-fields{margin-bottom:1rem}
+
+@media(min-width:761px){.plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.plan-card>.button{margin-top:auto}
