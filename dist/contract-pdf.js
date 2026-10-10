@@ -1,4 +1,4 @@
-import { validateContract, clean, yen, renewalDeadline } from './contract-core.js?v=20261010-simple';
+import { validateContract, clean, yen, renewalDeadline } from './contract-core.js?v=20261010-provider';
 import { TERMS } from './contract-terms.js';
 
 export function contractSections(data) {
@@ -25,7 +25,7 @@ export function contractSections(data) {
   section('3. 契約料金・計算内訳（税込）',[
     ...c.rows.map(r=>`${r.label}：${yen(r.unit)} × ${r.qty} = ${yen(r.amount)}${r.timing==='monthly'?'／月':'（初回契約中1回のみ）'}`),
     ...(c.monthly ? [`月額：${yen(c.recurring)} × 初回${c.months}か月 = ${yen(c.recurring*c.months)}`] : []),
-    `初回契約中1回のみの制作・追加費用：${yen(c.oneTime)}`,
+    ...(c.oneTime ? [`初回契約中1回のみの制作・追加費用：${yen(c.oneTime)}`] : []),
     `初回契約期間の確定総額：${yen(c.total)}`,
     '上記総額は後日精算の実費・未合意の追加業務・更新後の料金を含まない。一括前払い額を示すものではない。表示料金は税込の支払総額であり、消費税を重ねて加算しない。',
     c.monthly ? `初月の予定支払額：${yen(c.first)}（初月月額＋初回のみの追加費用）。2か月目以降の月額は${yen(c.recurring)}。更新後も本書の月額条件を適用し、初回のみの追加費用は繰り返し計上しない。変更・新規の実費は別途合意する。` : `着手前の予定支払額：${yen(c.first)}。後日精算分は下記の方法による。`

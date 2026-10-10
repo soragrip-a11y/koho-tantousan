@@ -48,7 +48,7 @@ test('additional fees, payer override and full form-to-download data flow',async
   assert.equal(h.el('summary-total').textContent,'57,000円');
   h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));
   await new Promise(setImmediate);
-  assert.equal(h.captured().payer,'支払者テスト');assert.equal(h.captured().extras[0].label,'初回撮影の交通費');
+  assert.equal(h.captured().payer,'支払者テスト');for(const [key,value] of Object.entries(core.DEFAULT_PROVIDER))assert.equal(h.captured()[key],value);assert.equal(h.captured().extras[0].label,'初回撮影の交通費');
   assert.equal(h.captured().extras[0].amount,'2000');assert.equal(h.downloads(),1);assert.equal(h.el('pdf-result').hidden,false);
   h.change('shorts',7);assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.revoked(),1);assert.equal(h.el('reviewed').checked,false);
 });
@@ -61,7 +61,7 @@ test('invalid values block creation and show an actionable error',async()=>{
 test('confirmation is plain text and removed fields cannot interrupt completion',()=>{
   const h=setup();
   assert.equal(h.el('reviewed').closest('label').querySelector('a'),null);
-  for(const id of ['channel','schedule','travelMode','parkingMode','lodgingMode','approval-fields','summary-fixed','summary-later'])assert.equal(h.el(id),null);
+  for(const id of ['channel','schedule','travelMode','parkingMode','lodgingMode','approval-fields','summary-fixed','summary-later','summary-once','provider','providerSigner','providerAddress','providerEmail'])assert.equal(h.el(id),null);
 });
 test('numeric editing supports replacing zero, deletion, and single-digit values',()=>{
   const h=setup();

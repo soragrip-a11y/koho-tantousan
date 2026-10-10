@@ -1,3 +1,4 @@
+export const DEFAULT_PROVIDER = Object.freeze({ provider: 'ソラグリップ（広報担当さん）', providerSigner: '須永 空和', providerEmail: 'sora.grip@gmail.com', providerAddress: '千葉県君津市常代5-7-36' });
 // All public service prices are tax-inclusive. Never add tax again.
 export const PRICES = Object.freeze({ standard: 55000, premium: 150000, short: 8000, long: 18000, shoot4: 22000, shoot7: 32000, extension: 10000 });
 export const PLANS = Object.freeze({

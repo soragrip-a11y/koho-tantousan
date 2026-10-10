@@ -1,5 +1,5 @@
-import { calculate, PLANS, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261010-simple';
-import { generateContract } from './contract-pdf.js?v=20261010-simple';
+import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261010-provider';
+import { generateContract } from './contract-pdf.js?v=20261010-provider';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -12,6 +12,7 @@ function show(id, visible) {
 function collect() {
   const data = {};
   form.querySelectorAll('[name]').forEach(el => data[el.name] = el.hasAttribute('data-numeric') && el.value === '' && el.getAttribute('min') === '0' ? '0' : clean(el.value));
+  Object.assign(data, DEFAULT_PROVIDER);
   data.payer = $('payerSame').checked ? data.customer : data.payer;
   data.reviewed = $('reviewed').checked;
   data.extras = [0,1,2].map(i=>({label:value('extraLabel'+i),amount:data['extraAmount'+i],timing:value('extraTiming'+i)}));
@@ -45,13 +46,12 @@ function update() {
     $('recurring-label').textContent = monthly ? '月額（税込）' : '単発の制作・撮影料金';
     // The one-off total is shown once; do not duplicate custom rows in the headline.
     $('summary-recurring').textContent = yen(monthly ? c.recurring : c.oneTime);
-    $('summary-once').textContent = monthly ? yen(c.oneTime) : '上記に含む';
     $('summary-total').textContent = yen(c.total);
     $('final-total').textContent = `初回契約期間の確定総額：${yen(c.total)}（税込）／後日精算の実費は含みません。`;
     $('summary-lines').replaceChildren(...c.rows.map(r=>{const p=document.createElement('p');p.textContent=`${r.label} × ${r.qty}：${yen(r.amount)}${r.timing==='monthly'?'／月':'／契約'}`;return p;}));
   } catch(e) {
     $('summary-error').textContent = e.message; $('final-total').textContent = '入力内容を確認すると、ここに確定総額が表示されます。';
-    ['summary-recurring','summary-once','summary-total'].forEach(id=>$(id).textContent='—');
+    ['summary-recurring','summary-total'].forEach(id=>$(id).textContent='—');
     $('summary-lines').replaceChildren();
   }
 }
