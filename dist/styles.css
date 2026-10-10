@@ -186,21 +186,15 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 .footer-carmap-link { display: inline-flex; align-items: center; gap: 8px; }
 .footer-carmap-link img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; border-radius: 4px; }
 
-/* Comparisons stay within the screen; mobile rows show each plan side by side. */
+/* Pricing tables; plan comparison restored to the original horizontal layout. */
 .pricing-table-wrap{margin:1.5rem 0 2.5rem;max-width:100%}
 .pricing-compare{border-collapse:collapse;width:100%;table-layout:fixed;font-size:1rem}
 .pricing-compare th,.pricing-compare td{border:1px solid #d7d7d7;padding:1rem;text-align:left;vertical-align:top;line-height:1.7;overflow-wrap:anywhere}
 .pricing-compare thead th{background:#f7f3ec;font-weight:700}
 .pricing-compare tbody th{background:#fafafa}
+.plan-comparison-wrap{overflow-x:auto}
+.plan-comparison{min-width:620px;table-layout:auto}
+.plan-comparison tbody th{min-width:125px}
 @media(min-width:761px){.plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .plan-card>.button{margin-top:auto}
-@media(max-width:760px){
-.pricing-compare th,.pricing-compare td{padding:.7rem .5rem;font-size:.875rem}
-.plan-comparison,.plan-comparison tbody{display:block}
-.plan-comparison thead{display:none}
-.plan-comparison tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:1rem}
-.plan-comparison tbody th{grid-column:1/-1;padding:.5rem .7rem;background:#f7f3ec;font-size:1rem}
-.plan-comparison td{min-width:0;border-top:0}
-.plan-comparison td+td{border-left:0}
-.plan-comparison td::before{content:attr(data-plan);display:block;font-size:.75rem;font-weight:700;color:#555;margin-bottom:.45rem}
-}
+@media(max-width:760px){.pricing-compare:not(.plan-comparison) th,.pricing-compare:not(.plan-comparison) td{padding:.7rem .5rem;font-size:.875rem}}
