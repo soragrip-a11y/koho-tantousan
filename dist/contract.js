@@ -1,5 +1,5 @@
-import { calculate, PLANS, EXPENSES, clean, yen, periodEnd, validateContract } from './contract-core.js';
-import { generateContract } from './contract-pdf.js';
+import { calculate, PLANS, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261010-simple';
+import { generateContract } from './contract-pdf.js?v=20261010-simple';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -11,11 +11,10 @@ function show(id, visible) {
 }
 function collect() {
   const data = {};
-  form.querySelectorAll('[name]').forEach(el => data[el.name] = clean(el.value));
+  form.querySelectorAll('[name]').forEach(el => data[el.name] = el.hasAttribute('data-numeric') && el.value === '' && el.getAttribute('min') === '0' ? '0' : clean(el.value));
   data.payer = $('payerSame').checked ? data.customer : data.payer;
   data.reviewed = $('reviewed').checked;
-  data.extras = [0,1,2].map(i=>({label:value('extraLabel'+i),amount:value('extraAmount'+i),timing:value('extraTiming'+i)}));
-  data.expenses = Object.fromEntries(Object.keys(EXPENSES).map(key=>[key,{mode:value(key+'Mode'),amount:value(key+'Amount'),cap:value(key+'Cap'),detail:value(key+'Detail')}]));
+  data.extras = [0,1,2].map(i=>({label:value('extraLabel'+i),amount:data['extraAmount'+i],timing:value('extraTiming'+i)}));
   return data;
 }
 function invalidatePDF() {
@@ -29,22 +28,14 @@ function update() {
   const plan = PLANS[value('plan')], monthly = value('plan') !== 'single';
   show('months-wrap', monthly); show('included-shoot', value('plan') === 'premium');
   show('payer-fields', !$('payerSame').checked); $('payer').required = !$('payerSame').checked;
-  $('end').readOnly = monthly; $('months').min = plan.months || 1;
-  $('shorts').min = plan.short; $('longs').min = plan.long;
+  $('end').readOnly = monthly; $('months').setAttribute('min', plan.months || 1);
+  $('shorts').setAttribute('min', plan.short); $('longs').setAttribute('min', plan.long);
   if (monthly) { try { $('end').value = periodEnd(value('start'),value('months')); } catch { $('end').value = ''; } }
   $('period-hint').textContent = monthly ? `最低${plan.months}か月。その後は1か月ごとに自動更新。更新停止・変更は満了14日前まで。開始日を起算し、翌月の同日の前日（同日がない場合は月末）までを1か月として計算します。月額は開始日からの1か月単位で計算します。` : '単発制作には自動更新はありません。完了予定日を指定してください。';
   $('plan-scope').textContent = plan.scope;
   $('quantity-hint').textContent = monthly ? `各月の総本数を入力。プラン内はショート${plan.short}本・ロング${plan.long}本で、超過分のみ追加計算します。` : '今回の契約全体の本数を入力してください。';
   $('shoot-hint').textContent = monthly ? '追加撮影は毎月の回数です。4時間22,000円／回、7時間32,000円／回。プレミアムの月1回分は上の欄で指定し、追加回数には含めません。' : '今回の契約全体の撮影回数です。4時間22,000円／回、7時間32,000円／回。';
   [0,1,2].forEach(i=>{ $('extraTiming'+i).disabled=!monthly; if(!monthly) $('extraTiming'+i).value='once'; });
-  let later = false;
-  Object.keys(EXPENSES).forEach(key=>{
-    const mode = value(key+'Mode');
-    show(key+'-fixed',mode==='fixed'); show(key+'-later',mode==='later'); show(key+'-detail',mode!=='none');
-    $(key+'Detail').required = mode !== 'none';
-    later ||= mode === 'later';
-  });
-  show('approval-fields',later); $('approver').required = later;
   const data = collect();
   $('summary-plan').textContent = plan.name + (monthly ? ` / 初回${value('months') || '—'}か月` : ' / 1契約');
   $('summary-period').textContent = data.start && data.end ? `${data.start} 〜 ${data.end}` : '期間を入力すると終了日を確認できます。';
@@ -55,18 +46,29 @@ function update() {
     // The one-off total is shown once; do not duplicate custom rows in the headline.
     $('summary-recurring').textContent = yen(monthly ? c.recurring : c.oneTime);
     $('summary-once').textContent = monthly ? yen(c.oneTime) : '上記に含む';
-    $('summary-fixed').textContent = yen(c.fixed); $('summary-total').textContent = yen(c.total);
+    $('summary-total').textContent = yen(c.total);
     $('final-total').textContent = `初回契約期間の確定総額：${yen(c.total)}（税込）／後日精算の実費は含みません。`;
     $('summary-lines').replaceChildren(...c.rows.map(r=>{const p=document.createElement('p');p.textContent=`${r.label} × ${r.qty}：${yen(r.amount)}${r.timing==='monthly'?'／月':'／契約'}`;return p;}));
-    $('summary-later').textContent = c.later.length ? c.later.map(e=>`${e.label}：${e.cap===null?'都度見積もり・承認':`初回契約の上限${yen(e.cap)}`}`).join(' / ')+'。確定総額には含みません。' : '指定なし。新たな実費が発生する場合も事前に合意します。';
   } catch(e) {
     $('summary-error').textContent = e.message; $('final-total').textContent = '入力内容を確認すると、ここに確定総額が表示されます。';
-    ['summary-recurring','summary-once','summary-fixed','summary-total'].forEach(id=>$(id).textContent='—');
-    $('summary-lines').replaceChildren(); $('summary-later').textContent = '未確定実費は合計に含めません。';
+    ['summary-recurring','summary-once','summary-total'].forEach(id=>$(id).textContent='—');
+    $('summary-lines').replaceChildren();
   }
 }
+// Text fields with a numeric keyboard let touch users replace or erase values reliably.
+form.addEventListener('focusin',e=>{
+  if(busy || !e.target.hasAttribute('data-numeric'))return;
+  if(e.target.value === '0') e.target.value = '';
+  else e.target.select();
+});
+form.addEventListener('focusout',e=>{
+  if(busy || !e.target.hasAttribute('data-numeric'))return;
+  if(e.target.value === '' && e.target.getAttribute('min') === '0') e.target.value = '0';
+  update();
+});
 form.addEventListener('input',e=>{
   if(busy)return;
+  if(e.target.hasAttribute('data-numeric') && /^\d+$/.test(e.target.value)) e.target.value = e.target.value.replace(/^0+(?=\d)/, '');
   invalidatePDF(); $('contract-error').hidden = true;
   if(e.target.id !== 'reviewed') $('reviewed').checked = false;
   update();

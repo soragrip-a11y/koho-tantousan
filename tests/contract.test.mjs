@@ -14,28 +14,22 @@ test('single prices match all four published shooting combinations',()=>{
   for(const [shorts,longs,shoot4,shoot7,total] of [[1,0,1,0,30000],[1,0,0,1,40000],[0,1,1,0,40000],[0,1,0,1,50000]])
     assert.equal(calculate(fixture({plan:'single',shorts,longs,shoot4,shoot7})).total,total);
 });
-test('premium extension, additional quantities, one-time fees and expenses',()=>{
-  const d=fixture({plan:'premium',shorts:9,longs:3,months:2,includedHours:7,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'}]});
-  d.expenses.parking={mode:'fixed',amount:2000,cap:'',detail:'初回2か月の撮影分'};
-  d.expenses.travel={mode:'later',amount:999999,cap:30000,detail:'事前承認する往復交通費'};
-  d.expenses.lodging={mode:'later',amount:999999,cap:'',detail:'必要時に事前承認する宿泊費'};
+test('premium extension and expenses use the same additional-fee rows without double counting',()=>{
+  const d=fixture({plan:'premium',shorts:9,longs:3,months:2,includedHours:7,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'},{label:'初回撮影の交通費・駐車場代',amount:2000,timing:'once'}]});
   const c=calculate(d);assert.equal(c.recurring,208000);assert.equal(c.first,215000);assert.equal(c.total,423000);
-  assert.equal(c.later[0].cap,30000);assert.equal(c.later[1].cap,null);
+  assert.equal(c.rows.filter(r=>r.label.includes('交通費')).length,1);
 });
 test('recurring fees multiply by months; one-time amounts do not',()=>{
   const d=fixture({months:3,extras:[{label:'追加A',amount:1000,timing:'monthly'},{label:'追加B',amount:2500,timing:'once'}]});
   assert.equal(calculate(d).total,170500);
 });
-test('unconfirmed expense caps are never part of any charged subtotal',()=>{
-  for(const cap of ['',0,1,10000000]){
-    const d=fixture();d.expenses.travel={mode:'later',amount:'99999',cap,detail:'電車代'};
-    assert.equal(calculate(d).total,55000);assert.equal(calculate(d).first,55000);
-  }
-});
-test('switching expense modes ignores stale amounts and caps',()=>{
-  const d=fixture();d.expenses.travel={mode:'none',amount:5000,cap:10000,detail:'以前の入力'};
-  assert.equal(calculate(d).fixed,0);assert.equal(calculate(d).later.length,0);
-  d.expenses.travel.mode='fixed';assert.equal(calculate(d).fixed,5000);assert.equal(calculate(d).expenses[0].cap,null);
+test('removed fields are not required or rendered as empty values',()=>{
+  const c=contractSections(fixture());
+  const text=JSON.stringify(c.sections);
+  assert.equal(c.calculation.total,55000);
+  assert.ok(!/undefined|null|発生なし・請求なし|承認担当者/.test(text));
+  assert.ok(text.includes('業務の実施前に双方で確認・合意'));
+  assert.ok(text.includes('未確定額は上記総額に含めない'));
 });
 test('monthly minimums and non-interchangeable bundles are enforced',()=>{
   for(const overrides of [{months:0},{plan:'premium',months:1,shorts:8,longs:2},{shorts:5},{plan:'premium',months:2,shorts:8,longs:1}]) assert.throws(()=>calculate(fixture(overrides)));
@@ -53,13 +47,12 @@ test('month-end, leap-year, cross-year and cancellation dates',()=>{
   assert.equal(renewalDeadline('2026-12-31'),'2026-12-17');
   assert.throws(()=>periodEnd('2026-02-30',1));
 });
-test('missing parties, invalid dates, email, consent and approval are rejected',()=>{
+test('missing parties, invalid dates, email and consent are rejected',()=>{
   for(const override of [{customer:''},{providerAddress:''},{customerEmail:'bad'},{reviewed:false},{contractDate:'2026-12-01'},{plan:'single',end:'2026-10-31'}])assert.throws(()=>validateContract(fixture(override)));
-  const d=fixture({approver:''});d.expenses.travel={mode:'later',cap:'',amount:0,detail:'電車代'};assert.throws(()=>validateContract(d));
 });
 test('all contract inputs and all service clauses are included in PDF content',()=>{
   const d=fixture();const c=contractSections(d);const text=JSON.stringify(c.sections);
-  for(const key of ['customer','customerSigner','customerAddress','customerEmail','providerAddress','payer','purpose','channel','schedule','usage','notes'])assert.ok(text.includes(d[key]));
+  for(const key of ['customer','customerSigner','customerAddress','customerEmail','providerAddress','payer','purpose','usage','notes'])assert.ok(text.includes(d[key]));
   const terms=readFileSync(new URL('../dist/terms.html',import.meta.url),'utf8');
   assert.equal(c.terms.length,12);
   for(const t of c.terms){assert.ok(terms.includes(t.title));assert.ok(terms.includes(t.text));}

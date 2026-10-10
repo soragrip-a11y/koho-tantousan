@@ -5,7 +5,6 @@ export const PLANS = Object.freeze({
   premium: { name: 'プレミアム', short: 8, long: 2, months: 2, scope: '月間企画・構成提案・編集・タイトル・説明文案、月1回の訪問撮影、YouTube 1チャンネルへの投稿・予約、月次レポート・改善提案、月1回60分までのオンライン相談。公開前にお客様の承認を得る。' },
   single: { name: '単発制作', short: 0, long: 0, months: 0, scope: '依頼動画の構成確認・編集・タイトル・説明文案。制作に必要な確認に対応。投稿はお客様。' }
 });
-export const EXPENSES = { travel: '交通費', parking: '駐車場代', lodging: '宿泊費' };
 export const yen = n => new Intl.NumberFormat('ja-JP').format(n) + '円';
 export const clean = value => String(value ?? '').normalize('NFC').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, '').trim();
 export function integer(value, label, max = 10000000) {
@@ -48,28 +47,18 @@ export function calculate(data) {
   add('追加訪問撮影（4時間まで）', shoot4, PRICES.shoot4, frequency);
   add('追加訪問撮影（7時間まで）', shoot7, PRICES.shoot7, frequency);
   for (const extra of data.extras || []) {
-    const amount = integer(extra.amount, '追加作業料金');
-    if (!['once', 'monthly'].includes(extra.timing)) throw new Error('追加作業の課金単位を選択してください。');
-    if (amount && !clean(extra.label)) throw new Error('追加作業の内容を入力してください。');
+    const amount = integer(extra.amount, '追加費用の金額');
+    if (!['once', 'monthly'].includes(extra.timing)) throw new Error('追加費用の課金単位を選択してください。');
+    if (amount && !clean(extra.label)) throw new Error('追加費用の内容を入力してください。');
     if (amount) add(clean(extra.label), 1, amount, monthly ? extra.timing : 'once');
   }
-  let fixed = 0;
-  const expenses = Object.entries(EXPENSES).map(([key,label]) => {
-    const e = data.expenses?.[key];
-    if (!e || !['none','fixed','later'].includes(e.mode)) throw new Error(`${label}の扱いを選択してください。`);
-    const amount = e.mode === 'fixed' ? integer(e.amount, `${label}の確定額`) : 0;
-    const cap = e.mode === 'later' && String(e.cap).trim() !== '' ? integer(e.cap, `${label}の承認上限`) : null;
-    if (e.mode !== 'none' && !clean(e.detail)) throw new Error(`${label}の対象・根拠を入力してください。`);
-    fixed += amount;
-    return {key, label, mode:e.mode, amount, cap, detail:clean(e.detail)};
-  });
   const recurring = rows.filter(r=>r.timing==='monthly').reduce((s,r)=>s+r.amount,0);
   const oneTime = rows.filter(r=>r.timing==='once').reduce((s,r)=>s+r.amount,0);
-  const total = recurring * months + oneTime + fixed;
-  return {plan:p,monthly,months,shorts,longs,shoot4,shoot7,rows,expenses,recurring,oneTime,fixed,total,first:recurring+oneTime+fixed,later:expenses.filter(e=>e.mode==='later')};
+  const total = recurring * months + oneTime;
+  return {plan:p,monthly,months,shorts,longs,shoot4,shoot7,rows,recurring,oneTime,total,first:recurring+oneTime};
 }
 export function validateContract(data) {
-  const required = ['customer','customerSigner','customerAddress','customerEmail','provider','providerSigner','providerAddress','providerEmail','payer','purpose','channel','schedule','usage'];
+  const required = ['customer','customerSigner','customerAddress','customerEmail','provider','providerSigner','providerAddress','providerEmail','payer','purpose','usage'];
   for (const k of required) if (!clean(data[k])) throw new Error('契約者・受託者・制作条件の必須項目をすべて入力してください。');
   for (const [k,v] of Object.entries(data)) if (typeof v === 'string' && v.length > 2000) throw new Error('入力が長すぎます。2,000文字以内にしてください。');
   for (const k of ['customerEmail','providerEmail']) if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data[k])) throw new Error('有効なメールアドレスを入力してください。');
@@ -80,7 +69,6 @@ export function validateContract(data) {
   if (end < data.start) throw new Error('終了日は開始日以降にしてください。');
   if (data.contractDate > data.start) throw new Error('契約日は開始日以前にしてください。');
   if (!['no','separate'].includes(data.portfolio)) throw new Error('実績掲載の扱いを選択してください。');
-  if (result.later.length && (!clean(data.approvalMethod) || !clean(data.approver))) throw new Error('実費の承認方法と承認担当者を入力してください。');
   if (!data.reviewed) throw new Error('入力内容と利用条件を確認してください。');
   return {...result,end};
 }

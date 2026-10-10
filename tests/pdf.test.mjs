@@ -9,10 +9,7 @@ vm.runInThisContext(readFileSync(new URL('../dist/vendor/pdf-lib-1.17.1.min.js',
 vm.runInThisContext(readFileSync(new URL('../dist/vendor/fontkit-1.1.1.min.js',import.meta.url),'utf8'));
 const deps={PDFLib:globalThis.PDFLib,fontkit:globalThis.fontkit,fontBytes:new Uint8Array(readFileSync(new URL('../dist/assets/fonts/NotoSansJP-Regular.ttf',import.meta.url)))};
 mkdirSync(new URL('../tmp/pdfs/',import.meta.url),{recursive:true});
-const premium=fixture({plan:'premium',shorts:9,longs:3,months:2,includedHours:7,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'}]});
-premium.expenses.parking={mode:'fixed',amount:2000,cap:'',detail:'初回2か月の撮影分'};
-premium.expenses.travel={mode:'later',amount:999999,cap:30000,detail:'撮影場所までの往復交通費'};
-premium.expenses.lodging={mode:'later',amount:999999,cap:'',detail:'必要時に事前承認する宿泊費'};
+const premium=fixture({plan:'premium',shorts:9,longs:3,months:2,includedHours:7,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'},{label:'交通費・駐車場代',amount:2000,timing:'once'}]});
 for(const [name,data] of [['standard',fixture()],['premium',premium],['single',fixture({plan:'single',shorts:1,shoot4:1})],['long-text',fixture({purpose:'地域の取り組みと活動内容を丁寧に確認する。'.repeat(80),notes:'長い入力の改ページと見切れを確認するための検証文。'.repeat(60)})]]){
   test(`PDF generation, embedded Japanese font and page structure: ${name}`,async()=>{
     const bytes=await generateContract(data,deps);assert.ok(bytes.byteLength>30000);

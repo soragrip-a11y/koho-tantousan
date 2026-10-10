@@ -25,6 +25,6 @@ https://design.digital.go.jp/dads/foundations/
 
 ## 契約書PDF作成
 
-`contract.html` に契約専用フォームを追加。顧客・契約情報、動画本数、撮影、追加料金、確定実費と後日精算を入力し、署名欄を残した日本語PDFを端末内で生成します。
+`contract.html` に契約専用フォームを追加。顧客・契約情報、動画本数、撮影、事前見積もり済みの追加費用を入力し、署名欄を残した日本語PDFを端末内で生成します。
 
 詳細・導入・検証手順は [docs/contract-generator.md](docs/contract-generator.md) を参照してください。料金シミュレーターは復活させていません。
