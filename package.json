@@ -1,0 +1,12 @@
+{
+  "name": "koho-tantousan",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "sync:terms": "python3 scripts/sync-contract-terms.py"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.12"
+  }
+}
