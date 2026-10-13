@@ -198,3 +198,6 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 @media(min-width:761px){.plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .plan-card>.button{margin-top:auto}
 @media(max-width:760px){.pricing-compare:not(.plan-comparison) th,.pricing-compare:not(.plan-comparison) td{padding:.7rem .5rem;font-size:.875rem}}
+
+/* Keep the local-only inquiry form inert when its script cannot load. */
+.contact-fields{border:0;margin:0;padding:0;min-width:0}

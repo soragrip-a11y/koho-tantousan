@@ -1,5 +1,5 @@
 import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261010-provider';
-import { generateContract } from './contract-pdf.js?v=20261010-provider';
+import { generateContract } from './contract-pdf.js?v=20261013-qa';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);

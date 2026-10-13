@@ -28,3 +28,9 @@ https://design.digital.go.jp/dads/foundations/
 `contract.html` に契約専用フォームを追加。顧客・契約情報、動画本数、撮影、事前見積もり済みの追加費用を入力し、署名欄を残した日本語PDFを端末内で生成します。
 
 詳細・導入・検証手順は [docs/contract-generator.md](docs/contract-generator.md) を参照してください。料金シミュレーターは復活させていません。
+
+## 配布書類PDFの更新
+
+`downloads/document-guide.pdf` の請求例は `dist/expenses-guide.html` の請求書サンプルを基準にします。HTML更新後は `python3 scripts/generate-document-guide.py`（ReportLabが必要）で再生成し、2ページの表示と公式資料リンクを確認してください。スクリプトは明細と合計の一致を検証します。
+
+問い合わせフォームはJavaScriptの準備完了まで無効です。ローカルのみでメール文を作成する処理が使えない場合に、入力内容をURLへ送信しないための対策です。`npm test` で問い合わせの模擬動作、サイト内リンク、契約計算・PDFを検証できます。

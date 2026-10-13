@@ -63,3 +63,15 @@ test('control characters are removed without interpreting HTML-like user input',
   const text=JSON.stringify(contractSections(fixture({customer:'<script>山田</script>'})).sections);
   assert.ok(text.includes('<script>山田</script>'));
 });
+
+
+test('payment explanations match prepayment for single and first monthly work',()=>{
+  for(const overrides of [{},{plan:'premium',shorts:8,longs:2,months:2},{plan:'single',shorts:1}]){
+    const text=JSON.stringify(contractSections(fixture(overrides)).sections);
+    assert.doesNotMatch(text,/一括前払い額を示すものではない/);
+    assert.match(text,/初月・単発は着手前、月額契約の2か月目以降は当月末払い/);
+  }
+  const page=readFileSync(new URL('../dist/contract.html',import.meta.url),'utf8');
+  assert.doesNotMatch(page,/一括前払い額ではありません/);
+  assert.match(page,/初月・単発は着手前、月額契約の2か月目以降は当月末/);
+});

@@ -17,3 +17,7 @@ document.querySelectorAll('.video-player').forEach(player=>{
  img?.addEventListener('error',()=>img.remove());
  button?.addEventListener('click',()=>{const iframe=document.createElement('iframe');iframe.title=player.dataset.title;iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(player.dataset.video)+'?autoplay=1&rel=0';iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';iframe.allowFullscreen=true;iframe.referrerPolicy='strict-origin-when-cross-origin';player.replaceChildren(iframe)});
 });
+
+// Enable the inquiry form only after its local-only handlers are ready.
+const contactFields=document.querySelector('#contact-fields');
+if(contactFields)contactFields.disabled=false;
