@@ -1,5 +1,5 @@
-import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261010-provider';
-import { generateContract } from './contract-pdf.js?v=20261013-qa';
+import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261017-service';
+import { generateContract } from './contract-pdf.js?v=20261017-service';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -27,7 +27,7 @@ function invalidatePDF() {
 }
 function update() {
   const plan = PLANS[value('plan')], monthly = value('plan') !== 'single';
-  show('months-wrap', monthly); show('included-shoot', value('plan') === 'premium');
+  show('months-wrap', monthly);
   show('payer-fields', !$('payerSame').checked); $('payer').required = !$('payerSame').checked;
   $('end').readOnly = monthly; $('months').setAttribute('min', plan.months || 1);
   $('shorts').setAttribute('min', plan.short); $('longs').setAttribute('min', plan.long);
@@ -35,7 +35,7 @@ function update() {
   $('period-hint').textContent = monthly ? `最低${plan.months}か月。その後は1か月ごとに自動更新。更新停止・変更は満了14日前まで。開始日を起算し、翌月の同日の前日（同日がない場合は月末）までを1か月として計算します。月額は開始日からの1か月単位で計算します。` : '単発制作には自動更新はありません。完了予定日を指定してください。';
   $('plan-scope').textContent = plan.scope;
   $('quantity-hint').textContent = monthly ? `各月の総本数を入力。プラン内はショート${plan.short}本・ロング${plan.long}本で、超過分のみ追加計算します。` : '今回の契約全体の本数を入力してください。';
-  $('shoot-hint').textContent = monthly ? '追加撮影は毎月の回数です。4時間22,000円／回、7時間32,000円／回。プレミアムの月1回分は上の欄で指定し、追加回数には含めません。' : '今回の契約全体の撮影回数です。4時間22,000円／回、7時間32,000円／回。';
+  $('shoot-hint').textContent = monthly ? '撮影は両プランとも別料金です。毎月の撮影回数を入力します。4時間17,000円／回、7時間27,000円／回。交通費等は別途。' : '今回の契約全体の撮影回数です。4時間17,000円／回、7時間27,000円／回。交通費等は別途。';
   [0,1,2].forEach(i=>{ $('extraTiming'+i).disabled=!monthly; if(!monthly) $('extraTiming'+i).value='once'; });
   const data = collect();
   $('summary-plan').textContent = plan.name + (monthly ? ` / 初回${value('months') || '—'}か月` : ' / 1契約');
@@ -78,7 +78,7 @@ form.addEventListener('change',e=>{
   invalidatePDF(); if(e.target.id !== 'reviewed') $('reviewed').checked=false;
   if(e.target.id==='plan') {
     const p=PLANS[value('plan')]; $('shorts').value=p.short||1; $('longs').value=p.long;
-    $('months').value=p.months||1; $('includedHours').value='4'; $('end').value='';
+    $('months').value=p.months||1; $('end').value='';
     $('shoot4').value=0; $('shoot7').value=0;
   }
   update();

@@ -8,15 +8,15 @@ import {fixture} from './fixture.mjs';
 test('published plans and bundled quantities are not charged twice',()=>{
   assert.equal(calculate(fixture()).total,55000);
   const p=calculate(fixture({plan:'premium',shorts:'8',longs:'2',months:'2'}));
-  assert.equal(p.total,300000);assert.equal(p.first,150000);assert.equal(p.rows.length,1);
+  assert.equal(p.total,200000);assert.equal(p.first,100000);assert.equal(p.rows.length,1);
 });
 test('single prices match all four published shooting combinations',()=>{
-  for(const [shorts,longs,shoot4,shoot7,total] of [[1,0,1,0,30000],[1,0,0,1,40000],[0,1,1,0,40000],[0,1,0,1,50000]])
+  for(const [shorts,longs,shoot4,shoot7,total] of [[1,0,1,0,20000],[1,0,0,1,30000],[0,1,1,0,35000],[0,1,0,1,45000]])
     assert.equal(calculate(fixture({plan:'single',shorts,longs,shoot4,shoot7})).total,total);
 });
-test('premium extension and expenses use the same additional-fee rows without double counting',()=>{
-  const d=fixture({plan:'premium',shorts:9,longs:3,months:2,includedHours:7,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'},{label:'初回撮影の交通費・駐車場代',amount:2000,timing:'once'}]});
-  const c=calculate(d);assert.equal(c.recurring,208000);assert.equal(c.first,215000);assert.equal(c.total,423000);
+test('premium filming and expenses use the same additional-fee rows without double counting',()=>{
+  const d=fixture({plan:'premium',shorts:9,longs:3,months:2,shoot4:1,extras:[{label:'特殊編集',amount:5000,timing:'once'},{label:'初回撮影の交通費・駐車場代',amount:2000,timing:'once'}]});
+  const c=calculate(d);assert.equal(c.recurring,138000);assert.equal(c.first,145000);assert.equal(c.total,283000);
   assert.equal(c.rows.filter(r=>r.label.includes('交通費')).length,1);
 });
 test('recurring fees multiply by months; one-time amounts do not',()=>{
@@ -48,7 +48,7 @@ test('month-end, leap-year, cross-year and cancellation dates',()=>{
   assert.throws(()=>periodEnd('2026-02-30',1));
 });
 test('missing parties, invalid dates, email and consent are rejected',()=>{
-  for(const override of [{customer:''},{providerAddress:''},{customerEmail:'bad'},{reviewed:false},{contractDate:'2026-12-01'},{plan:'single',end:'2026-10-31'}])assert.throws(()=>validateContract(fixture(override)));
+  for(const override of [{customer:''},{customerEmail:'bad'},{reviewed:false},{contractDate:'2026-12-01'},{plan:'single',end:'2026-10-31'}])assert.throws(()=>validateContract(fixture(override)));
 });
 test('all contract inputs and all service clauses are included in PDF content',()=>{
   const d=fixture();const c=contractSections(d);const text=JSON.stringify(c.sections);
@@ -74,4 +74,14 @@ test('payment explanations match prepayment for single and first monthly work',(
   const page=readFileSync(new URL('../dist/contract.html',import.meta.url),'utf8');
   assert.doesNotMatch(page,/一括前払い額ではありません/);
   assert.match(page,/初月・単発は着手前、月額契約の2か月目以降は当月末/);
+});
+
+
+test('provider address may be left blank for later entry and is not hardcoded',async()=>{
+  const {DEFAULT_PROVIDER}=await import('../dist/contract-core.js');
+  assert.equal(DEFAULT_PROVIDER.providerAddress,'');
+  const data=fixture({providerAddress:''});
+  assert.doesNotThrow(()=>validateContract(data));
+  const text=JSON.stringify(contractSections(data).sections);
+  assert.match(text,/住所：_{32}（契約時に記入）/);
 });

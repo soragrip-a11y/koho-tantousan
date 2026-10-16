@@ -34,10 +34,11 @@ test('page connects all labels and controls; referenced local files exist',()=>{
 test('plan changes update bundles, periods and shooting without double counting',()=>{
   const h=setup();h.change('start','2026-11-01');h.change('plan','premium');
   assert.equal(h.el('months').value,'2');assert.equal(h.el('shorts').value,'8');assert.equal(h.el('longs').value,'2');
-  assert.equal(h.el('end').value,'2026-12-31');assert.equal(h.el('summary-total').textContent,'300,000円');
-  h.change('includedHours','7');assert.equal(h.el('summary-total').textContent,'320,000円');
-  h.change('plan','single');assert.equal(h.el('summary-total').textContent,'8,000円');
-  assert.equal(h.el('includedHours').disabled,true);assert.equal(h.el('end').readOnly,false);
+  assert.equal(h.el('end').value,'2026-12-31');assert.equal(h.el('summary-total').textContent,'200,000円');
+  h.change('shoot4','1');assert.equal(h.el('summary-total').textContent,'234,000円');
+  h.change('shoot4','0');h.change('shoot7','1');assert.equal(h.el('summary-total').textContent,'254,000円');
+  h.change('plan','single');assert.equal(h.el('summary-total').textContent,'3,000円');
+  assert.equal(h.el('includedHours'),null);assert.equal(h.el('end').readOnly,false);
 });
 test('additional fees, payer override and full form-to-download data flow',async()=>{
   const h=setup(),d=fixture();
@@ -50,7 +51,7 @@ test('additional fees, payer override and full form-to-download data flow',async
   await new Promise(setImmediate);
   assert.equal(h.captured().payer,'支払者テスト');for(const [key,value] of Object.entries(core.DEFAULT_PROVIDER))assert.equal(h.captured()[key],value);assert.equal(h.captured().extras[0].label,'初回撮影の交通費');
   assert.equal(h.captured().extras[0].amount,'2000');assert.equal(h.downloads(),1);assert.equal(h.el('pdf-result').hidden,false);
-  h.change('shorts',7);assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.revoked(),1);assert.equal(h.el('reviewed').checked,false);
+  h.change('shorts',9);assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.revoked(),1);assert.equal(h.el('reviewed').checked,false);
 });
 test('invalid values block creation and show an actionable error',async()=>{
   const h=setup();h.el('reviewed').checked=true;

@@ -201,3 +201,12 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 
 /* Keep the local-only inquiry form inert when its script cannot load. */
 .contact-fields{border:0;margin:0;padding:0;min-width:0}
+
+/* General-audience service positioning, October 2026. */
+.strengths { border-bottom: 1px solid var(--line); }
+.strength-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; }
+.strength-grid article { min-width: 0; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius-card, 6px); background: #fff; }
+.strength-grid h3 { margin-top: 1.25rem; font-size: 1.125rem; }
+.strength-grid p { margin-bottom: 0; color: var(--muted); font-size: 1rem; }
+@media (max-width: 1000px) { .strength-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .strength-grid { grid-template-columns: 1fr; gap: 1rem; } .strength-grid article { padding: 1.5rem; } }

@@ -1,5 +1,5 @@
-import { validateContract, clean, yen, renewalDeadline } from './contract-core.js?v=20261010-provider';
-import { TERMS } from './contract-terms.js';
+import { validateContract, clean, yen, renewalDeadline } from './contract-core.js?v=20261017-service';
+import { TERMS } from './contract-terms.js?v=20261017-service';
 
 export function contractSections(data) {
   const c = validateContract(data), d = Object.fromEntries(Object.entries(data).map(([k,v])=>[k,typeof v==='string'?clean(v):v]));
@@ -8,14 +8,14 @@ export function contractSections(data) {
   section('1. 契約当事者・契約期間',[
     `契約日：${d.contractDate}`,
     `委託者（甲）：${d.customer}\n代表者・署名者：${d.customerSigner}\n住所：${d.customerAddress}\nメール：${d.customerEmail}\n電話：${d.customerPhone || '記載なし'}\n支払者・請求書宛名：${d.payer}`,
-    `受託者（乙）：${d.provider}\n氏名：${d.providerSigner}\n住所：${d.providerAddress}\nメール：${d.providerEmail}`,
+    `受託者（乙）：${d.provider}\n氏名：${d.providerSigner}\n住所：${d.providerAddress || '________________________________（契約時に記入）'}\nメール：${d.providerEmail}`,
     `対象期間：${d.start} 〜 ${c.end}${c.monthly ? `（初回${c.months}か月）` : '（単発）'}`,
     c.monthly ? `最低利用期間は${c.plan.months}か月。初回期間満了後は1か月ごとに自動更新。初回の更新停止・プラン変更の連絡期限は${renewalDeadline(c.end)}（満了14日前）。開始日を起算し、翌月の同日の前日（同日がない場合は月末）までを1か月として計算。月額は開始日からの1か月単位で計算する。` : '単発契約のため自動更新なし。'
   ]);
   section('2. 委託する制作・運用業務',[
     `プラン：${c.plan.name}\n${c.plan.scope}`,
     `${c.monthly?'毎月':'契約全体'}の制作本数：ショート${c.shorts}本（各1分以内）、ロング${c.longs}本（各10分以内）。ショートは動画内表紙、ロングはサムネイル各1枚を含む。`,
-    `撮影：${c.monthly?'毎月':'契約全体'} ${d.plan==='premium'?`プラン内1回・${d.includedHours}時間まで ＋ `:''}追加4時間枠${c.shoot4}回、追加7時間枠${c.shoot7}回。準備・休憩・撤収を含む。`,
+    `撮影：${c.monthly?'毎月':'契約全体'} 4時間枠${c.shoot4}回、7時間枠${c.shoot7}回。全プランで撮影は別料金。準備・休憩・撤収を含む。交通費等は別途。`,
     `発信目的・制作内容：\n${d.purpose}`,
     '公開先・対象チャンネルおよび素材提供・撮影・納品・公開の日程は、業務の実施前に双方で確認・合意する。',
     `完成動画の利用範囲：\n${d.usage}`,
@@ -82,7 +82,7 @@ export async function generateContract(data,{PDFLib,fontkit,fontBytes}) {
   paragraph('委託者（甲）と受託者（乙）は、以下の個別条件および本書に収録するサービス利用条件に基づき、業務を委託・受託します。',10);
   for(const s of content.sections){heading(s.title);s.paragraphs.forEach(p=>paragraph(p));}
   newPage();heading('別紙 サービス利用条件');
-  paragraph('本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月10日。元ページ： https://local-koho.com/terms.html',9);
+  paragraph('本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月17日。元ページ： https://local-koho.com/terms.html',9);
   for(const term of content.terms){heading(term.title);paragraph(term.text);}
   need(360);heading('双方の確認・署名');
   paragraph(`契約日：${content.data.contractDate}\n本書の個別条件および別紙利用条件を確認し、合意します。PDFの生成だけで契約は確定しません。`,10);

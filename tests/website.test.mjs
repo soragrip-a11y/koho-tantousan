@@ -59,3 +59,35 @@ test('all local website links, assets and fragment targets exist',()=>{
   }
  }
 });
+
+test('general audience leads, with political experience retained as a secondary specialty',()=>{
+ const {document}=parseHTML(read('index.html'));
+ assert.match(document.querySelector('.service-label').textContent,/個人・お店・企業・団体/);
+ assert.equal(document.querySelectorAll('.strength-grid article').length,4);
+ const sections=[...document.querySelector('main').children];
+ assert.ok(sections.findIndex(x=>x.classList.contains('expertise'))>sections.findIndex(x=>x.id==='service'));
+ for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){
+  const {document:page}=parseHTML(read(file));
+  if(page.querySelector('footer'))assert.doesNotMatch(page.querySelector('footer').textContent,/地方議員向け/);
+ }
+});
+test('official LINE destination stays verified and always-contact wording has a reply window',()=>{
+ for(const file of ['index.html','contact.html','pricing.html']){
+  const {document}=parseHTML(read(file));
+  const band=document.querySelector('.contact-band');
+  assert.match(band.textContent,/いつでも送信/);assert.match(band.textContent,/順次、原則2営業日以内/);
+  for(const a of document.querySelectorAll('a.line-button'))assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
+ }
+});
+test('published single prices and shooting combinations match contract calculations',async()=>{
+ const {PRICES}=await import('../dist/contract-core.js');
+ const {document}=parseHTML(read('pricing.html'));
+ const rows=[...document.querySelectorAll('tr')].map(x=>x.textContent.replace(/\s/g,''));
+ for(const [label,amount] of [['ショート編集〈1分以内〉',PRICES.short],['ロング編集〈10分以内〉',PRICES.long],['訪問撮影〈4時間まで〉',PRICES.shoot4],['訪問撮影〈7時間まで〉',PRICES.shoot7]]){
+  assert.ok(rows.some(x=>x.startsWith(label)&&x.includes(amount.toLocaleString('ja-JP')+'円')),label);
+ }
+ for(const [label,unit] of [['撮影＋ショート1本',PRICES.short],['撮影＋ロング1本',PRICES.long]]){
+  assert.ok(rows.includes(label+(unit+PRICES.shoot4).toLocaleString('ja-JP')+'円'+(unit+PRICES.shoot7).toLocaleString('ja-JP')+'円'),label);
+ }
+ assert.doesNotMatch(document.body.textContent,/単発換算|[124]22,000円|32,000円|(?<!\d)8,000円/);
+});

@@ -1,9 +1,9 @@
-export const DEFAULT_PROVIDER = Object.freeze({ provider: 'ソラグリップ（広報担当さん）', providerSigner: '須永 空和', providerEmail: 'sora.grip@gmail.com', providerAddress: '千葉県君津市常代5-7-36' });
+export const DEFAULT_PROVIDER = Object.freeze({ provider: 'ソラグリップ（広報担当さん）', providerSigner: '須永 空和', providerEmail: 'sora.grip@gmail.com', providerAddress: '' });
 // All public service prices are tax-inclusive. Never add tax again.
-export const PRICES = Object.freeze({ standard: 55000, premium: 150000, short: 8000, long: 18000, shoot4: 22000, shoot7: 32000, extension: 10000 });
+export const PRICES = Object.freeze({ standard: 55000, premium: 100000, short: 3000, long: 18000, shoot4: 17000, shoot7: 27000 });
 export const PLANS = Object.freeze({
-  standard: { name: 'スタンダード', short: 6, long: 0, months: 1, scope: '発信テーマの整理・構成提案・編集・タイトル・説明文案、月1回30分までのオンライン相談と簡単な振り返り。撮影・投稿はお客様。' },
-  premium: { name: 'プレミアム', short: 8, long: 2, months: 2, scope: '月間企画・構成提案・編集・タイトル・説明文案、月1回の訪問撮影、YouTube 1チャンネルへの投稿・予約、月次レポート・改善提案、月1回60分までのオンライン相談。公開前にお客様の承認を得る。' },
+  standard: { name: 'スタンダード', short: 8, long: 0, months: 1, scope: '発信テーマの整理・構成提案・編集・タイトル・説明文案、月1回30分までのオンライン相談と簡単な振り返り。撮影・投稿はお客様。' },
+  premium: { name: 'プレミアム', short: 8, long: 2, months: 2, scope: '月間企画・構成提案・編集・タイトル・説明文案、YouTube 1チャンネルへの投稿・予約、月次レポート・改善提案、月1回60分までのオンライン相談。公開前にお客様の承認を得る。撮影はお客様。訪問撮影は別料金で追加可能。' },
   single: { name: '単発制作', short: 0, long: 0, months: 0, scope: '依頼動画の構成確認・編集・タイトル・説明文案。制作に必要な確認に対応。投稿はお客様。' }
 });
 export const yen = n => new Intl.NumberFormat('ja-JP').format(n) + '円';
@@ -37,14 +37,12 @@ export function calculate(data) {
   if (shorts < p.short || longs < p.long) throw new Error('プラン標準本数を下回る構成・動画の交換は個別見積もりです。無料相談からご連絡ください。');
   const shoot4 = integer(data.shoot4, '追加4時間撮影回数', 31), shoot7 = integer(data.shoot7, '追加7時間撮影回数', 31);
   if (!monthly && shorts + longs + shoot4 + shoot7 === 0) throw new Error('単発制作は動画または撮影を1件以上指定してください。');
-  if (data.plan === 'premium' && !['4','7'].includes(String(data.includedHours))) throw new Error('プレミアムの撮影時間を選択してください。');
   const rows = [];
   const add = (label, qty, unit, timing) => { if (qty) rows.push({ label, qty, unit, amount: qty * unit, timing }); };
   const frequency = monthly ? 'monthly' : 'once';
   if (monthly) add(`${p.name}基本料金`, 1, PRICES[data.plan], 'monthly');
   add(monthly ? '追加ショート（1分以内）' : 'ショート（1分以内）', shorts-p.short, PRICES.short, frequency);
   add(monthly ? '追加ロング（10分以内）' : 'ロング（10分以内）', longs-p.long, PRICES.long, frequency);
-  if (data.plan === 'premium' && String(data.includedHours) === '7') add('プラン内撮影の7時間への延長', 1, PRICES.extension, 'monthly');
   add('追加訪問撮影（4時間まで）', shoot4, PRICES.shoot4, frequency);
   add('追加訪問撮影（7時間まで）', shoot7, PRICES.shoot7, frequency);
   for (const extra of data.extras || []) {
@@ -59,7 +57,7 @@ export function calculate(data) {
   return {plan:p,monthly,months,shorts,longs,shoot4,shoot7,rows,recurring,oneTime,total,first:recurring+oneTime};
 }
 export function validateContract(data) {
-  const required = ['customer','customerSigner','customerAddress','customerEmail','provider','providerSigner','providerAddress','providerEmail','payer','purpose','usage'];
+  const required = ['customer','customerSigner','customerAddress','customerEmail','provider','providerSigner','providerEmail','payer','purpose','usage'];
   for (const k of required) if (!clean(data[k])) throw new Error('契約者・受託者・制作条件の必須項目をすべて入力してください。');
   for (const [k,v] of Object.entries(data)) if (typeof v === 'string' && v.length > 2000) throw new Error('入力が長すぎます。2,000文字以内にしてください。');
   for (const k of ['customerEmail','providerEmail']) if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data[k])) throw new Error('有効なメールアドレスを入力してください。');
