@@ -79,15 +79,23 @@ test('official LINE destination stays verified and always-contact wording has a 
   for(const a of document.querySelectorAll('a.line-button'))assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
  }
 });
-test('published single prices and shooting combinations match contract calculations',async()=>{
- const {PRICES}=await import('../dist/contract-core.js');
+test('compact proposal preserves recommended videos and the existing homepage sections',()=>{
+ const {document}=parseHTML(read('index.html'));
+ assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
+ assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube.com/.test(x)),['https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=YCXll8IjTB8']);
+ assert.equal(document.querySelectorAll('main > section').length,8);
+ assert.equal(document.querySelectorAll('.mini-price-table').length,1);
+ assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
+ assert.ok(document.querySelectorAll('main > section')[5].classList.contains('pricing-teaser'));
+});
+test('new proposal prices, inclusions and trial are separate from old documents',()=>{
  const {document}=parseHTML(read('pricing.html'));
- const rows=[...document.querySelectorAll('tr')].map(x=>x.textContent.replace(/\s/g,''));
- for(const [label,amount] of [['ショート編集〈1分以内〉',PRICES.short],['ロング編集〈10分以内〉',PRICES.long],['訪問撮影〈4時間まで〉',PRICES.shoot4],['訪問撮影〈7時間まで〉',PRICES.shoot7]]){
-  assert.ok(rows.some(x=>x.startsWith(label)&&x.includes(amount.toLocaleString('ja-JP')+'円')),label);
- }
- for(const [label,unit] of [['撮影＋ショート1本',PRICES.short],['撮影＋ロング1本',PRICES.long]]){
-  assert.ok(rows.includes(label+(unit+PRICES.shoot4).toLocaleString('ja-JP')+'円'+(unit+PRICES.shoot7).toLocaleString('ja-JP')+'円'),label);
- }
- assert.doesNotMatch(document.body.textContent,/単発換算|[124]22,000円|32,000円|(?<!\d)8,000円/);
+ const heads=[...document.querySelectorAll('.mini-price-table thead th')].map(x=>x.textContent);
+ assert.equal(heads.length,4);
+ for(const [i,p]of [[1,'30,000円'],[2,'80,000円'],[3,'120,000円']])assert.ok(heads[i].includes(p));
+ assert.match(heads[2],/おすすめ.*伴走型/);
+ const rows=[...document.querySelectorAll('.mini-price-table tbody tr')];
+ for(const label of ['企画相談','YouTube投稿','タイトル・説明文','月次振り返り・改善提案'])assert.deepEqual([...rows.find(r=>r.querySelector('th').textContent===label).querySelectorAll('td')].map(x=>x.textContent),['×','○','○']);
+ for(const text of ['3本15,000円＋半日撮影15,000円＝合計30,000円','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません','旧条件'])assert.ok(document.body.textContent.includes(text));
+ for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.equal(d.querySelectorAll('a[href^="contract.html"]').length,0);}
 });
