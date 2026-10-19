@@ -210,3 +210,6 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 .strength-grid p { margin-bottom: 0; color: var(--muted); font-size: 1rem; }
 @media (max-width: 1000px) { .strength-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .strength-grid { grid-template-columns: 1fr; gap: 1rem; } .strength-grid article { padding: 1.5rem; } }
+
+/* Portrait in the existing staff introduction grid. */
+.about-portrait{display:block;width:100%;max-width:480px;height:auto;aspect-ratio:1;object-fit:cover;object-position:center 65%;align-self:start;border-top:3px solid var(--ink)}
