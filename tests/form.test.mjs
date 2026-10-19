@@ -16,7 +16,7 @@ function setup(){
   let captured,revoked=0,downloads=0;
   document.querySelector('#pdf-download').click=()=>downloads++;
   const context=vm.createContext({document,console,Intl,Date,URL:{createObjectURL:()=> 'blob:pdf-test',revokeObjectURL:()=>revoked++},Blob,setTimeout,clearTimeout,Uint8Array,PDFLib:{},fontkit:{},fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)}),AbortController,...core,generateContract:async data=>{core.validateContract(data);captured=data;return new Uint8Array([37,80,68,70]);}});
-  const source=readFileSync(new URL('../dist/contract.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'');
+  const source=readFileSync(new URL('../dist/contract.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');
   vm.runInContext(source,context);
   const el=id=>document.getElementById(id);
   const change=(id,v)=>{el(id).value=String(v);el(id).dispatchEvent(new window.Event('change',{bubbles:true}));};

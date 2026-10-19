@@ -53,7 +53,7 @@ test('missing parties, invalid dates, email and consent are rejected',()=>{
 test('all contract inputs and all service clauses are included in PDF content',()=>{
   const d=fixture();const c=contractSections(d);const text=JSON.stringify(c.sections);
   for(const key of ['customer','customerSigner','customerAddress','customerEmail','providerAddress','payer','purpose','usage','notes'])assert.ok(text.includes(d[key]));
-  const terms=readFileSync(new URL('../dist/contract-terms.js',import.meta.url),'utf8');
+  const terms=readFileSync(new URL('../dist/terms.html',import.meta.url),'utf8');
   assert.equal(c.terms.length,12);
   for(const t of c.terms){assert.ok(terms.includes(t.title));assert.ok(terms.includes(t.text));}
   assert.ok(text.includes('55,000円'));assert.ok(text.includes('2026-11-30'));

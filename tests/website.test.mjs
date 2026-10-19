@@ -79,22 +79,15 @@ test('official LINE destination stays verified and always-contact wording has a 
   for(const a of document.querySelectorAll('a.line-button'))assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
  }
 });
-test('proposal rates are centralized and distinguish included services',()=>{
+test('published single prices and shooting combinations match contract calculations',async()=>{
+ const {PRICES}=await import('../dist/contract-core.js');
  const {document}=parseHTML(read('pricing.html'));
- const headers=[...document.querySelectorAll('.proposal-table thead th')].map(x=>x.textContent);
- assert.equal(headers.length,4);
- for(const [i,price] of [[1,'30,000'],[2,'80,000'],[3,'120,000']])assert.ok(headers[i].includes(price));
- assert.match(headers[2],/おすすめ.*伴走型/);
- const rows=[...document.querySelectorAll('.proposal-table tbody tr')];
- for(const label of ['企画相談','YouTube投稿代行','タイトル・説明文','月次振り返り・改善提案'])assert.deepEqual([...rows.find(r=>r.querySelector('th').textContent===label).querySelectorAll('td')].map(x=>x.textContent),['×','○','○']);
- assert.match(document.body.textContent,/3本15,000円＋半日撮影15,000円/);
- assert.match(document.body.textContent,/2回目以降は内容により相談/);
- assert.match(document.body.textContent,/独自動画制作.*含みません/);
- for(const file of ['index.html','pricing.html','terms.html','contact.html']) {
-  const {document:page}=parseHTML(read(file));
-  assert.doesNotMatch(page.body.textContent,/55,000|100,000/);
-  assert.equal(page.querySelectorAll('a[href^="contract.html"]').length,0);
-  assert.match(page.body.textContent,/仮案/);
+ const rows=[...document.querySelectorAll('tr')].map(x=>x.textContent.replace(/\s/g,''));
+ for(const [label,amount] of [['ショート編集〈1分以内〉',PRICES.short],['ロング編集〈10分以内〉',PRICES.long],['訪問撮影〈4時間まで〉',PRICES.shoot4],['訪問撮影〈7時間まで〉',PRICES.shoot7]]){
+  assert.ok(rows.some(x=>x.startsWith(label)&&x.includes(amount.toLocaleString('ja-JP')+'円')),label);
  }
- assert.match(parseHTML(read('expenses-guide.html')).document.querySelector('.proposal-note').textContent,/旧条件/);
+ for(const [label,unit] of [['撮影＋ショート1本',PRICES.short],['撮影＋ロング1本',PRICES.long]]){
+  assert.ok(rows.includes(label+(unit+PRICES.shoot4).toLocaleString('ja-JP')+'円'+(unit+PRICES.shoot7).toLocaleString('ja-JP')+'円'),label);
+ }
+ assert.doesNotMatch(document.body.textContent,/単発換算|[124]22,000円|32,000円|(?<!\d)8,000円/);
 });
