@@ -220,3 +220,12 @@ nav a:hover, nav a[aria-current=page] { text-decoration: underline; text-underli
 
 @media(min-width:761px){.compact-price-section{grid-template-columns:1fr 1.4fr}}
 .compact-price-section .mini-price-note{margin-bottom:4px}.compact-price-section .text-link{margin-top:4px}
+
+/* Keep plan prices aligned; reserve scroll space for the floating badge. */
+.mini-price-scroll{padding-top:25px;border:0;border-radius:0}
+.mini-price-table{border:1px solid var(--line)}
+.mini-price-table thead th{position:relative;vertical-align:bottom;border-top:3px solid #f7f3ec}
+.mini-price-table thead th strong{font-size:1.15rem;line-height:1.5;margin-top:4px}
+.mini-price-table .mini-recommend{border-top-color:#b46300}
+.mini-price-table .mini-recommend span{position:absolute;top:-25px;left:50%;transform:translateX(-50%);z-index:2;display:block;white-space:nowrap;background:#8b4500;color:#fff;border-radius:12px;padding:2px 12px;font-size:.75rem;line-height:1.5}
+.mini-price-table .mini-recommend span::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#8b4500;border-bottom:0}
