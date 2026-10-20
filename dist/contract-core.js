@@ -77,7 +77,7 @@ export function validateContract(data) {
   const end = result.monthly ? periodEnd(data.start, result.months) : data.end;
   dateValue(end);
   if (end < data.start) throw new Error('終了日は開始日以降にしてください。');
-  if (data.contractDate > data.start) throw new Error('契約日は開始日以前にしてください。');
+  if ((data.documentType||'contract')==='contract' && data.contractDate > data.start) throw new Error('契約日は開始日以前にしてください。');
   if (!['no','separate'].includes(data.portfolio)) throw new Error('実績掲載の扱いを選択してください。');
   if (!data.reviewed) throw new Error('入力内容と利用条件を確認してください。');
   return {...result,end};

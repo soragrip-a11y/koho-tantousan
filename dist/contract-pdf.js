@@ -1,6 +1,6 @@
 
-import { validateContract, clean, yen } from './contract-core.js?v=20261020-terms';
-import { TERMS } from './contract-terms.js?v=20261020-terms';
+import { validateContract, clean, yen } from './contract-core.js?v=20261020-final';
+import { TERMS } from './contract-terms.js?v=20261020-final';
 export const DOCUMENT_TITLES={contract:'動画制作・運用支援 業務委託契約書',estimate:'動画制作・運用支援 見積書',invoice:'動画制作・運用支援 請求書'};
 export function contractSections(data) {
  const c=validateContract(data),d=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,typeof v==='string'?clean(v):v]));

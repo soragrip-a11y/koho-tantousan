@@ -53,3 +53,7 @@ test('control characters are cleaned and provider address remains fillable later
  assert.equal(clean('  <img src=x>\u0000\u202e  '),'<img src=x>');assert.equal(DEFAULT_PROVIDER.providerAddress,'');
  assert.match(JSON.stringify(contractSections(fixture({providerAddress:''})).sections),/住所：_{32}（契約時に記入）/);
 });
+test('later monthly invoices may be issued after the service start date',()=>{
+ const data=fixture({plan:'companion',months:3,documentType:'invoice',invoiceMonth:2,contractDate:'2026-12-01',paymentDue:'2026-12-31'});
+ assert.equal(validateContract(data).invoiceTotal,80000);
+});
