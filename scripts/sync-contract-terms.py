@@ -17,6 +17,6 @@ class TermsParser(HTMLParser):
         if tag in ('h2','p'): self.part=None
         if tag=='section' and self.active:
             self.sections.append(self.current); self.active=False
-parser=TermsParser(); parser.feed((ROOT/'dist/terms.html').read_text())
+parser=TermsParser(); parser.feed((ROOT/'dist/terms.html').read_text(encoding='utf-8'))
 if len(parser.sections)<10: raise RuntimeError('Expected all published service clauses')
-(ROOT/'dist/contract-terms.js').write_text('// Generated from terms.html by npm run sync:terms. Keep this snapshot in the signed PDF.\nexport const TERMS = '+json.dumps(parser.sections,ensure_ascii=False,indent=2)+';\n')
+(ROOT/'dist/contract-terms.js').write_text('// Generated from terms.html by npm run sync:terms. Keep this snapshot in the signed PDF.\nexport const TERMS = '+json.dumps(parser.sections,ensure_ascii=False,indent=2)+';\n', encoding='utf-8')

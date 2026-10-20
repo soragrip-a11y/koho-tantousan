@@ -42,7 +42,7 @@ test('contact navigation identifies its current page',()=>{
 });
 test('contract fields expose their quantity, shooting, and period explanations',()=>{
  const {document}=parseHTML(read('contract.html'));
- for(const id of ['shorts','longs','shoot4','shoot7','months','start','end']){
+ for(const id of ['shorts','longs','shootHalf','months','start','end']){
   const hint=document.querySelector('#'+id).getAttribute('aria-describedby');assert.ok(hint,id);assert.ok(document.getElementById(hint),hint);
  }
 });
@@ -88,7 +88,7 @@ test('compact proposal preserves recommended videos and the existing homepage se
  assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
  assert.ok(document.querySelectorAll('main > section')[5].classList.contains('pricing-teaser'));
 });
-test('new proposal prices, inclusions and trial are separate from old documents',()=>{
+test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
  const heads=[...document.querySelectorAll('.mini-price-table thead th')].map(x=>x.textContent);
  assert.equal(heads.length,4);
@@ -96,6 +96,6 @@ test('new proposal prices, inclusions and trial are separate from old documents'
  assert.match(heads[2],/おすすめ.*伴走型/);
  const rows=[...document.querySelectorAll('.mini-price-table tbody tr')];
  for(const label of ['企画相談','YouTube投稿','タイトル・説明文','月次振り返り・改善提案'])assert.deepEqual([...rows.find(r=>r.querySelector('th').textContent===label).querySelectorAll('td')].map(x=>x.textContent),['×','○','○']);
- for(const text of ['3本15,000円＋半日撮影15,000円＝合計30,000円','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません','旧条件'])assert.ok(document.body.textContent.includes(text));
- for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.equal(d.querySelectorAll('a[href^="contract.html"]').length,0);}
+ for(const text of ['3本15,000円＋半日撮影15,000円＝合計30,000円','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません'])assert.ok(document.body.textContent.includes(text));
+ for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
 });

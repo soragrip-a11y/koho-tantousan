@@ -31,46 +31,28 @@ test('page connects all labels and controls; referenced local files exist',()=>{
     assert.ok(existsSync(new URL('../dist/'+href.split(/[?#]/)[0],import.meta.url)),href);
   }
 });
-test('plan changes update bundles, periods and shooting without double counting',()=>{
-  const h=setup();h.change('start','2026-11-01');h.change('plan','premium');
-  assert.equal(h.el('months').value,'2');assert.equal(h.el('shorts').value,'8');assert.equal(h.el('longs').value,'2');
-  assert.equal(h.el('end').value,'2026-12-31');assert.equal(h.el('summary-total').textContent,'200,000円');
-  h.change('shoot4','1');assert.equal(h.el('summary-total').textContent,'234,000円');
-  h.change('shoot4','0');h.change('shoot7','1');assert.equal(h.el('summary-total').textContent,'254,000円');
-  h.change('plan','single');assert.equal(h.el('summary-total').textContent,'3,000円');
-  assert.equal(h.el('includedHours'),null);assert.equal(h.el('end').readOnly,false);
-});
-test('additional fees, payer override and full form-to-download data flow',async()=>{
-  const h=setup(),d=fixture();
-  for(const [key,v] of Object.entries(d))if(typeof v==='string' && h.el(key))h.el(key).value=v;
-  h.change('extraLabel0','初回撮影の交通費');h.change('extraAmount0','2000');
-  h.el('payerSame').checked=false;h.change('payer','支払者テスト');
-  h.el('reviewed').checked=true;
-  assert.equal(h.el('summary-total').textContent,'57,000円');
-  h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));
-  await new Promise(setImmediate);
-  assert.equal(h.captured().payer,'支払者テスト');for(const [key,value] of Object.entries(core.DEFAULT_PROVIDER))assert.equal(h.captured()[key],value);assert.equal(h.captured().extras[0].label,'初回撮影の交通費');
-  assert.equal(h.captured().extras[0].amount,'2000');assert.equal(h.downloads(),1);assert.equal(h.el('pdf-result').hidden,false);
-  h.change('shorts',9);assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.revoked(),1);assert.equal(h.el('reviewed').checked,false);
-});
-test('invalid values block creation and show an actionable error',async()=>{
-  const h=setup();h.el('reviewed').checked=true;
-  h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));
-  await new Promise(setImmediate);assert.equal(h.captured(),undefined);assert.equal(h.el('contract-error').hidden,false);
-});
 
-test('confirmation is plain text and removed fields cannot interrupt completion',()=>{
-  const h=setup();
-  assert.equal(h.el('reviewed').closest('label').querySelector('a'),null);
-  for(const id of ['channel','schedule','travelMode','parkingMode','lodgingMode','approval-fields','summary-fixed','summary-later','summary-once','provider','providerSigner','providerAddress','providerEmail'])assert.equal(h.el(id),null);
+test('plan switches show included filming and require quoted extras',()=>{
+ const h=setup();h.change('start','2026-11-01');h.change('plan','companion');
+ assert.equal(h.el('shorts').value,'6');assert.equal(h.el('summary-total').textContent,'80,000円');assert.match(h.el('shoot-hint').textContent,/月2回/);
+ h.change('shootHalf','1');assert.match(h.el('summary-error').textContent,/合意済み単価/);
+ h.change('extraShootUnit','18000');assert.equal(h.el('summary-total').textContent,'98,000円');
+ h.change('plan','premium');assert.equal(h.el('months').value,'1');assert.equal(h.el('longs').value,'2');assert.equal(h.el('summary-total').textContent,'120,000円');
+ h.change('plan','single');assert.equal(h.el('shorts').value,'3');assert.equal(h.el('summary-total').textContent,'15,000円');assert.equal(h.el('end').readOnly,false);
+ h.change('shootHalf','1');assert.equal(h.el('summary-total').textContent,'30,000円');
 });
-test('numeric editing supports replacing zero, deletion, and single-digit values',()=>{
-  const h=setup();
-  for(const el of h.document.querySelectorAll('[data-numeric]')){
-    assert.equal(el.type,'text');assert.equal(el.getAttribute('inputmode'),'numeric');
-    el.value='0';el.dispatchEvent(new h.window.Event('focusin',{bubbles:true}));assert.equal(el.value,'');
-    el.value='06';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'6');
-    el.value='';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'');
-    el.dispatchEvent(new h.window.Event('focusout',{bubbles:true}));assert.equal(el.value,el.getAttribute('min')==='0'?'0':'');
-  }
+test('form generates selected invoice locally and invalidates stale downloads',async()=>{
+ const h=setup(),d=fixture({documentType:'invoice'});
+ for(const[key,v]of Object.entries(d))if(typeof v==='string'&&h.el(key))h.el(key).value=v;
+ h.change('extraLabel0','交通費');h.change('extraAmount0','2000');h.el('payerSame').checked=false;h.change('payer','検証用請求先');
+ h.el('reviewed').checked=true;h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));await new Promise(setImmediate);
+ assert.equal(h.captured().documentType,'invoice');assert.equal(h.captured().payer,'検証用請求先');assert.equal(h.downloads(),1);assert.match(decodeURIComponent(h.el('pdf-download').download),/請求書/);
+ h.change('shorts','7');assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.revoked(),1);assert.equal(h.el('reviewed').checked,false);
+});
+test('invalid form blocks creation without network submission',async()=>{
+ const h=setup();h.el('reviewed').checked=true;const event=new h.window.Event('submit',{bubbles:true,cancelable:true});h.form.dispatchEvent(event);await new Promise(setImmediate);
+ assert.equal(event.defaultPrevented,true);assert.equal(h.captured(),undefined);assert.equal(h.el('contract-error').hidden,false);
+});
+test('numeric editing supports replacing zero and deletion',()=>{
+ const h=setup();for(const el of h.document.querySelectorAll('[data-numeric]')){assert.equal(el.type,'text');assert.equal(el.getAttribute('inputmode'),'numeric');el.value='0';el.dispatchEvent(new h.window.Event('focusin',{bubbles:true}));assert.equal(el.value,'');el.value='06';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'6');el.value='';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'');}
 });

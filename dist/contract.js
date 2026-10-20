@@ -1,5 +1,5 @@
-import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261017-service';
-import { generateContract } from './contract-pdf.js?v=20261017-service';
+import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261020-terms';
+import { generateContract } from './contract-pdf.js?v=20261020-terms';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -11,7 +11,7 @@ function show(id, visible) {
 }
 function collect() {
   const data = {};
-  form.querySelectorAll('[name]').forEach(el => data[el.name] = el.hasAttribute('data-numeric') && el.value === '' && el.getAttribute('min') === '0' ? '0' : clean(el.value));
+  form.querySelectorAll('[name]').forEach(el => data[el.name] = el.hasAttribute('data-numeric') && !['extraShortUnit','extraLongUnit','extraShootUnit'].includes(el.id) && el.value === '' && el.getAttribute('min') === '0' ? '0' : clean(el.value));
   Object.assign(data, DEFAULT_PROVIDER);
   data.payer = $('payerSame').checked ? data.customer : data.payer;
   data.reviewed = $('reviewed').checked;
@@ -27,15 +27,20 @@ function invalidatePDF() {
 }
 function update() {
   const plan = PLANS[value('plan')], monthly = value('plan') !== 'single';
+  show('invoice-fields',value('documentType')==='invoice');$('paymentDue').required=value('documentType')==='invoice';
+  show('extra-short-unit',monthly&&Number(value('shorts'))>plan.short);
+  show('extra-long-unit',monthly&&Number(value('longs'))>plan.long);
+  show('extra-shoot-unit',monthly&&value('plan')!=='standard'&&Number(value('shootHalf'))>0);
+  show('tiktok-wrap',monthly);if(!monthly)$('tiktok').value='0';
   show('months-wrap', monthly);
   show('payer-fields', !$('payerSame').checked); $('payer').required = !$('payerSame').checked;
   $('end').readOnly = monthly; $('months').setAttribute('min', plan.months || 1);
   $('shorts').setAttribute('min', plan.short); $('longs').setAttribute('min', plan.long);
   if (monthly) { try { $('end').value = periodEnd(value('start'),value('months')); } catch { $('end').value = ''; } }
-  $('period-hint').textContent = monthly ? `最低${plan.months}か月。その後は1か月ごとに自動更新。更新停止・変更は満了14日前まで。開始日を起算し、翌月の同日の前日（同日がない場合は月末）までを1か月として計算します。月額は開始日からの1か月単位で計算します。` : '単発制作には自動更新はありません。完了予定日を指定してください。';
+  $('period-hint').textContent = monthly ? '個別に合意した月数を入力します。最低利用期間や自動更新を設定するものではありません。開始日から1か月単位で計算し、継続・更新は別途合意します。' : '初回お試しです。完了予定日を指定してください。自動更新はありません。';
   $('plan-scope').textContent = plan.scope;
-  $('quantity-hint').textContent = monthly ? `各月の総本数を入力。プラン内はショート${plan.short}本・ロング${plan.long}本で、超過分のみ追加計算します。` : '今回の契約全体の本数を入力してください。';
-  $('shoot-hint').textContent = monthly ? '撮影は両プランとも別料金です。毎月の撮影回数を入力します。4時間17,000円／回、7時間27,000円／回。交通費等は別途。' : '今回の契約全体の撮影回数です。4時間17,000円／回、7時間27,000円／回。交通費等は別途。';
+  $('quantity-hint').textContent = monthly ? `各月の本数。基本料金内はショート${plan.short}本・ロング${plan.long}本。超過分は合意済みの単価（税込）を入力してください。` : '初回お試しはショート3本以上、1本5,000円（税込）。ロングは対象外です。';
+  $('shoot-hint').textContent = !monthly ? '初回お試しの半日撮影は1回15,000円（税込）、交通費別途。追加撮影は個別相談です。' : value('plan')==='standard' ? 'スタンダードの半日撮影は別途17,000円／回（税込）。各月の回数を入力します。交通費別途。' : '月2回の半日撮影は基本料金内です。ここには月2回を超える追加分のみ入力し、合意済み単価を指定します。交通費別途。';
   [0,1,2].forEach(i=>{ $('extraTiming'+i).disabled=!monthly; if(!monthly) $('extraTiming'+i).value='once'; });
   const data = collect();
   $('summary-plan').textContent = plan.name + (monthly ? ` / 初回${value('months') || '—'}か月` : ' / 1契約');
@@ -47,7 +52,7 @@ function update() {
     // The one-off total is shown once; do not duplicate custom rows in the headline.
     $('summary-recurring').textContent = yen(monthly ? c.recurring : c.oneTime);
     $('summary-total').textContent = yen(c.total);
-    $('final-total').textContent = `初回契約期間の確定総額：${yen(c.total)}（税込）／後日精算の実費は含みません。`;
+    $('final-total').textContent = `指定期間の確定総額：${yen(c.total)}（税込）${value('documentType')==='invoice'?'／今回の請求額：'+yen(c.invoiceTotal):''}。後日精算の実費は含みません。`;
     $('summary-lines').replaceChildren(...c.rows.map(r=>{const p=document.createElement('p');p.textContent=`${r.label} × ${r.qty}：${yen(r.amount)}${r.timing==='monthly'?'／月':'／契約'}`;return p;}));
   } catch(e) {
     $('summary-error').textContent = e.message; $('final-total').textContent = '入力内容を確認すると、ここに確定総額が表示されます。';
@@ -63,7 +68,7 @@ form.addEventListener('focusin',e=>{
 });
 form.addEventListener('focusout',e=>{
   if(busy || !e.target.hasAttribute('data-numeric'))return;
-  if(e.target.value === '' && e.target.getAttribute('min') === '0') e.target.value = '0';
+  if(e.target.value === '' && e.target.getAttribute('min') === '0' && !['extraShortUnit','extraLongUnit','extraShootUnit'].includes(e.target.id)) e.target.value = '0';
   update();
 });
 form.addEventListener('input',e=>{
@@ -79,7 +84,7 @@ form.addEventListener('change',e=>{
   if(e.target.id==='plan') {
     const p=PLANS[value('plan')]; $('shorts').value=p.short||1; $('longs').value=p.long;
     $('months').value=p.months||1; $('end').value='';
-    $('shoot4').value=0; $('shoot7').value=0;
+    $('shootHalf').value=0; $('tiktok').value='0';$('invoiceMonth').value='1';['extraShortUnit','extraLongUnit','extraShootUnit'].forEach(id=>$(id).value='');
   }
   update();
 });
@@ -115,14 +120,14 @@ form.addEventListener('submit',async e=>{
   try {
     const bytes=await generateContract(data,await dependencies());
     pdfUrl=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
-    const link=$('pdf-download');link.href=pdfUrl;link.download=`広報担当さん_契約書_${data.contractDate}.pdf`;
+    const link=$('pdf-download');link.href=pdfUrl;link.download=`広報担当さん_${({contract:'契約書',estimate:'見積書',invoice:'請求書'})[data.documentType]}_${data.contractDate}.pdf`;
     $('pdf-open').href=pdfUrl;$('pdf-result').hidden=false;
     $('pdf-status').textContent='PDFを作成しました。署名前に内容を双方で確認してください。';
     link.click();link.focus();
   } catch(error) {
     $('contract-error').textContent=error.name==='AbortError'?'読み込みがタイムアウトしました。通信状態を確認して再度お試しください。':`PDFを作成できませんでした。${error.message}`;
     $('contract-error').hidden=false; $('contract-error').focus();$('pdf-status').textContent='入力内容は保持されています。修正または再試行してください。';
-  } finally {enabled.forEach(el=>el.disabled=false);busy=false;$('create-pdf').textContent='契約書PDFを作成・保存';update();}
+  } finally {enabled.forEach(el=>el.disabled=false);busy=false;$('create-pdf').textContent='選択した書類のPDFを作成・保存';update();}
 });
 $('contractDate').value=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 update(); $('create-pdf').disabled=false;
