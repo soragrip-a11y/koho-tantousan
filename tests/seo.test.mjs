@@ -6,14 +6,20 @@ import { parseHTML, DOMParser } from 'linkedom';
 const dist = new URL('../dist/', import.meta.url);
 const read = file => readFileSync(new URL(file, dist), 'utf8');
 const origin = 'https://local-koho.com';
+const verificationFile = 'google6d1f5ddc13882b87.html';
 const publicPages = readdirSync(dist)
   .filter(file => file.endsWith('.html'))
+  .filter(file => file !== verificationFile)
   .filter(file => {
     const { document } = parseHTML(read(file));
     return !document.querySelector('meta[name="robots"][content*="noindex"]')
       && !document.querySelector('meta[http-equiv="refresh"]');
   });
 const representative = file => `${origin}/${file === 'index.html' ? '' : file}`;
+
+test('Google ownership verification keeps its exact content without page markup', () => {
+  assert.equal(read(verificationFile), `google-site-verification: ${verificationFile}`);
+});
 
 test('homepage title matches the approved searchable service title', () => {
   const { document } = parseHTML(read('index.html'));
