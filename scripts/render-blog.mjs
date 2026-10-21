@@ -4,7 +4,7 @@ const root=new URL('../',import.meta.url);
 const read=p=>readFileSync(new URL(p,root),'utf8');
 const write=(p,s)=>writeFileSync(new URL(p,root),s);
 const articles=JSON.parse(read('content/note-articles.json'));
-const approved=new Set(['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108']);
+const approved=new Set(['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108','nf1fcec6cd3b0']);
 const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let index=read('dist/blog.html');
 const filename=a=>`blog-${a.id}.html`;
