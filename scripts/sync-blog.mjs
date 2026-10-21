@@ -40,6 +40,8 @@ export function renderArticles(articles) {
 }
 
 export async function syncBlog() {
+  const current = await readFile(PAGE, 'utf8');
+  if (current.includes('blog-published')) throw new Error('Full-text articles are managed with npm run sync:blog from approved local snapshots; RSS cannot overwrite them');
   const response = await fetch(FEED_URL, { signal: AbortSignal.timeout(15000), redirect: 'error' });
   if (!response.ok) throw new Error(`RSS HTTP ${response.status}`);
   let source = '';

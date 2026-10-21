@@ -5,7 +5,7 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "sync:terms": "python3 scripts/sync-contract-terms.py",
-    "sync:blog": "node scripts/sync-blog.mjs"
+    "sync:blog": "node scripts/render-blog.mjs"
   },
   "devDependencies": {
     "linkedom": "0.18.12"
