@@ -82,11 +82,11 @@ test('official LINE destination stays verified and always-contact wording has a 
 test('compact proposal preserves recommended videos and the existing homepage sections',()=>{
  const {document}=parseHTML(read('index.html'));
  assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
- assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube.com/.test(x)),['https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=YCXll8IjTB8']);
- assert.equal(document.querySelectorAll('main > section').length,8);
+ assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube.com/.test(x)&&!x.includes("2H3bwkASc2M")),['https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=YCXll8IjTB8']);
+ assert.equal(document.querySelectorAll('main > section').length,9);
  assert.equal(document.querySelectorAll('.mini-price-table').length,1);
  assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
- assert.ok(document.querySelectorAll('main > section')[5].classList.contains('pricing-teaser'));
+ assert.ok(document.querySelectorAll('main > section')[6].classList.contains('pricing-teaser'));
 });
 test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
@@ -99,3 +99,5 @@ test('published prices and new document guidance agree',()=>{
  for(const text of ['3本15,000円＋半日撮影15,000円＝合計30,000円','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません'])assert.ok(document.body.textContent.includes(text));
  for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
 });
+
+test("intro video uses the approved ID without autoplay and offers a fallback",()=>{const {document}=parseHTML(read("index.html"));const f=document.querySelector(".intro-video iframe");assert.ok(f);assert.equal(new URL(f.getAttribute("src")).pathname,"/embed/2H3bwkASc2M");assert.equal(new URL(f.getAttribute("src")).searchParams.get("autoplay"),"0");assert.ok(document.querySelector(".intro-video a").getAttribute("href").endsWith("/shorts/2H3bwkASc2M"));});
