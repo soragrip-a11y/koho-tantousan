@@ -5,8 +5,8 @@ import {parseHTML} from 'linkedom';
 import {syncBlog} from '../scripts/sync-blog.mjs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const articles=JSON.parse(read('content/note-articles.json'));
-test('only the nine authorized note articles are published with their complete original bodies',()=>{
- assert.deepEqual(articles.map(a=>a.id).sort(),['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108','nf1fcec6cd3b0','nb9465545900d','n69af80f8210c','nd9e50babf6b9','n528833262a49'].sort());
+test('only the seventeen authorized note articles are published with their complete original bodies',()=>{
+ assert.deepEqual(articles.map(a=>a.id).sort(),['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108','nf1fcec6cd3b0','nb9465545900d','n69af80f8210c','nd9e50babf6b9','n528833262a49','nf8b9baf1bd47','nb0e4d3677725','n832c404e2d2e','n62737dad7314','n53d16db656a9','nd7bb4fa858c5','n6757f9f7b91b','n5ed98c8bbfce'].sort());
  for(const a of articles){
   const html=read(`dist/blog-${a.id}.html`);
   assert.ok(html.includes(`<div class="article-body">${a.bodyHtml}</div>`),a.id);
@@ -20,9 +20,9 @@ test('only the nine authorized note articles are published with their complete o
   assert.deepEqual([...document.querySelectorAll('.article-body a')].map(a=>a.getAttribute('href')),[...original.querySelectorAll('a')].map(a=>a.getAttribute('href')));
  }
 });
-test('blog index links to nine local full-text pages and has no empty state',()=>{
+test('blog index links to seventeen local full-text pages and has no empty state',()=>{
  const {document}=parseHTML(read('dist/blog.html'));
- assert.equal(document.querySelectorAll('.blog-published li').length,9);
+ assert.equal(document.querySelectorAll('.blog-published li').length,17);
  assert.equal(document.querySelectorAll('.blog-empty').length,0);
  for(const a of articles)assert.ok(document.querySelector(`.blog-published h3 a[href="blog-${a.id}.html"]`));
 });
