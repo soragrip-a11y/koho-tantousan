@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {validateArticle, renderOriginalArticle, filename} from '../scripts/render-original-blog.mjs';
+import {validateArticle, renderOriginalArticle, filename, selectApprovedArticles} from '../scripts/render-original-blog.mjs';
 
 const source = () => ({
  id:'2026-10-24-kimitsu-seo-test',
@@ -49,8 +49,17 @@ test('original article renders clean canonical, structured data, local links and
  assert.equal(metadata.datePublished,a.publishedAt);
  assert.equal(metadata.mainEntityOfPage,'https://local-koho.com/'+file);
 });
-test('new article storage begins without any auto-approved content',()=>{
+test('publication gate excludes drafts and allows approved articles to be added later',()=>{
  const list=JSON.parse(read('content/site-articles.json'));
  assert.ok(Array.isArray(list));
- assert.equal(list.filter(a=>a.status==='published'&&a.approved===true).length,0);
+ const currentApproved=selectApprovedArticles(list);
+ assert.ok(currentApproved.every(a=>a.status==='published' && a.approved===true));
+ const draft=source();
+ const approved={...source(),id:'2026-10-24-funabashi-seo-test',area:'船橋',status:'published',approved:true};
+ const mixed=selectApprovedArticles([draft,approved]);
+ assert.equal(mixed.length,1);
+ assert.equal(mixed[0].id,approved.id);
+ assert.throws(()=>selectApprovedArticles([draft,draft]),/Duplicate article ID/);
+ assert.throws(()=>selectApprovedArticles([draft],new Set([draft.id])),/collides with existing note article/);
+ assert.throws(()=>selectApprovedArticles([{...draft,status:'published',approved:false}]),/Unapproved publication refused/);
 });
