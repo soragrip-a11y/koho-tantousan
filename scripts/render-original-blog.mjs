@@ -90,8 +90,14 @@ export function selectApprovedArticles(articles, legacyIds = new Set()) {
  return articles.filter(a => a.status === 'published' && a.approved === true);
 }
 
+export function assertPublicStoreSafe(articles) {
+ if (!Array.isArray(articles)) throw Error('Expected an article array');
+ if (articles.some(a => a?.status === 'draft')) throw Error('Private drafts must not be stored in a public GitHub repository. Use private Google Drive.');
+}
+
 export function renderOriginals() {
  const articles = JSON.parse(read('content/site-articles.json'));
+ assertPublicStoreSafe(articles);
  const legacyIds = new Set(JSON.parse(read('content/note-articles.json')).map(a => a.id));
  const approved = selectApprovedArticles(articles, legacyIds);
  let index = read('dist/blog.html');
