@@ -49,7 +49,8 @@ export function renderOriginalArticle(a, indexHtml) {
  validateArticle(a);
  const canonical = origin + '/' + filename(a);
  const dateModified = a.updatedAt || a.publishedAt;
- const image = origin + '/' + (a.image || 'assets/service-logo.png');
+ const image = a.image ? origin + '/' + a.image : null;
+ const ogImageMeta = image ? '<meta property="og:image" content="'+escape(image)+'">' : '';
  const metadata = {
   '@context':'https://schema.org',
   '@type':'BlogPosting',
@@ -61,15 +62,15 @@ export function renderOriginalArticle(a, indexHtml) {
   inLanguage:'ja-JP',
   author:{'@type':'Organization',name:'広報担当さん',url:origin+'/'},
   publisher:{'@type':'Organization',name:'広報担当さん',url:origin+'/'},
-  image:[image]
  };
+ if (image) metadata.image = [image];
  const structuredData = JSON.stringify(metadata).replace(/</g, '\\u003c');
  const head = indexHtml.slice(0, indexHtml.indexOf('<main id="main">'))
   .replace(/<title>.*?<\/title>/, '<title>'+escape(a.title)+' | 広報担当さん</title>')
   .replace(/<link rel="canonical"[^>]*>/, '<link rel="canonical" href="'+canonical+'">')
   .replace(/<meta name="description"[^>]*>/, '<meta name="description" content="'+escape(a.description)+'">')
   .replace('property="og:type" content="website"', 'property="og:type" content="article"')
-  .replace('</head>', '<meta property="og:title" content="'+escape(a.title)+'"><meta property="og:description" content="'+escape(a.description)+'"><meta property="og:url" content="'+canonical+'"><meta property="og:image" content="'+image+'"><meta property="article:published_time" content="'+escape(a.publishedAt)+'"><meta property="article:modified_time" content="'+escape(dateModified)+'"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">'+structuredData+'</script></head>');
+  .replace('</head>', '<meta property="og:title" content="'+escape(a.title)+'"><meta property="og:description" content="'+escape(a.description)+'"><meta property="og:url" content="'+canonical+'">'+ogImageMeta+'<meta property="article:published_time" content="'+escape(a.publishedAt)+'"><meta property="article:modified_time" content="'+escape(dateModified)+'"><meta name="twitter:card" content="'+(image ? 'summary_large_image' : 'summary')+'"><script type="application/ld+json">'+structuredData+'</script></head>');
  const paragraphs = a.sections.map(s=>'<section><h2>'+escape(s.heading)+'</h2>'+s.paragraphs.map(p=>'<p>'+escape(p).replace(/\n/g,'<br>')+'</p>').join('')+'</section>').join('');
  const faq = a.faq?.length ? '<section><h2>よくある質問</h2>'+a.faq.map(q=>'<h3>'+escape(q.question)+'</h3><p>'+escape(q.answer)+'</p>').join('')+'</section>' : '';
  const sources = '<section class="article-sources"><h2>出典・確認日</h2><ul>'+a.sources.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.title)+'</a>（確認：'+escape(s.checkedAt)+'）</li>').join('')+'</ul></section>';
