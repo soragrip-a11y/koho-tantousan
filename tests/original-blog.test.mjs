@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {validateArticle, renderOriginalArticle, filename, selectApprovedArticles, assertPublicStoreSafe} from '../scripts/render-original-blog.mjs';
+import {validateArticle, renderOriginalArticle, filename, selectApprovedArticles, assertPublicStoreSafe, buildPublicationArtifacts} from '../scripts/render-original-blog.mjs';
 
 const source = () => ({
  id:'2026-10-24-kimitsu-seo-test',
@@ -70,4 +70,29 @@ test('public GitHub store contains only approved live entries; drafts belong in 
  assert.throws(()=>assertPublicStoreSafe([source()]),/Private drafts must not be stored/);
  const published={...source(),id:'2026-10-24-chiba-sample-approved',status:'published',approved:true};
  assert.doesNotThrow(()=>assertPublicStoreSafe([published]));
+});
+
+test('integration: approved article creates page, index and sitemap without altering legacy article blocks',()=>{
+ const a={...source(),id:'2026-10-24-funabashi-integration',area:'船橋',status:'published',approved:true};
+ const currentIndex=read('dist/blog.html'),currentSitemap=read('dist/sitemap.xml');
+ const built=buildPublicationArtifacts([a],new Set(),currentIndex,currentSitemap);
+ assert.equal(built.pages.length,1);
+ assert.equal(built.pages[0].path,filename(a));
+ assert.ok(built.pages[0].html.includes('application/ld+json'));
+ assert.ok(built.pages[0].html.includes('この記事の原本は広報担当さん公式サイトです'));
+ assert.ok(built.index.includes('<!-- note-articles:start -->'));
+ assert.ok(built.index.includes('blog-originals'));
+ assert.ok(built.index.includes(filename(a)));
+ assert.ok(built.sitemap.includes('https://local-koho.com/'+filename(a)));
+ const repeated=buildPublicationArtifacts([a],new Set(),built.index,built.sitemap);
+ assert.equal(repeated.index,built.index,'Repeated builds must not duplicate index cards');
+ assert.equal(repeated.sitemap,built.sitemap,'Repeated builds must not duplicate sitemap URLs');
+ const cleared=buildPublicationArtifacts([],new Set(),built.index,built.sitemap);
+ assert.ok(!cleared.index.includes(filename(a)), 'Removed article leaves index');
+ assert.ok(!cleared.sitemap.includes(filename(a)), 'Removed article leaves sitemap');
+});
+test('integration: private drafts never produce a public HTML page',()=>{
+ const result=buildPublicationArtifacts([source()],new Set(),read('dist/blog.html'),read('dist/sitemap.xml'));
+ assert.equal(result.pages.length,0);
+ assert.ok(!result.index.includes('2026-10-24-kimitsu-seo-test'));
 });
