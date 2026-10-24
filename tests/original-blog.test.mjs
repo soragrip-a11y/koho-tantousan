@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {validateArticle, renderOriginalArticle, filename, selectApprovedArticles} from '../scripts/render-original-blog.mjs';
+import {validateArticle, renderOriginalArticle, filename, selectApprovedArticles, assertPublicStoreSafe} from '../scripts/render-original-blog.mjs';
 
 const source = () => ({
  id:'2026-10-24-kimitsu-seo-test',
@@ -62,4 +62,12 @@ test('publication gate excludes drafts and allows approved articles to be added 
  assert.throws(()=>selectApprovedArticles([draft,draft]),/Duplicate article ID/);
  assert.throws(()=>selectApprovedArticles([draft],new Set([draft.id])),/collides with existing note article/);
  assert.throws(()=>selectApprovedArticles([{...draft,status:'published',approved:false}]),/Unapproved publication refused/);
+});
+
+test('public GitHub store contains only approved live entries; drafts belong in private Drive',()=>{
+ const stored=JSON.parse(read('content/site-articles.json'));
+ assert.doesNotThrow(()=>assertPublicStoreSafe(stored));
+ assert.throws(()=>assertPublicStoreSafe([source()]),/Private drafts must not be stored/);
+ const published={...source(),id:'2026-10-24-chiba-sample-approved',status:'published',approved:true};
+ assert.doesNotThrow(()=>assertPublicStoreSafe([published]));
 });
