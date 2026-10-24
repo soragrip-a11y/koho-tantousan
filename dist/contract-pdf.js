@@ -93,7 +93,7 @@ export async function renderDocument(content,{PDFLib,fontkit,fontBytes}) {
   const W=595.28,H=841.89,left=46,width=W-92,bottom=54;
   const ink=rgb(.08,.10,.12),muted=rgb(.32,.35,.38),accent=rgb(.65,.31,.02);
   let page,y;
-  function newPage(){page=doc.addPage([W,H]);y=H-52;page.drawText('広報担当さん | 動画制作・YouTube運用支援',{x:left,y:H-27,size:8,font,color:muted});}
+  function newPage(){page=doc.addPage([W,H]);y=H-52;page.drawText((content.sample?'【見本・実取引には使用しない】 ':'')+'広報担当さん | 動画制作・YouTube運用支援',{x:left,y:H-27,size:8,font,color:muted});}
   function need(height){if(y-height<bottom)newPage();}
   function wrap(text,size=10){
     const lines=[];
@@ -124,7 +124,7 @@ export async function renderDocument(content,{PDFLib,fontkit,fontBytes}) {
   paragraph(content.type==='review'?'確認事項を整理するための書類です。通常プランの金額・包括業務・署名欄は出力しません。受託・実施・支払いを確約するものではありません。':content.type==='contract'?'委託者（甲）と受託者（乙）は、以下の個別条件および本書に収録するサービス利用条件を確認します。':'新規のお取引用書類です。個別に確認した範囲・金額を記載します。生成だけで契約が確定するものではありません。',10);
   for(const s of content.sections){heading(s.title);s.paragraphs.forEach(p=>paragraph(p));}
   if(content.type==='contract') { newPage();heading('別紙 サービス利用条件');
-  paragraph('本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月20日。受託条件・AI利用方針：2026年10月24日版。元ページ： https://local-koho.com/terms.html',9);
+  paragraph(content.termsNotice||'本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月20日。受託条件・AI利用方針：2026年10月24日版。元ページ： https://local-koho.com/terms.html',9);
   for(const term of content.terms){heading(term.title);paragraph(term.text);}
   need(360);heading('双方の確認・署名');
   paragraph(`契約日：${content.data.contractDate}\n本書の個別条件および別紙利用条件を確認し、合意します。PDFの生成だけで契約は確定しません。`,10);

@@ -83,7 +83,7 @@ test('compact proposal preserves recommended videos and the existing homepage se
  const {document}=parseHTML(read('index.html'));
  assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
  assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube.com/.test(x)&&!x.includes("2H3bwkASc2M")),['https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=YCXll8IjTB8']);
- assert.equal(document.querySelectorAll('main > section').length,9);
+ assert.equal(document.querySelectorAll('main > section').length,10);
  assert.equal(document.querySelectorAll('.mini-price-table').length,1);
  assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
  assert.ok(document.querySelectorAll('main > section')[6].classList.contains('pricing-teaser'));

@@ -1,0 +1,4 @@
+// Only approved, published Google Form URLs may be configured here.
+// No credentials, response URLs, customer data, or edit URLs belong in this file.
+export const RECEPTION=Object.freeze({formUrl:'https://docs.google.com/forms/d/e/1FAIpQLSfSaSPMb5Odz8IhHm6nLzl_KpTOKlqSK5UnJN3GBNFSrLiesw/viewform',embedUrl:'https://docs.google.com/forms/d/e/1FAIpQLSfSaSPMb5Odz8IhHm6nLzl_KpTOKlqSK5UnJN3GBNFSrLiesw/viewform?embedded=true',receiptTested:true});
+export function publicFormUrl(url){if(!url)return null;const u=new URL(url);if(u.protocol!=='https:'||u.hostname!=='docs.google.com'||!/^\/forms\/d\/e\/[A-Za-z0-9_-]+\/viewform$/.test(u.pathname)||u.username||u.password)throw Error('公開Googleフォームの閲覧URLだけを設定してください。');for(const key of u.searchParams.keys())if(!['embedded','usp'].includes(key))throw Error('受付URLに不要なパラメーターがあります。');return u.href;}

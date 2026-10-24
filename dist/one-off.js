@@ -1,0 +1,12 @@
+import {inquiryText} from './one-off-core.js';
+import {RECEPTION,publicFormUrl} from './one-off-config.js';
+const form=document.querySelector('#one-inquiry'),$=id=>document.getElementById(id);let composed=false;
+const collect=()=>Object.fromEntries([...form.querySelectorAll('[name]')].map(el=>[el.name,el.type==='checkbox'?el.checked:el.value.trim()]));
+function update(){const blocked=$('category').value==='political';$('political-warning').hidden=!blocked;$('compose').disabled=blocked||composed;$('copy-request').disabled=blocked;}
+function message(){if(!form.reportValidity())return null;try{return inquiryText(collect());}catch(e){$('inquiry-error').textContent=e.message;return null;}}
+form.addEventListener('submit',e=>{e.preventDefault();if(composed)return;const text=message();if(!text)return;composed=true;update();location.href='mailto:sora.grip@gmail.com?subject='+encodeURIComponent('単発作業の相談・見積依頼')+'&body='+encodeURIComponent(text);$('inquiry-status').textContent='メール作成画面を開きました。このサイトからは送信していません。宛先と内容を確認し、メールアプリで1回だけ送信してください。';});
+$('copy-request').addEventListener('click',async()=>{const text=message();if(!text)return;try{await navigator.clipboard.writeText('送信先：sora.grip@gmail.com\n\n'+text);$('inquiry-status').textContent='コピーしました。まだ送信されていません。メールか公式LINEへ貼り付けて送信してください。';}catch{$('copy-fallback').hidden=false;$('copy-fallback').value=text;$('copy-fallback').focus();$('copy-fallback').select();$('inquiry-status').textContent='自動コピーできませんでした。表示した内容を選択してコピーしてください。まだ送信されていません。';}});
+form.addEventListener('input',()=>{composed=false;$('inquiry-error').textContent='';$('copy-fallback').hidden=true;$('inquiry-status').textContent='未送信です。入力内容は自動保存しません。';update();});form.addEventListener('change',update);
+document.querySelectorAll('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('service').value=a.dataset.service;composed=false;update();}));
+$('inquiry-fields').disabled=false;update();
+try{const link=publicFormUrl(RECEPTION.formUrl),embed=publicFormUrl(RECEPTION.embedUrl);if(link&&RECEPTION.receiptTested){$('reception-link').href=link;$('reception-link').hidden=false;$('reception-status').textContent='Googleフォームで相談・見積依頼を送信できます。送信だけで契約は確定しません。';if(embed){const frame=document.createElement('iframe');frame.src=embed;frame.title='単発作業の相談・見積依頼フォーム';frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';$('reception-embed').append(frame);}}}catch{$('reception-status').textContent='直接受付フォームを利用できません。下のメール・LINEをご利用ください。';}
