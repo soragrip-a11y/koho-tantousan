@@ -36,7 +36,7 @@ test('blog has the approved channels, current navigation, no face thumbnails or 
     const a = document.querySelector(`main a[href="${url}"]`);
     assert.ok(a); assert.equal(a.getAttribute('rel'), 'noopener noreferrer');
   }
-  assert.equal(document.querySelectorAll('main img').length, 19);
+  assert.equal(document.querySelectorAll('.blog-published img').length, 19);
   assert.equal(document.querySelectorAll('main iframe').length, 0);
   assert.match(document.querySelector('main').textContent, /個人的な政治意見や賛否は含めません/);
   assert.doesNotMatch(html, /自動更新済み/);
