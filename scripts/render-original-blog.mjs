@@ -87,6 +87,8 @@ export function renderOriginals() {
   if(ids.has(a.id)) throw Error('Duplicate article ID');
   ids.add(a.id);
  }
+ const legacyIds = new Set(JSON.parse(read('content/note-articles.json')).map(a => a.id));
+ for (const a of articles) if (legacyIds.has(a.id)) throw Error('Article ID collides with existing note article: '+a.id);
  const approved = articles.filter(a => a.status === 'published' && a.approved === true);
  let index = read('dist/blog.html');
  const cards = approved.sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).map(a=>
@@ -94,9 +96,9 @@ export function renderOriginals() {
  ).join('');
  const marker='<!-- site-originals:start -->';
  const end='<!-- site-originals:end -->';
- const newCards=marker+cards+end;
+ const newCards=marker+(cards ? '<ul class="blog-list blog-originals">'+cards+'</ul>' : '')+end;
  if(index.includes(marker)) index=index.replace(/<!-- site-originals:start -->[\s\S]*?<!-- site-originals:end -->/,newCards);
- else index=index.replace('<ul class="blog-list blog-published">','<ul class="blog-list blog-published">'+newCards);
+ else index=index.replace('<!-- note-articles:start -->',newCards+'\n<!-- note-articles:start -->');
  write('dist/blog.html',index);
  let sitemap=read('dist/sitemap.xml');
  const siteUrls=approved.map(a=>'<url><loc>'+origin+'/'+filename(a)+'</loc><lastmod>'+escape((a.updatedAt||a.publishedAt).slice(0,10))+'</lastmod></url>').join('');
