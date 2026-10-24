@@ -36,4 +36,4 @@ https://design.digital.go.jp/dads/foundations/
 問い合わせフォームはJavaScriptの準備完了まで無効です。ローカルのみでメール文を作成する処理が使えない場合に、入力内容をURLへ送信しないための対策です。`npm test` で問い合わせの模擬動作、サイト内リンク、契約計算・PDFを検証できます。
 
 ## 地域ニュースの原本型ブログ（2026-10-24）
-新規記事は `content/site-articles.json` に下書き保存し、承認済み記事だけ `scripts/render-original-blog.mjs` でWeb向けに生成します。従来のnote転載19記事は残します。公開前に記事HTML・SEOメタ情報・一覧・サイトマップを自動検証します。運用方法は [docs/site-original-blog-workflow.md](docs/site-original-blog-workflow.md) を参照してください。
+未公開記事は非公開のGoogle Drive「広報担当さん_ブログ下書き（非公開）」に保存し、公開GitHubには保存しません。本人が記事全文を確認して明示承認した後に限り、`content/site-articles.json` に `status: published`・`approved: true` として登録し、`scripts/render-original-blog.mjs` でWebページ・SEOメタ情報・記事一覧・サイトマップを生成します。従来のnote転載19記事は維持します。公開前に `npm test` を実行します。運用方法は [docs/site-original-blog-workflow.md](docs/site-original-blog-workflow.md) を参照してください。
