@@ -1,5 +1,6 @@
 import {readFileSync,writeFileSync} from 'node:fs';
 import {parseHTML} from 'linkedom';
+import {renderOriginals} from './render-original-blog.mjs';
 const root=new URL('../',import.meta.url);
 const read=p=>readFileSync(new URL(p,root),'utf8');
 const write=(p,s)=>writeFileSync(new URL(p,root),s);
@@ -36,3 +37,7 @@ let sitemap=read('dist/sitemap.xml');
 for(const a of articles)if(!sitemap.includes('https://local-koho.com/'+filename(a)))sitemap=sitemap.replace('</urlset>',`  <url><loc>https://local-koho.com/${filename(a)}</loc></url>\n</urlset>`);
 write('dist/sitemap.xml',sitemap);
 console.log(`Rendered ${articles.length} approved articles from local snapshots. No network requests.`);
+
+// Re-render approved site-original articles after the legacy note snapshot.
+// Drafts stay out of the deployed site and sitemap.
+renderOriginals();
