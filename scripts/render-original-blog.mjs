@@ -78,18 +78,22 @@ export function renderOriginalArticle(a, indexHtml) {
  return head + main + indexHtml.slice(indexHtml.indexOf('<footer>'));
 }
 
-export function renderOriginals() {
- const articles = JSON.parse(read('content/site-articles.json'));
+export function selectApprovedArticles(articles, legacyIds = new Set()) {
  if (!Array.isArray(articles)) throw Error('Expected an article array');
  const ids = new Set();
  for (const a of articles) {
   validateArticle(a);
   if(ids.has(a.id)) throw Error('Duplicate article ID');
+  if(legacyIds.has(a.id)) throw Error('Article ID collides with existing note article: '+a.id);
   ids.add(a.id);
  }
+ return articles.filter(a => a.status === 'published' && a.approved === true);
+}
+
+export function renderOriginals() {
+ const articles = JSON.parse(read('content/site-articles.json'));
  const legacyIds = new Set(JSON.parse(read('content/note-articles.json')).map(a => a.id));
- for (const a of articles) if (legacyIds.has(a.id)) throw Error('Article ID collides with existing note article: '+a.id);
- const approved = articles.filter(a => a.status === 'published' && a.approved === true);
+ const approved = selectApprovedArticles(articles, legacyIds);
  let index = read('dist/blog.html');
  const cards = approved.sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).map(a=>
   '<li><article><div><p class="eyebrow">'+escape(a.area)+'</p><time datetime="'+escape(a.publishedAt)+'">'+isoJa(a.publishedAt)+'</time><h3><a href="'+filename(a)+'">'+escape(a.title)+'</a></h3><p>'+escape(a.description)+'</p><a class="text-link" href="'+filename(a)+'">この記事を読む</a></div></article></li>'
