@@ -95,37 +95,40 @@ export function assertPublicStoreSafe(articles) {
  if (articles.some(a => a?.status === 'draft')) throw Error('Private drafts must not be stored in a public GitHub repository. Use private Google Drive.');
 }
 
+function replaceBetween(source, beginMarker, endMarker, replacement) {
+ const a = source.indexOf(beginMarker);
+ if (a < 0) return null;
+ const b = source.indexOf(endMarker, a + beginMarker.length);
+ if (b < 0) throw Error('Unclosed article marker');
+ return source.slice(0, a) + replacement + source.slice(b + endMarker.length);
+}
 export function buildPublicationArtifacts(articles, legacyIds, indexHtml, sitemapXml) {
  const approved = selectApprovedArticles(articles, legacyIds);
- const marker = '<!-- site-originals:start -->';
- const end = '<!-- site-originals:end -->';
- if (!indexHtml.includes('<!-- note-articles:start -->')) throw Error('Blog index note boundary is missing');
- if (!sitemapXml.includes('</urlset>')) throw Error('Sitemap closing tag is missing');
- const cards = [...approved].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).map(a =>
+ const marker='<!-- site-originals:start -->', end='<!-- site-originals:end -->';
+ if (!indexHtml.includes('<!-- note-articles:start -->')) throw Error('Missing note index boundary');
+ if (!sitemapXml.includes('</urlset>')) throw Error('Missing sitemap closing tag');
+ const cards=[...approved].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).map(a=>
   '<li><article><div><p class="eyebrow">'+escape(a.area)+'</p><time datetime="'+escape(a.publishedAt)+'">'+isoJa(a.publishedAt)+'</time><h3><a href="'+filename(a)+'">'+escape(a.title)+'</a></h3><p>'+escape(a.description)+'</p><a class="text-link" href="'+filename(a)+'">この記事を読む</a></div></article></li>'
  ).join('');
- const indexEntry = marker + (cards ? '<ul class="blog-list blog-originals">'+cards+'</ul>' : '') + end;
- const index = indexHtml.includes(marker)
-  ? indexHtml.replace(/<!-- site-originals:start -->[\\s\\S]*?<!-- site-originals:end -->/, indexEntry)
-  : indexHtml.replace('<!-- note-articles:start -->', indexEntry+'\\n<!-- note-articles:start -->');
- const urlEntries = approved.map(a =>
-  '<url><loc>'+origin+'/'+filename(a)+'</loc><lastmod>'+escape((a.updatedAt || a.publishedAt).slice(0,10))+'</lastmod></url>'
- ).join('');
- const sitemapEntry = marker + urlEntries + end;
- const sitemap = sitemapXml.includes(marker)
-  ? sitemapXml.replace(/<!-- site-originals:start -->[\\s\\S]*?<!-- site-originals:end -->/, sitemapEntry)
-  : sitemapXml.replace('</urlset>', sitemapEntry+'\\n</urlset>');
- // Build every page before writing anything, so invalid content cannot partially publish.
- const pages = approved.map(a => ({path:filename(a), html:renderOriginalArticle(a, index)}));
- return {index, sitemap, pages};
+ const cardsBlock=marker+(cards?'<ul class="blog-list blog-originals">'+cards+'</ul>':'')+end;
+ const existingIndex=replaceBetween(indexHtml,marker,end,cardsBlock);
+ const index=existingIndex??indexHtml.replace('<!-- note-articles:start -->',cardsBlock+String.fromCharCode(10)+'<!-- note-articles:start -->');
+ const urls=approved.map(a=>'<url><loc>'+origin+'/'+filename(a)+'</loc><lastmod>'+escape((a.updatedAt||a.publishedAt).slice(0,10))+'</lastmod></url>').join('');
+ const urlsBlock=marker+urls+end;
+ const existingMap=replaceBetween(sitemapXml,marker,end,urlsBlock);
+ const sitemap=existingMap??sitemapXml.replace('</urlset>',urlsBlock+String.fromCharCode(10)+'</urlset>');
+ const pages=approved.map(a=>({path:filename(a),html:renderOriginalArticle(a,index)}));
+ return {index,sitemap,pages};
 }
 export function renderOriginals() {
- const articles = JSON.parse(read('content/site-articles.json'));
- const legacyIds = new Set(JSON.parse(read('content/note-articles.json')).map(a=>a.id));
- const {index,sitemap,pages} = buildPublicationArtifacts(articles,legacyIds,read('dist/blog.html'),read('dist/sitemap.xml'));
- write('dist/blog.html', index);
- write('dist/sitemap.xml', sitemap);
+ const articles=JSON.parse(read('content/site-articles.json'));
+ // A public repository must never contain unreviewed article bodies, even if the renderer skips them.
+ assertPublicStoreSafe(articles);
+ const legacyIds=new Set(JSON.parse(read('content/note-articles.json')).map(a=>a.id));
+ const {index,sitemap,pages}=buildPublicationArtifacts(articles,legacyIds,read('dist/blog.html'),read('dist/sitemap.xml'));
+ write('dist/blog.html',index);
+ write('dist/sitemap.xml',sitemap);
  for (const page of pages) write('dist/'+page.path,page.html);
- console.log('Rendered '+pages.length+' approved site-original articles; drafts remain unpublished.');
+ console.log('Rendered '+pages.length+' reviewed site-original articles.');
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) renderOriginals();
