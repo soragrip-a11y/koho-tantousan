@@ -4,7 +4,7 @@ const root=new URL('../',import.meta.url);
 const read=p=>readFileSync(new URL(p,root),'utf8');
 const write=(p,s)=>writeFileSync(new URL(p,root),s);
 const articles=JSON.parse(read('content/note-articles.json'));
-const approved=new Set(['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108','nf1fcec6cd3b0','nb9465545900d','n69af80f8210c','nd9e50babf6b9','n528833262a49','nf8b9baf1bd47','nb0e4d3677725','n832c404e2d2e','n62737dad7314','n53d16db656a9','nd7bb4fa858c5','n6757f9f7b91b','n5ed98c8bbfce']);
+const approved=new Set(['n185eb0dfe1c9','n513a33d7dde6','na27e51f9e846','na75104de9108','nf1fcec6cd3b0','nb9465545900d','n69af80f8210c','nd9e50babf6b9','n528833262a49','nf8b9baf1bd47','nb0e4d3677725','n832c404e2d2e','n62737dad7314','n53d16db656a9','nd7bb4fa858c5','n6757f9f7b91b','n5ed98c8bbfce','nf578c5ca06f8']);
 const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let index=read('dist/blog.html');
 const filename=a=>`blog-${a.id}.html`;
