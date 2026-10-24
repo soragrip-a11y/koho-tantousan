@@ -38,7 +38,7 @@ test('required parties, dates, approval and invoice due dates are validated',()=
 test('signed contract clause snapshot matches current published terms exactly',()=>{
  const content=contractSections(fixture());const {document}=parseHTML(readFileSync(new URL('../dist/terms.html',import.meta.url),'utf8'));
  const clauses=[...document.querySelectorAll('.prose-section')].map(x=>({title:x.querySelector('h2').textContent,text:[...x.querySelectorAll('p')].map(p=>p.textContent).join('')}));
- assert.deepEqual(content.terms,clauses);assert.equal(clauses.length,12);
+ assert.deepEqual(content.terms,clauses);assert.equal(clauses.length,14);
  const text=JSON.stringify(content);assert.match(text,/30,000円/);assert.doesNotMatch(text,/55,000円|100,000円|各動画2回|4時間まで|7時間まで|ショート3,000/);
 });
 test('invoice and estimate use the same calculation without charging all months up front',()=>{

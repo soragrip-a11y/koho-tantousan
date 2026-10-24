@@ -10,6 +10,9 @@ vm.runInThisContext(readFileSync(new URL('../dist/vendor/fontkit-1.1.1.min.js',i
 const deps={PDFLib:globalThis.PDFLib,fontkit:globalThis.fontkit,fontBytes:new Uint8Array(readFileSync(new URL('../dist/assets/fonts/NotoSansJP-Regular.ttf',import.meta.url)))};
 mkdirSync(new URL('../tmp/pdfs/',import.meta.url),{recursive:true});
 const cases=[
+ ['political-review',fixture({requestCategory:'political',scopeAttachment:'技術制作：具体的指示に基づく編集の検討。企画・投稿・広告は対象外。',instructionOwner:'指示者と意思決定者は確認中',expertRecord:'未確認'})],
+ ['election-review-blank',{requestCategory:'election',contractDate:'2026-10-24',purpose:'確認用',reviewed:true}],
+ ['political-review-long',fixture({requestCategory:'political',scopeAttachment:'技術制作・企画・投稿・広告・実費の境界を個別に確認する。'.repeat(55),expertRecord:'確認事項を記録し、未回答の点は受託前に照会する。'.repeat(60)})],
  ['standard',fixture({providerAddress:''})],
  ['companion',fixture({plan:'companion',months:3,tiktok:1,extras:[{label:'初回交通費',amount:3000,timing:'once'}]})],
  ['premium',fixture({plan:'premium',shorts:9,longs:3,months:2,shootHalf:1,extraShortUnit:6000,extraLongUnit:20000,extraShootUnit:18000,extras:[{label:'交通費',amount:2000,timing:'once'}]})],

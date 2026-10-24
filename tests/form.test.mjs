@@ -33,7 +33,7 @@ test('page connects all labels and controls; referenced local files exist',()=>{
 });
 
 test('plan switches show included filming and require quoted extras',()=>{
- const h=setup();h.change('start','2026-11-01');h.change('plan','companion');
+ const h=setup();h.change('requestCategory','general');h.change('start','2026-11-01');h.change('plan','companion');
  assert.equal(h.el('shorts').value,'6');assert.equal(h.el('summary-total').textContent,'80,000円');assert.match(h.el('shoot-hint').textContent,/月2回/);
  h.change('shootHalf','1');assert.match(h.el('summary-error').textContent,/合意済み単価/);
  h.change('extraShootUnit','18000');assert.equal(h.el('summary-total').textContent,'98,000円');
@@ -55,4 +55,17 @@ test('invalid form blocks creation without network submission',async()=>{
 });
 test('numeric editing supports replacing zero and deletion',()=>{
  const h=setup();for(const el of h.document.querySelectorAll('[data-numeric]')){assert.equal(el.type,'text');assert.equal(el.getAttribute('inputmode'),'numeric');el.value='0';el.dispatchEvent(new h.window.Event('focusin',{bubbles:true}));assert.equal(el.value,'');el.value='06';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'6');el.value='';el.dispatchEvent(new h.window.Event('input',{bubbles:true}));assert.equal(el.value,'');}
+});
+
+test('classification changes hide standard terms and invalidate generated agreements',async()=>{
+ const h=setup();assert.equal(h.el('requestCategory').value,'');assert.equal(h.el('summary-total').textContent,'未確定');
+ const d=fixture();for(const[k,v]of Object.entries(d))if(typeof v==='string'&&h.el(k))h.el(k).value=v;
+ h.change('requestCategory','general');h.el('reviewed').checked=true;
+ h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));await new Promise(setImmediate);
+ assert.equal(h.downloads(),1);
+ h.change('requestCategory','election');assert.equal(h.el('pdf-result').hidden,true);assert.equal(h.el('general-plan').hidden,true);
+ assert.equal(h.el('summary-total').textContent,'未確定');assert.equal(h.el('request-review-fields').hidden,false);
+ h.el('reviewed').checked=true;h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));await new Promise(setImmediate);
+ assert.equal(h.captured().requestCategory,'election');assert.match(decodeURIComponent(h.el('pdf-download').download),/受託前確認票/);
+ h.change('requestCategory','general');assert.equal(h.el('general-plan').hidden,false);assert.equal(h.el('pdf-result').hidden,true);
 });

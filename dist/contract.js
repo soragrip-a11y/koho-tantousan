@@ -1,5 +1,5 @@
-import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261020-final';
-import { generateContract } from './contract-pdf.js?v=20261020-final';
+import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261024-policy';
+import { generateContract } from './contract-pdf.js?v=20261024-policy';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -26,6 +26,24 @@ function invalidatePDF() {
   $('pdf-status').textContent = '';
 }
 function update() {
+  const category=value('requestCategory'),general=category==='general';
+  show('request-review-fields',Boolean(category)&&!general);
+  for(const id of ['general-party','general-plan','general-work'])show(id,general);
+  $('documentType').disabled=!general;
+  $('documentType').closest('fieldset').hidden=!general;
+  $('usage').required=general;
+  $('general-payment-help').hidden=!general;
+  if(!general){
+    show('invoice-fields',false);
+    $('summary-plan').textContent='受託前の確認';$('summary-period').textContent='通常プランは適用しません。';
+    $('plan-scope').textContent='政治・選挙関係は個別確認です。';
+    $('summary-lines').replaceChildren();$('summary-error').textContent='';
+    ['summary-recurring','summary-total'].forEach(id=>$(id).textContent='未確定');
+    $('final-total').textContent=category?'受託前確認票のみ作成します。契約・見積・請求や受託の確定ではありません。':'依頼区分を選択してください。';
+    $('create-pdf').textContent='受託前確認票PDFを作成';
+    return;
+  }
+  $('create-pdf').textContent='選択した書類のPDFを作成・保存';
   const plan = PLANS[value('plan')], monthly = value('plan') !== 'single';
   show('invoice-fields',value('documentType')==='invoice');$('paymentDue').required=value('documentType')==='invoice';
   show('extra-short-unit',monthly&&Number(value('shorts'))>plan.short);
@@ -120,9 +138,9 @@ form.addEventListener('submit',async e=>{
   try {
     const bytes=await generateContract(data,await dependencies());
     pdfUrl=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
-    const link=$('pdf-download');link.href=pdfUrl;link.download=`広報担当さん_${({contract:'契約書',estimate:'見積書',invoice:'請求書'})[data.documentType]}_${data.contractDate}.pdf`;
+    const link=$('pdf-download');link.href=pdfUrl;link.download=`広報担当さん_${data.requestCategory==='general'?({contract:'契約書',estimate:'見積書',invoice:'請求書'})[data.documentType]:'受託前確認票'}_${data.contractDate}.pdf`;
     $('pdf-open').href=pdfUrl;$('pdf-result').hidden=false;
-    $('pdf-status').textContent='PDFを作成しました。署名前に内容を双方で確認してください。';
+    $('pdf-status').textContent=data.requestCategory==='general'?'PDFを作成しました。署名前に内容を双方で確認してください。':'受託前確認票を作成しました。未確認事項を整理し、受託前に個別確認を行ってください。';
     link.click();link.focus();
   } catch(error) {
     $('contract-error').textContent=error.name==='AbortError'?'読み込みがタイムアウトしました。通信状態を確認して再度お試しください。':`PDFを作成できませんでした。${error.message}`;

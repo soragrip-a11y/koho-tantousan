@@ -65,6 +65,14 @@ export function calculate(data) {
  return {plan:p,monthly,months,shorts,longs,shootHalf,includedShoots:p.includedShoots,tiktok,rows,recurring,oneTime,total,first:recurring+oneTime,invoiceMonth,invoiceRows,invoiceTotal:invoiceRows.reduce((a,r)=>a+r.amount,0)};
 }
 export function validateContract(data) {
+  if (!['general','political','election'].includes(data.requestCategory)) throw new Error('依頼区分を選択してください。旧データも自動で一般事業には分類しません。');
+  if (data.requestCategory !== 'general') {
+    for (const v of Object.values(data)) if (typeof v === 'string' && v.length > 2000) throw new Error('入力は2,000文字以内にしてください。');
+    dateValue(data.contractDate);
+    if (!clean(data.purpose)) throw new Error('発信目的・制作内容を入力してください。');
+    if (!data.reviewed) throw new Error('受託前確認票であり受託確定ではないことを確認してください。');
+    return {reviewOnly:true};
+  }
   const required = ['customer','customerSigner','customerAddress','customerEmail','provider','providerSigner','providerEmail','payer','purpose','usage'];
   for (const k of required) if (!clean(data[k])) throw new Error('契約者・受託者・制作条件の必須項目をすべて入力してください。');
   for (const [k,v] of Object.entries(data)) if (typeof v === 'string' && v.length > 2000) throw new Error('入力が長すぎます。2,000文字以内にしてください。');

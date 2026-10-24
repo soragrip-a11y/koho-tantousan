@@ -1,11 +1,24 @@
 
-import { validateContract, clean, yen } from './contract-core.js?v=20261020-final';
-import { TERMS } from './contract-terms.js?v=20261020-final';
+import { validateContract, clean, yen } from './contract-core.js?v=20261024-policy';
+import { TERMS } from './contract-terms.js?v=20261024-policy';
+import { ACCEPTANCE_POLICY, POLITICAL_DETAIL, AI_POLICY, REQUEST_LABELS, REVIEW_FIELDS } from './acceptance-policy.js?v=20261024';
 export const DOCUMENT_TITLES={contract:'動画制作・運用支援 業務委託契約書',estimate:'動画制作・運用支援 見積書',invoice:'動画制作・運用支援 請求書'};
 export function contractSections(data) {
  const c=validateContract(data),d=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,typeof v==='string'?clean(v):v]));
  const type=d.documentType||'contract',sections=[];
  const section=(title,paragraphs)=>sections.push({title,paragraphs:paragraphs.map(clean)});
+ if(c.reviewOnly){
+  section('受託前の確認・未確定事項',[
+   '受託前確認票（契約・見積・請求ではありません）。専門家確認の記入だけで適法確認済みとはなりません。確認後も個別の業務範囲・条件を書面で合意する必要があります。',
+   '作成日：'+d.contractDate+'／依頼区分：'+REQUEST_LABELS[d.requestCategory],
+   '依頼者：'+(d.customer||'未確認')+'／連絡先：'+(d.customerEmail||'未確認'),
+   '発信目的・制作内容：'+d.purpose,
+   ...Object.entries(REVIEW_FIELDS).map(([key,label])=>label+'：\n'+(d[key]||'未確認')),
+   '個別メモ：'+(d.notes||'未記入')
+  ]);
+  section('受託方針・AI利用', [ACCEPTANCE_POLICY,POLITICAL_DETAIL,AI_POLICY]);
+  return {sections,terms:[],data:d,calculation:c,documentTitle:'受託前確認票（受託未確定）',type:'review'};
+ }
  section('1. 当事者・対象期間',[
   '書類作成日：'+d.contractDate,
   '宛名：'+d.payer+'\n契約者：'+d.customer+'\n代表者・署名者：'+d.customerSigner+'\n住所：'+d.customerAddress+'\nメール：'+d.customerEmail+'\n電話：'+(d.customerPhone||'記載なし'),
@@ -55,13 +68,21 @@ export function contractSections(data) {
   '後日精算の実費・未合意の追加業務は今回の請求に含みません。同じ費用を二重に請求しません。',
   clean('備考：'+(d.notes||'追加の確認事項なし。'))
  ];
+ section('依頼区分・受託条件・AI利用',[ '依頼区分：一般事業。政治・選挙との関係が判明した場合は通常プランの自動適用を止め、個別に確認します。',ACCEPTANCE_POLICY,POLITICAL_DETAIL,AI_POLICY,'既存の締結済み契約・過去発行書類は本書により一方的に変更されません。']);
  return {sections,terms:type==='contract'?TERMS:[],data:d,calculation:c,documentTitle:DOCUMENT_TITLES[type],type};
 }
 
 // Pure PDF renderer shared by the browser and automated output checks.
 export async function generateContract(data,{PDFLib,fontkit,fontBytes}) {
-  const content=contractSections(data), {PDFDocument,rgb}=PDFLib;
-  const doc=await PDFDocument.create(); doc.registerFontkit(fontkit);
+  return renderDocument(contractSections(data),{PDFLib,fontkit,fontBytes});
+}
+export async function renderDocument(content,{PDFLib,fontkit,fontBytes}) {
+  const {PDFDocument,rgb}=PDFLib;
+  const doc=await PDFDocument.create();
+  // The bundled shaper substitutes ASCII digits before URL punctuation with
+  // alternate glyphs absent from the full-font PDF cmap. Keep literal digits in
+  // both measurement and encoding; retain ordinary shaping for all other text.
+  doc.registerFontkit({create(bytes){const f=fontkit.create(bytes),layout=f.layout.bind(f);f.layout=(text,features)=>{const run=layout(text,features);run.glyphs=run.glyphs.map(g=>g.codePoints.length===1&&g.codePoints[0]>=48&&g.codePoints[0]<=57?f.glyphForCodePoint(g.codePoints[0]):g);return run;};return f;}});
   // Embed the complete font: subset embedding can omit visible glyphs in short invoices.
   const font=await doc.embedFont(fontBytes,{subset:false});
   doc.setTitle(content.documentTitle);doc.setAuthor('広報担当さん');doc.setLanguage('ja-JP');
@@ -100,10 +121,10 @@ export async function generateContract(data,{PDFLib,fontkit,fontBytes}) {
   function heading(text){need(68);y-=5;page.drawRectangle({x:left,y:y-25,width,height:25,color:rgb(.97,.94,.90)});page.drawText(text,{x:left+8,y:y-17,size:11,font,color:accent});y-=38;}
   newPage();
   paragraph(content.documentTitle,18);
-  paragraph(content.type==='contract'?'委託者（甲）と受託者（乙）は、以下の個別条件および本書に収録するサービス利用条件を確認します。':'新規のお取引用書類です。個別に確認した範囲・金額を記載します。生成だけで契約が確定するものではありません。',10);
+  paragraph(content.type==='review'?'確認事項を整理するための書類です。通常プランの金額・包括業務・署名欄は出力しません。受託・実施・支払いを確約するものではありません。':content.type==='contract'?'委託者（甲）と受託者（乙）は、以下の個別条件および本書に収録するサービス利用条件を確認します。':'新規のお取引用書類です。個別に確認した範囲・金額を記載します。生成だけで契約が確定するものではありません。',10);
   for(const s of content.sections){heading(s.title);s.paragraphs.forEach(p=>paragraph(p));}
   if(content.type==='contract') { newPage();heading('別紙 サービス利用条件');
-  paragraph('本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月20日。元ページ： https://local-koho.com/terms.html',9);
+  paragraph('本書に収録した条件を双方で確認し、署名・同意の記録とともに保存してください。料金条件基準日：2026年10月20日。受託条件・AI利用方針：2026年10月24日版。元ページ： https://local-koho.com/terms.html',9);
   for(const term of content.terms){heading(term.title);paragraph(term.text);}
   need(360);heading('双方の確認・署名');
   paragraph(`契約日：${content.data.contractDate}\n本書の個別条件および別紙利用条件を確認し、合意します。PDFの生成だけで契約は確定しません。`,10);
