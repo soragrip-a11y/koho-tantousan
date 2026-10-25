@@ -16,7 +16,7 @@ export function mountSharedStaff(app,client){
  function clear(){cleanup?.();cleanup=null;app.innerHTML='';}
  function message(text){app.querySelector('[role="alert"]')?.replaceChildren(document.createTextNode(text));}
  function login(){epoch++;clear();app.classList.add('easy-post');rows=[];session=false;
-  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label><button class="easy-primary">ログイン</button></form><p role="alert"></p></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label><button class="easy-primary">ログイン</button></form><p role="alert"></p><p><a href="./password-recovery.html">パスワードを忘れたとき</a></p></section>';
   app.querySelector('form').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const form=e.currentTarget;form.querySelector('button').disabled=true;
    const email=form.elements.email.value,password=form.elements.password.value;form.elements.password.value='';
    try{await flow.login(email,password);session=true;await preview();}catch{login();message('ログインまたは権限確認ができませんでした。');}finally{busy=false;form.querySelector('button').disabled=false;}};
