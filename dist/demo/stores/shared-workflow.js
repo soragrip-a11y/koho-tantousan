@@ -1,4 +1,4 @@
-import {prepareChange} from './notice-repository.js?v=20261025-9';
+import {prepareChange} from './notice-repository.js?v=20261025-17';
 // No credentials, persistent session, localStorage or automatic demo fallback.
 export function createSharedWorkflow(repository){
  let authorized=false,pending=null,inflight=null;

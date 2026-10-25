@@ -1,4 +1,5 @@
 // Shared storage adapter. All authorization is enforced by server-side RPC and RLS.
+import {accessError} from './access-errors.js';
 const STORE='nakatomi',BUCKET='koho-notice-images';
 const allowedActions=new Set(['publish','end','withdraw']);
 function failure(error){
@@ -28,10 +29,11 @@ export function createNoticeRepository(client){
     async listPublic(){return (await rpc('koho_list_notices',{p_store_id:STORE})).map(notice);},
     async listStaff(){return (await rpc('koho_list_staff_notices',{p_store_id:STORE})).map(notice);},
     async signIn(email,password){
-      const {error}=await client.auth.signInWithPassword({email,password});
-      if(error)throw new Error('ログインできませんでした。');
-      try{if(!await rpc('koho_can_manage',{p_store_id:STORE}))throw new Error('この店舗の操作権限がありません。');}
-      catch(error){await client.auth.signOut({scope:'local'});throw error;}
+      let result;try{result=await client.auth.signInWithPassword({email,password});}catch{throw new Error(accessError(null,'auth'));}
+      const {error}=result;
+      if(error)throw new Error(accessError(error,'auth'));
+      try{if(!await rpc('koho_can_manage',{p_store_id:STORE}))throw Object.assign(new Error(),{code:'STORE_DENIED'});}
+      catch(error){try{await client.auth.signOut({scope:'local'});}catch{}throw new Error(accessError(error,'permission'));}
     },
     async signOut(){const {error}=await client.auth.signOut();if(error)throw failure(error);},
     async save(operation){return notice(await rpc('koho_change_notice',operation));},
