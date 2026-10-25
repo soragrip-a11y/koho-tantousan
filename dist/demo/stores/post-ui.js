@@ -19,7 +19,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     }else if(step===2){
       content='<p class="easy-step">2 / 3　ひとこと</p><h1>お店の情報を、<br>お客さんに伝えましょう</h1><label class="easy-label" for="words">お知らせの文章</label><textarea id="words" maxlength="180" rows="5" placeholder="例：これはお知らせの練習です">'+esc(text)+'</textarea><p class="easy-help">180文字まで書けます。</p><button id="next" class="easy-primary">内容を確認する →</button>'+back+cancel;
     }else{
-      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>投稿から24時間たつと、終了したお知らせとして表示されます。写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">このスマホだけに保存する練習です。ほかの人には公開・送信されません。</p>'+back+cancel;
+      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>投稿から24時間たつと、終了したお知らせとして表示されます。写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">保存すると店舗の共有データを更新します。公開開始までは店員さんだけが確認できます。</p>'+back+cancel;
     }
     app.innerHTML='<section class="easy-shell">'+intro+content+'<p id="easy-error" class="error" role="alert"></p></section>';
     if(focus){window.scrollTo(0,0);$('h1').setAttribute('tabindex','-1');$('h1').focus({preventScroll:true});}
@@ -28,8 +28,8 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     if(step==='actions'){
       $('#exit').onclick=onExit;
       $('#rewrite').onclick=onEdit;
-      $('#soldout').onclick=()=>{if(confirm('このお知らせを終了にしますか？ お客さんの画面に「終了しました」と表示されます。')){if(onState(existing.id,'soldout')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
-      $('#withdraw').onclick=()=>{if(confirm('このお知らせを取り下げますか？ 客向けの見本から消えます。')){if(onState(existing.id,'withdrawn')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
+      $('#soldout').onclick=async()=>{if(busy||!confirm('このお知らせを終了にしますか？'))return;busy=true;for(const b of app.querySelectorAll('button'))b.disabled=true;const ok=await onState(existing.id,'soldout');if(!ok&&!disposed){busy=false;render();$('#easy-error').textContent='変更を保存できませんでした。接続を確認して再試行してください。';}};
+      $('#withdraw').onclick=async()=>{if(busy||!confirm('このお知らせを取り下げますか？'))return;busy=true;for(const b of app.querySelectorAll('button'))b.disabled=true;const ok=await onState(existing.id,'withdrawn');if(!ok&&!disposed){busy=false;render();$('#easy-error').textContent='変更を保存できませんでした。接続を確認して再試行してください。';}};
     }else if(step===1){
       $('#take-photo').onclick=()=>$('#camera').click();$('#choose-photo').onclick=()=>$('#library').click();
       $('#camera').onchange=readPhoto;$('#library').onchange=readPhoto;
@@ -38,10 +38,10 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     }else if(step===2){
       $('#next').onclick=()=>{text=$('#words').value.trim();if(!text){$('#easy-error').textContent='文章をひとこと書いてください。';$('#words').focus();return;}step=3;render(true);};
     }else{
-      $('#publish').onclick=()=>{
-        if(committed)return;committed=true;$('#publish').disabled=true;
+      $('#publish').onclick=async()=>{
+        if(committed)return;committed=true;for(const button of app.querySelectorAll('button'))button.disabled=true;
         const input={id:existing?.id||crypto.randomUUID(),storeId:'nakatomi',title:'お店からのお知らせ',text,image:photo,state:'active',end:new Date(Date.now()+86400000).toISOString()};
-        if(!onSave(input)){committed=false;$('#publish').disabled=false;$('#easy-error').textContent='保存できませんでした。写真を外して、もう一度お試しください。';}
+        if(!await onSave(input)){committed=false;for(const button of app.querySelectorAll('button'))button.disabled=false;$('#easy-error').textContent='保存できませんでした。写真を外して、もう一度お試しください。';}
       };
     }
   }

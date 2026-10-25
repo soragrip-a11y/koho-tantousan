@@ -23,6 +23,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run build:store-client
       - run: npm run sync:blog
       - run: npm test
       - uses: actions/configure-pages@v5

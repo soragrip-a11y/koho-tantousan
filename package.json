@@ -3,11 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:store-client": "node scripts/build-store-client.mjs",
     "test": "node --test tests/*.test.mjs",
     "sync:terms": "python3 scripts/sync-contract-terms.py",
     "sync:blog": "node scripts/render-blog.mjs"
   },
   "devDependencies": {
-    "linkedom": "0.18.12"
+    "esbuild": "0.28.2",
+    "linkedom": "0.18.12",
+    "playwright": "1.64.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
   }
 }

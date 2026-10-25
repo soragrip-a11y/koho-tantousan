@@ -1,0 +1,58 @@
+import {chromium,webkit} from 'playwright';
+import {createServer} from 'node:http';
+import {readFile,mkdir} from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const root=path.resolve('dist');
+const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');const file=path.resolve(root,'.'+url.pathname+(url.pathname.endsWith('/')?'index.html':''));if(!file.startsWith(root+path.sep))throw Error();res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream');res.end(await readFile(file));}catch{res.writeHead(404);res.end();}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const browser=await (process.env.TEST_BROWSER==='webkit'?webkit.launch():chromium.launch({channel:'msedge'}));
+const base='http://127.0.0.1:'+server.address().port+'/demo/stores/';
+const enc=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+const token=enc({alg:'HS256',typ:'JWT'})+'.'+enc({sub:'11111111-1111-4111-8111-111111111111',role:'authenticated',exp:Math.floor(Date.now()/1000)+3600})+'.mock';
+try{for(const width of [320,390,430]){
+ const context=await browser.newContext({viewport:{width,height:844},hasTouch:true,isMobile:true});
+ const page=await context.newPage(),customer=await context.newPage(),rows=[],images=new Map(),errors=[];let saves=0,fail=false;
+ for(const p of [page,customer])p.on('pageerror',e=>errors.push(e.message));
+ await context.addInitScript(()=>localStorage.setItem('koho-post-experience-v3',JSON.stringify([{id:'private-legacy',image:'data:image/jpeg;base64,YQ==',text:'DO NOT MIGRATE'}])));
+ await context.route('https://rnedesemnameergeksuo.supabase.co/**',async route=>{
+  const req=route.request(),url=new URL(req.url()),p=req.headers()['content-type']?.includes('application/json')?(req.postDataJSON()??{}):{};
+  const reply=(data,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(data)});
+  if(url.pathname==='/auth/v1/token')return reply({access_token:token,refresh_token:'mock-refresh',expires_in:3600,token_type:'bearer',user:{id:'11111111-1111-4111-8111-111111111111',email:'dummy@example.invalid',aud:'authenticated',app_metadata:{},user_metadata:{},created_at:new Date().toISOString()}});
+  if(url.pathname==='/auth/v1/logout')return reply({});
+  if(url.pathname.includes('/storage/v1/object/')){
+   const key=url.pathname.split('koho-notice-images/')[1];
+   if(req.method()==='POST'){const raw=req.postDataBuffer(),start=raw.indexOf(Buffer.from([255,216])),end=raw.lastIndexOf(Buffer.from([255,217]));images.set(key,raw.subarray(start,end+2));return reply({Key:key});}
+   return route.fulfill({status:200,contentType:'image/jpeg',body:images.get(key)});
+  }
+  const name=url.pathname.split('/').at(-1);
+  if(name==='koho_list_notices')return reply([]);
+  if(!req.headers().authorization?.includes(token))return reply({code:'42501'},401);
+  if(name==='koho_can_manage')return reply(true);
+  if(name==='koho_list_staff_notices')return reply(rows);
+  if(name==='koho_change_notice'){
+   await new Promise(r=>setTimeout(r,120));if(fail)return reply({code:'network'},503);
+   let row=rows.find(r=>r.id===p.p_id);if(row?.request===p.p_request_id)return reply(row);
+   if(!row){row={id:p.p_id,store_id:'nakatomi',version:0};rows.push(row);}
+   Object.assign(row,p.p_action==='publish'?{title:p.p_title,body:p.p_body,image_path:p.p_image_path,state:'active',expires_at:new Date(Date.now()+86400000).toISOString()}:{state:p.p_action==='end'?'soldout':'withdrawn'});row.version++;row.request=p.p_request_id;saves++;return reply(row);
+  }
+  return reply({code:'unexpected'},404);
+ });
+ page.on('dialog',d=>d.accept());
+ await page.goto(base+'staff.html');await page.waitForSelector('input[name=email]');
+ assert.ok(await page.locator('form button').evaluate(b=>b.getBoundingClientRect().height>=80));
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ if(width===390){await mkdir('tmp/connected',{recursive:true});await page.screenshot({path:'tmp/connected/login.png',fullPage:true});}
+ await page.locator('input[name=email]').fill('dummy@example.invalid');await page.locator('input[name=password]').fill('dummy');await page.locator('form button').click();await page.waitForSelector('#new');assert.equal(images.size,0);
+ await page.locator('#new').click();const png=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=c.height=32;c.getContext('2d').fillRect(0,0,32,32);return c.toDataURL('image/png').split(',')[1];});
+ await page.locator('#library').setInputFiles({name:'dummy.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.waitForSelector('.easy-photo');await page.locator('#next').click();await page.locator('#words').fill('架空のテスト投稿');await page.locator('#next').click();
+ fail=true;await page.locator('#publish').click();await page.waitForFunction(()=>!document.querySelector('#publish').disabled);assert.equal(saves,0);
+ fail=false;await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(saves,1);assert.equal(images.size,1);
+ await page.locator('[data-edit]').click();await page.locator('#rewrite').click();await page.locator('#remove-photo').click();await page.locator('#words').fill('編集した本文');await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(rows.length,1);assert.equal(rows[0].image_path,null);
+ await page.locator('[data-edit]').click();await page.locator('#soldout').click();await page.waitForSelector('.soldout-cover');
+ await customer.goto(base+'#post');await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
+ await page.locator('[data-edit]').click();await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows[0].state,'withdrawn');
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.reload();await page.waitForSelector('input[name=password]');assert.equal(await page.locator('[data-edit]').count(),0);assert.equal(await page.locator('input[name=password]').inputValue(),'');
+ assert.deepEqual(errors,[]);console.log(width+'px connected SDK: auth, photo, failure/retry, edit, end, withdraw, anonymous separation, reload PASS');await context.close();
+}}finally{await browser.close();await new Promise(r=>server.close(r));}
