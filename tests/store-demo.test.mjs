@@ -32,7 +32,7 @@ test('connected store has anonymous-only customer UI and a restricted backend or
  assert.ok(!readdirSync(root).some(name=>/sql|audit|private|staff-members/i.test(name)));
  const html=readFileSync(new URL('index.html',root),'utf8'),customer=readFileSync(new URL('customer.js',root),'utf8'),staff=readFileSync(new URL('staff.html',root),'utf8');
  assert.match(html,/noindex,nofollow,noarchive/);assert.match(html,/connect-src https:\/\/rnedesemnameergeksuo.supabase.co;/);assert.match(html,/form-action 'none'/);
- assert.match(html,/src="\.\/customer.js\?v=20261025-9"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
+ assert.match(html,/src="\.\/customer.js\?v=20261025-11"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
  assert.doesNotMatch(customer,/owner-local-only|events:|fetch\(|XMLHttpRequest|sendBeacon|mountPostUI|data-edit|<a\b|<input|<form|<textarea|staff\.html|post-ui\.js/);
  assert.match(staff,/一般公開は停止中/);assert.match(staff,/既存の端末内デモ写真は自動送信しません/);
  assert.doesNotMatch(customer,/listStaff|loadPosts|sampleNotices|POST_KEY/);

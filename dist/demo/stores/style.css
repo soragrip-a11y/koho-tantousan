@@ -67,3 +67,8 @@ body.customer-demo :is(button,a.button)::after,body.staff-demo :is(button,a.butt
 .soldout-cover strong{font-size:38px;line-height:1.4;color:#414944;background:rgba(250,251,250,.94);border:2px solid #858d88;border-radius:8px;padding:2px 24px;margin-top:8px}
 
 body.staff-demo header,body.customer-demo header{background:#fff}
+
+/* No empty photo placeholder; ended text-only posts keep a compact visible status. */
+.notice-media.no-photo{min-height:0}
+.notice-media.no-photo .soldout-cover{position:relative;padding:12px}
+.notice-media.no-photo .soldout-cover strong{margin:0;font-size:clamp(28px,8vw,38px)}

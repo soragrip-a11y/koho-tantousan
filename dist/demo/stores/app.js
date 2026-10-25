@@ -4,7 +4,7 @@ import {createNoticeRepository} from './notice-repository.js?v=20261025-10';
 import {createSharedWorkflow} from './shared-workflow.js?v=20261025-10';
 import {mountPostUI} from './post-ui.js?v=20261025-10';
 import {mountEditUI} from './edit-ui.js?v=20261025-10';
-import {noticeMedia} from './notice-view.js';
+import {noticeMedia} from './notice-view.js?v=20261025-11';
 import {postStatus} from './post-model.js?v=20261025-10';
 import './press-feedback.js';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -28,7 +28,7 @@ export function mountSharedStaff(app,client){
   for(const p of next)p.image=p.imagePath?await dataUrl(await repo.downloadPhoto(p.imagePath)):'';
   if(disposed||!session||currentEpoch!==epoch)return;
   rows=next;clear();app.classList.add('easy-post');
-  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>一般公開は停止中です。取り下げたお知らせも店員さんだけに表示します。</p><button id="new" class="easy-primary">新しく載せる</button><button id="reload" class="easy-secondary">最新の内容を確認</button><button id="logout" class="easy-cancel">ログアウト</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card"><div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div>'+noticeMedia(p,postStatus(p))+'<button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('');
+  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>一般公開は停止中です。取り下げたお知らせも店員さんだけに表示します。</p><button id="new" class="easy-primary">新しく載せる</button><button id="reload" class="easy-secondary">最新の内容を確認</button><button id="logout" class="easy-cancel">ログアウト</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('');
   app.querySelector('#new').onclick=()=>edit(null,false);
   app.querySelector('#reload').onclick=()=>preview().catch(()=>message('読み込めませんでした。'));
   app.querySelector('#logout').onclick=async()=>{session=false;rows=[];clear();try{await flow.logout();}finally{login();}};

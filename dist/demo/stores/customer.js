@@ -1,6 +1,6 @@
 import {createStoreClient} from './connection.js?v=20261025-9';
 import {createNoticeRepository} from './notice-repository.js?v=20261025-9';
-import {noticeMedia} from './notice-view.js?v=20261025-6';
+import {noticeMedia} from './notice-view.js?v=20261025-11';
 import './press-feedback.js';
 // Anonymous public RPC only. Never reads local demo posts or a staff session.
 import {STORES,VISIT_KEY,dayKey,readVisits,recordVisit} from './model.js';
@@ -23,7 +23,7 @@ function render(){
   const visited=done();
   const cards=posts.filter(p=>postStatus(p)!=='withdrawn').map(p=>{
     const state=postStatus(p),labels={active:'サンプルのお知らせ',soldout:'終了の表示例',ended:'掲載終了の表示例'};
-    return '<article class="card"><div class="card-body"><span class="badge '+(state==='active'?'':'off')+'">'+labels[state]+'</span><h2>'+esc(p.title)+'</h2><p class="deadline">掲載期限：'+date(p.end)+'（日本時間）</p><p>'+esc(p.text)+'</p></div>'+noticeMedia(p,state)+'</article>';
+    return '<article class="card">'+noticeMedia(p,state)+'<div class="card-body"><span class="badge '+(state==='active'?'':'off')+'">'+labels[state]+'</span><h2>'+esc(p.title)+'</h2><p class="deadline">掲載期限：'+date(p.end)+'（日本時間）</p><p>'+esc(p.text)+'</p></div></article>';
   }).join('');
   area.innerHTML='<section class="store-head"><p class="eyebrow">お店の情報 / 提案デモ</p><h1>'+esc(store.name)+'</h1><p>公式の店舗ページではありません。<br>実際の販売情報ではありません。</p></section><section class="cards">'+(cards||'<p class="empty">'+(readError?'お知らせを読み込めませんでした。時間をおいて再度お開きください。':'現在、一般公開中のお知らせはありません。')+'</p>')+'<section class="visit-panel"><h2>「いいね」を体験</h2><button id="visit" '+(visited||pending||unavailable?'disabled':'')+'>'+(visited?'今日はいいね済み':'いいね（デモ）')+'</button><p>このブラウザー内で1日1回、日本時間0時で更新する簡易デモです。実人数・来店証明・全利用者の集計ではありません。</p></section><p class="note">情報はサンプルです。在庫を保証しません。「いいね」はこのブラウザー内だけのデモです。</p></section>';
   document.querySelector('#visit').onclick=visit;
