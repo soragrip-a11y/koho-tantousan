@@ -2,7 +2,7 @@ import {mountEditUI} from './edit-ui.js?v=20261025-6';
 import {noticeMedia} from './notice-view.js?v=20261025-6';
 import './press-feedback.js';
 // Staff-only fictional practice surface. This module is not loaded by the customer page.
-import {mountPostUI} from './post-ui.js?v=20261025-6';
+import {mountPostUI} from './post-ui.js?v=20261025-7';
 import {STORES,START_KEY,VISIT_KEY,sampleNotices} from './model.js';
 import {POST_KEY,validPhoto,loadPosts,savePosts,postStatus} from './post-model.js';
 const app=document.querySelector('#app'),store=STORES[0];

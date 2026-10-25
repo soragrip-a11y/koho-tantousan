@@ -65,6 +65,15 @@ try{
  assert.equal(await staff.locator('input[type=datetime-local]').count(),0);
  assert.equal(await staff.locator('#camera').getAttribute('capture'),'environment');
  await staff.locator('#library').setInputFiles({name:'sample.png',mimeType:'image/png',buffer:await customer.screenshot()});await staff.waitForSelector('.easy-photo');
+ for(const width of [320,390,430]){
+  await staff.setViewportSize({width,height:844});await controlAppearance(staff);
+  assert.deepEqual(await staff.locator('.easy-photo').evaluate(e=>[e.nextElementSibling.id,e.nextElementSibling.nextElementSibling.className,e.nextElementSibling.nextElementSibling.nextElementSibling.id]),['next','easy-help','remove-photo']);
+  await staff.screenshot({path:'tmp/store-demo-separated/photo-order-'+width+'.png',fullPage:true});
+ }
+ await staff.setViewportSize({width:390,height:844});
+ await staff.locator('#remove-photo').click();assert.equal(await staff.locator('.easy-photo').count(),0);assert.equal(await staff.locator('#next').textContent(),'写真なしで次へ →');
+ await staff.locator('#library').setInputFiles({name:'sample.png',mimeType:'image/png',buffer:await customer.screenshot()});await staff.waitForSelector('.easy-photo');
+ staff.once('dialog',d=>d.dismiss());await staff.locator('#cancel').click();assert.ok(await staff.locator('.easy-photo').isVisible());
  await staff.locator('#next').click();await staff.locator('#next').click();assert.ok((await staff.locator('#easy-error').textContent()).includes('文章'));
  assert.equal(await staff.locator('h1').textContent(),'お店の情報を、お客さんに伝えましょう');await controlAppearance(staff);await staff.screenshot({path:'tmp/store-demo-separated/new-intro-390.png',fullPage:true});
  await staff.locator('#words').fill('文'.repeat(200));assert.equal((await staff.locator('#words').inputValue()).length,180);
