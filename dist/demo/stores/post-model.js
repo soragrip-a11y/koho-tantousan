@@ -5,7 +5,7 @@ export function validatePost(input) {
   if (typeof input.title !== 'string' || !input.title.trim() || input.title.length > 40) throw Error('見出しは1〜40文字で入力してください。');
   if (typeof input.text !== 'string' || !input.text.trim() || input.text.length > 180) throw Error('本文は1〜180文字で入力してください。');
   if (!Number.isFinite(Date.parse(input.end))) throw Error('終了日時を入力してください。');
-  if (!['active','soldout','ended'].includes(input.state)) throw Error('状態が不正です。');
+  if (!['active','soldout','ended','withdrawn'].includes(input.state)) throw Error('状態が不正です。');
   if (input.image && !validPhoto(input.image)) throw Error('写真を読み込めません。選び直してください。');
   return {id:String(input.id),storeId:'nakatomi',title:input.title.trim(),text:input.text.trim(),end:input.end,state:input.state,image:input.image||''};
 }
@@ -23,6 +23,7 @@ export function savePosts(storage, posts) {
   return next;
 }
 export function postStatus(post, now=Date.now()) {
+  if(post.state==='withdrawn')return 'withdrawn';
   if(post.state==='soldout')return 'soldout';
   return post.state==='ended'||Date.parse(post.end)<=now?'ended':'active';
 }
