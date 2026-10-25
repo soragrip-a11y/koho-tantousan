@@ -29,10 +29,10 @@ test('daily own visit limit is independent by store and changes at Japan midnigh
 });
 test('published demo has no actual audit data, owner backend or network writes',()=>{
  const root=new URL('../dist/demo/stores/',import.meta.url);
- assert.deepEqual(readdirSync(root).sort(),['app.js','customer.js','index.html','staff.html','model.js','post-model.js','post-ui.js','press-feedback.js','placeholder.svg','rich-menu.png','rich-menu.svg','style.css'].sort());
+ assert.deepEqual(readdirSync(root).sort(),['app.js','customer.js','index.html','staff.html','model.js','post-model.js','post-ui.js','press-feedback.js','edit-ui.js','notice-view.js','placeholder.svg','rich-menu.png','rich-menu.svg','style.css'].sort());
  const html=readFileSync(new URL('index.html',root),'utf8'),customer=readFileSync(new URL('customer.js',root),'utf8'),staff=readFileSync(new URL('staff.html',root),'utf8');
  assert.match(html,/noindex,nofollow,noarchive/);assert.match(html,/connect-src 'none'/);assert.match(html,/form-action 'none'/);
- assert.match(html,/src="\.\/customer.js\?v=20261025-3"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
+ assert.match(html,/src="\.\/customer.js\?v=20261025-4"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
  assert.doesNotMatch(customer,/owner-local-only|events:|fetch\(|XMLHttpRequest|sendBeacon|mountPostUI|data-edit|<a\b|<input|<form|<textarea|staff\.html|post-ui\.js/);
  assert.match(staff,/本番の管理画面やログイン機能ではありません/);assert.match(staff,/ほかの人には公開・送信されません/);
  assert.doesNotMatch(readFileSync(new URL('../dist/sitemap.xml',import.meta.url),'utf8'),/demo\/stores/);

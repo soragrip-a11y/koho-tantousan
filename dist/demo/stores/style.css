@@ -58,3 +58,13 @@ body.staff-demo :is(button,a.button):not(:disabled)[data-pressed]{transform:none
 body.customer-demo :is(button,a.button)::after,body.staff-demo :is(button,a.button)::after{content:"";position:absolute;inset:-6px 0;}
 
 .easy-post h1 .intro-phrase{white-space:nowrap}
+
+/* End marking is confined to the sold-out notice's image, preserving readable text. */
+.notice-media{position:relative;background:#edf1ec;overflow:hidden}
+.notice-media.is-soldout{min-height:180px}
+.notice-media .picture{display:block;width:100%;margin:0}
+.soldout-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,rgba(110,116,114,.17) 0,rgba(110,116,114,.17) 3px,rgba(240,242,241,.48) 3px,rgba(240,242,241,.48) 12px);pointer-events:none}
+.soldout-cross{font-family:Arial,sans-serif;font-size:112px;line-height:.85;font-weight:700;color:#656d69;text-shadow:0 1px 3px #fff}
+.soldout-cover strong{font-size:38px;line-height:1.4;color:#414944;background:rgba(250,251,250,.94);border:2px solid #858d88;border-radius:8px;padding:2px 24px;margin-top:8px}
+
+body.staff-demo header,body.customer-demo header{background:#fff}

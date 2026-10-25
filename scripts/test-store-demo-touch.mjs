@@ -44,7 +44,7 @@ try{
  await customer.goto(base);await readonly();
  await staffRoute();await staff.locator('#next').tap();await staff.locator('#words').fill('タッチ操作の投稿テスト');await staff.locator('#next').tap();await staff.locator('#publish').tap();await staff.waitForSelector('.staff-preview-note');
  await customer.waitForFunction(()=>document.querySelector('.card')?.textContent.includes('タッチ操作の投稿テスト'));
- await staff.locator('[data-edit-post]').first().tap();await staff.waitForSelector('#rewrite');await staff.locator('#rewrite').tap();await staff.waitForSelector('#next');await staff.locator('#next').tap();await staff.locator('#words').fill('書き直した本文');await staff.locator('#next').tap();await staff.locator('#publish').tap();await staff.waitForSelector('.staff-preview-note');
+ await staff.locator('[data-edit-post]').first().tap();await staff.waitForSelector('#rewrite');await staff.locator('#rewrite').tap();await staff.waitForSelector('#words');await staff.locator('#words').fill('書き直した本文');staff.once('dialog',d=>d.accept());await staff.locator('#publish').tap();await staff.waitForSelector('.staff-preview-note');
  await customer.waitForFunction(()=>document.querySelector('.card')?.textContent.includes('書き直した本文'));
  await staff.locator('[data-edit-post]').first().tap();
  await staff.evaluate(()=>{window.savedSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('test full','QuotaExceededError');};});

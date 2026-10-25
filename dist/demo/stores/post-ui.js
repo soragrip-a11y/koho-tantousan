@@ -1,7 +1,7 @@
 // Simple browser-local practice flow. No authentication, history or network submission.
 import {validPhoto} from './post-model.js';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function mountPostUI({app,existing,onSave,onState,onExit}) {
+export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
   let step=existing?'actions':1,photo=existing?.image||'',text=existing?.text||'',busy=false,disposed=false,token=0,committed=false;
   const $=s=>app.querySelector(s);
   const intro='<p class="easy-note">店員さんの練習です。<br>このスマホだけに残ります。<br>ほかの人には送られません。</p>';
@@ -27,7 +27,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit}) {
     $('#back')?.addEventListener('click',()=>{if(step===3)step=2;else{ text=$('#words').value;step=1;}render(true);});
     if(step==='actions'){
       $('#exit').onclick=onExit;
-      $('#rewrite').onclick=()=>{step=1;render(true);};
+      $('#rewrite').onclick=onEdit;
       $('#soldout').onclick=()=>{if(confirm('このお知らせを「売り切れ」にしますか？')){if(onState(existing.id,'soldout')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
       $('#withdraw').onclick=()=>{if(confirm('このお知らせを取り下げますか？ 客向けの見本から消えます。')){if(onState(existing.id,'withdrawn')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
     }else if(step===1){
