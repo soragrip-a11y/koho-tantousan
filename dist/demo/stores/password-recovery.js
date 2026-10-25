@@ -1,4 +1,4 @@
-import {consumeRecoveryLink,mountRecovery} from './password-recovery-ui.js?v=20261025-18';
+import {consumeRecoveryLink,mountRecovery} from './password-recovery-ui.js?v=20261026-19';
 let generation=0,dispose=null,client=null;
 async function start(){
  // Consume the callback synchronously, before SDK initialization or any await.
