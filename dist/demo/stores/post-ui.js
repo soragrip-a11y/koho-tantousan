@@ -5,7 +5,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
   let step=existing?'actions':1,photo=existing?.image||'',text=existing?.text||'',busy=false,disposed=false,token=0,committed=false;
   const $=s=>app.querySelector(s);
-  const intro='<p class="easy-note">店員さんの練習です。<br>このスマホだけに残ります。<br>ほかの人には送られません。</p>';
+  const intro='<p class="easy-note">投稿すると、写真と文章を共有保存します。<br>お店が公開設定のときは、お客さんにも表示されます。</p>';
   const back='<button class="easy-secondary" id="back" type="button">← 戻る</button>';
   const cancel='<button class="easy-cancel" id="cancel" type="button">入力をやめる</button>';
   function cancelFlow(){if(confirm('入力をやめますか？ 保存していない内容は消えます。'))onExit();}
@@ -18,9 +18,9 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     }else if(step===1){
       content='<p class="easy-step">1 / 3　写真</p><h1>お店の情報を、<br>お客さんに<wbr><span class="intro-phrase">伝えましょう</span></h1><p>写真がなくても大丈夫です。</p><input hidden id="camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><input hidden id="library" type="file" accept="image/jpeg,image/png,image/webp"><button id="take-photo" class="easy-primary">写真を撮る</button><button id="choose-photo" class="easy-secondary">スマホの写真を選ぶ</button>'+(photo?'<img class="easy-photo" src="'+photo+'" alt="選んだ写真"><button id="next" class="easy-primary">この写真で次へ →</button>':'')+'<p class="easy-help">撮影画面はスマホによって異なります。</p>'+(photo?'<button id="remove-photo" class="easy-cancel">この写真を外す</button>':'<button id="next" class="easy-primary">写真なしで次へ →</button>')+cancel;
     }else if(step===2){
-      content='<p class="easy-step">2 / 3　ひとこと</p><h1>お店の情報を、<br>お客さんに伝えましょう</h1><label class="easy-label" for="words">お知らせの文章</label><textarea id="words" maxlength="180" rows="5" placeholder="例：これはお知らせの練習です">'+esc(text)+'</textarea><p class="easy-help">180文字まで書けます。</p><button id="next" class="easy-primary">内容を確認する →</button>'+back+cancel;
+      content='<p class="easy-step">2 / 3　ひとこと</p><h1>お店の情報を、<br>お客さんに伝えましょう</h1><label class="easy-label" for="words">お知らせの文章</label><textarea id="words" maxlength="180" rows="5" placeholder="お客さんに伝える内容を書いてください">'+esc(text)+'</textarea><p class="easy-help">180文字まで書けます。</p><button id="next" class="easy-primary">内容を確認する →</button>'+back+cancel;
     }else{
-      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>投稿から24時間たつと、終了したお知らせとして表示されます。写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">保存すると店舗の共有データを更新します。公開開始までは店員さんだけが確認できます。</p>'+back+cancel;
+      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>投稿から24時間たつと、終了したお知らせとして表示されます。写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">お店が公開設定のときは、この内容がお客さんに公開されます。非公開設定のときは、権限のある店員さんだけが確認できます。</p>'+back+cancel;
     }
     app.innerHTML='<section class="easy-shell">'+intro+content+'<p id="easy-error" class="error" role="alert"></p></section>';
     if(focus){window.scrollTo(0,0);$('h1').setAttribute('tabindex','-1');$('h1').focus({preventScroll:true});}

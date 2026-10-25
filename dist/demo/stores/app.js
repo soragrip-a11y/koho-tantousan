@@ -2,8 +2,8 @@ import {createStoreClient} from './connection.js?v=20261025-9';
 import {createDeleteOperation} from './delete-operation.js?v=20261025-10';
 import {createNoticeRepository} from './notice-repository.js?v=20261025-10';
 import {createSharedWorkflow} from './shared-workflow.js?v=20261025-10';
-import {mountPostUI} from './post-ui.js?v=20261025-10';
-import {mountEditUI} from './edit-ui.js?v=20261025-10';
+import {mountPostUI} from './post-ui.js?v=20261025-12';
+import {mountEditUI} from './edit-ui.js?v=20261025-12';
 import {noticeMedia} from './notice-view.js?v=20261025-11';
 import {postStatus} from './post-model.js?v=20261025-10';
 import './press-feedback.js';
@@ -16,7 +16,7 @@ export function mountSharedStaff(app,client){
  function clear(){cleanup?.();cleanup=null;app.innerHTML='';}
  function message(text){app.querySelector('[role="alert"]')?.replaceChildren(document.createTextNode(text));}
  function login(){epoch++;clear();app.classList.add('easy-post');rows=[];session=false;
-  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>共有保存の接続確認用です。一般公開は停止中です。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label><button class="easy-primary">ログイン</button></form><p role="alert"></p></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label><button class="easy-primary">ログイン</button></form><p role="alert"></p></section>';
   app.querySelector('form').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const form=e.currentTarget;form.querySelector('button').disabled=true;
    const email=form.elements.email.value,password=form.elements.password.value;form.elements.password.value='';
    try{await flow.login(email,password);session=true;await preview();}catch{login();message('ログインまたは権限確認ができませんでした。');}finally{busy=false;form.querySelector('button').disabled=false;}};
@@ -28,7 +28,7 @@ export function mountSharedStaff(app,client){
   for(const p of next)p.image=p.imagePath?await dataUrl(await repo.downloadPhoto(p.imagePath)):'';
   if(disposed||!session||currentEpoch!==epoch)return;
   rows=next;clear();app.classList.add('easy-post');
-  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>一般公開は停止中です。取り下げたお知らせも店員さんだけに表示します。</p><button id="new" class="easy-primary">新しく載せる</button><button id="reload" class="easy-secondary">最新の内容を確認</button><button id="logout" class="easy-cancel">ログアウト</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('');
+  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新しく載せる</button><button id="reload" class="easy-secondary">最新の内容を確認</button><button id="logout" class="easy-cancel">ログアウト</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('');
   app.querySelector('#new').onclick=()=>edit(null,false);
   app.querySelector('#reload').onclick=()=>preview().catch(()=>message('読み込めませんでした。'));
   app.querySelector('#logout').onclick=async()=>{session=false;rows=[];clear();try{await flow.logout();}finally{login();}};
@@ -37,7 +37,7 @@ export function mountSharedStaff(app,client){
  function edit(existing,rewrite){clear();
   async function deletePost(){
    if(busy)return false;busy=true;
-   try{const result=await removeNotice(existing);try{await preview();message('削除しました。'+(result.retained_count?'ほかの投稿が参照する写真は削除対象外です。':''));}catch{clear();app.innerHTML='<section class="easy-shell"><p>削除は完了しました。画面の更新ができませんでした。</p><button id="reload-deleted" class="easy-primary">一覧を読み直す</button><p role="alert"></p></section>';app.querySelector('#reload-deleted').onclick=()=>preview().catch(()=>message('まだ読み込めません。時間をおいて再度お試しください。'));}}
+   try{const result=await removeNotice(existing);try{await preview();message('投稿を削除しました。非公開の操作記録（文章・写真の保存先情報）は残ります。'+(result.retained_count?'ほかの投稿が参照する写真は削除対象外です。':''));}catch{clear();app.innerHTML='<section class="easy-shell"><p>投稿の削除は完了しました。非公開の操作記録は残ります。画面の更新ができませんでした。</p><button id="reload-deleted" class="easy-primary">一覧を読み直す</button><p role="alert"></p></section>';app.querySelector('#reload-deleted').onclick=()=>preview().catch(()=>message('まだ読み込めません。時間をおいて再度お試しください。'));}}
    catch(error){try{await preview();}catch{edit({...existing,state:'deleting',image:''},false);}message(error.message||'削除は完了していません。もう一度確認してください。');}
    finally{busy=false;}return true;
   }

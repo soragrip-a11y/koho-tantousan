@@ -70,7 +70,7 @@ try{for(const width of [320,390,430,1280]){
  await customer.reload();await customer.waitForSelector('.soldout-cover');for(const p of [page,customer]){assert.equal(await p.locator('.card img').count(),0);assert.ok(await p.locator('.notice-media.no-photo').evaluate(e=>e.getBoundingClientRect().height<130));assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
  if(width===390)await customer.screenshot({path:'tmp/connected/no-photo-ended.png',fullPage:true});
  fixturePublic=false;
- await customer.goto(base+'#post');await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
+ await customer.goto(base+'#post');await customer.waitForSelector('.empty');await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
  await page.locator('[data-edit]').click();assert.equal(await page.locator('#withdraw').textContent(),'削除する');accept=false;await page.locator('#withdraw').click();assert.equal(jobs.size,0);
  accept=true;await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows[0].state,'deleting');assert.match(await page.locator('[role=alert]').textContent(),/削除が完了していません/);
  await page.locator('[data-edit]').click();assert.equal(await page.locator('#rewrite,#soldout').count(),0);await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows.length,0);assert.equal(images.size,0);

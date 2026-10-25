@@ -34,10 +34,19 @@ test('connected store has anonymous-only customer UI and a restricted backend or
  assert.match(html,/noindex,nofollow,noarchive/);assert.match(html,/connect-src https:\/\/rnedesemnameergeksuo.supabase.co;/);assert.match(html,/form-action 'none'/);
  assert.match(html,/src="\.\/customer.js\?v=20261025-11"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
  assert.doesNotMatch(customer,/owner-local-only|events:|fetch\(|XMLHttpRequest|sendBeacon|mountPostUI|data-edit|<a\b|<input|<form|<textarea|staff\.html|post-ui\.js/);
- assert.match(staff,/一般公開は停止中/);assert.match(staff,/既存の端末内デモ写真は自動送信しません/);
+ assert.match(staff,/お店が公開設定のときは、お客さんにも表示されます/);assert.match(staff,/既存の端末内デモ写真は自動送信しません/);
  assert.doesNotMatch(customer,/listStaff|loadPosts|sampleNotices|POST_KEY/);
  const config=readFileSync(new URL('connection.js',root),'utf8');
  assert.match(config,/persistSession:false/);assert.match(config,/detectSessionInUrl:false/);
  assert.doesNotMatch(config,/service_role|sb_secret_/);
  assert.doesNotMatch(readFileSync(new URL('../dist/sitemap.xml',import.meta.url),'utf8'),/demo\/stores/);
+});
+
+test('shared posting explanations never promise device-only or unpublished storage',()=>{
+ const root=new URL('../dist/demo/stores/',import.meta.url);
+ for(const file of ['staff.html','app.js','post-ui.js','edit-ui.js']){
+  const source=readFileSync(new URL(file,root),'utf8');
+  assert.doesNotMatch(source,/一般公開は停止中|このスマホだけに残ります|ほかの人には送られません|公開開始までは/);
+  assert.match(source,/お店が公開設定のときは/);
+ }
 });
