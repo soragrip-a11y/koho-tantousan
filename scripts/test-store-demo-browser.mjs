@@ -95,7 +95,7 @@ try{
  await staffRoute();await staff.locator('#next').click();await staff.locator('#words').fill('写真なしの練習');staff.once('dialog',d=>d.dismiss());await staff.locator('#cancel').click();assert.equal(await staff.locator('#words').inputValue(),'写真なしの練習');
  await staff.locator('#next').click();await staff.locator('#publish').click();await staff.waitForSelector('.staff-preview-note');
  await customer.reload();await readonly();assert.equal(await customer.locator('.card').count(),2);
- await customer.locator('#visit').evaluate(b=>{for(let i=0;i<20;i++)b.click();});await customer.waitForFunction(()=>document.querySelector('#visit').textContent.includes('受付済み'));await customer.reload();await readonly();assert.ok(await customer.locator('#visit').isDisabled());
+ assert.equal(await customer.locator('#visit').textContent(),'いいね（デモ）');assert.equal(await customer.locator('.visit-panel h2').textContent(),'「いいね」を体験');await customer.locator('#visit').evaluate(b=>{for(let i=0;i<20;i++)b.click();});await customer.waitForFunction(()=>document.querySelector('#visit').textContent.includes('いいね済み'));await customer.reload();await readonly();assert.ok(await customer.locator('#visit').isDisabled());assert.equal(await customer.locator('#visit').textContent(),'今日はいいね済み');
  await controlAppearance(customer);await customer.screenshot({path:'tmp/store-demo-separated/customer-disabled-390.png',fullPage:true});
  await staffRoute();await staff.locator('#library').setInputFiles({name:'bad.png',mimeType:'image/png',buffer:Buffer.from('broken')});await staff.waitForFunction(()=>document.querySelector('#easy-error').textContent.includes('読み込めません'));
  staff.once('dialog',d=>d.accept());await staff.locator('#cancel').click();await staff.waitForSelector('.staff-preview-note');
