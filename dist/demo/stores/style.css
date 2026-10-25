@@ -72,3 +72,5 @@ body.staff-demo header,body.customer-demo header{background:#fff}
 .notice-media.no-photo{min-height:0}
 .notice-media.no-photo .soldout-cover{position:relative;padding:12px}
 .notice-media.no-photo .soldout-cover strong{margin:0;font-size:clamp(28px,8vw,38px)}
+
+.customer-demo #refresh{display:block;width:100%;min-height:80px;font-size:26px;margin:20px 0 16px}.refresh-status{font-size:16px;min-height:1.7em;overflow-wrap:anywhere}

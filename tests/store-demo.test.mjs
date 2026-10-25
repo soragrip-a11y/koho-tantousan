@@ -25,16 +25,16 @@ test('daily own visit limit is independent by store and changes at Japan midnigh
  assert.equal(recordVisit(result.ledger,'nakatomi',now+1000).added,true);
  assert.equal(dayKey(now+1000),'2026-10-26');
  assert.throws(()=>readVisits({getItem:()=>'{'}));
- assert.equal(STORES[0].name,'セブンイレブン中富店');
+ assert.equal(STORES[0].name,'セブンイレブン君津中富店');
 });
 test('connected store has anonymous-only customer UI and a restricted backend origin',()=>{
  const root=new URL('../dist/demo/stores/',import.meta.url);
  assert.ok(!readdirSync(root).some(name=>/sql|audit|private|staff-members/i.test(name)));
  const html=readFileSync(new URL('index.html',root),'utf8'),customer=readFileSync(new URL('customer.js',root),'utf8'),staff=readFileSync(new URL('staff.html',root),'utf8');
  assert.match(html,/noindex,nofollow,noarchive/);assert.match(html,/connect-src https:\/\/rnedesemnameergeksuo.supabase.co;/);assert.match(html,/form-action 'none'/);
- assert.match(html,/src="\.\/customer.js\?v=20261025-11"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
+ assert.match(html,/src="\.\/customer.js\?v=20261025-13"/);assert.doesNotMatch(html,/<a\b|staff\.html|post-ui|app\.js|id="reset"/);
  assert.doesNotMatch(customer,/owner-local-only|events:|fetch\(|XMLHttpRequest|sendBeacon|mountPostUI|data-edit|<a\b|<input|<form|<textarea|staff\.html|post-ui\.js/);
- assert.match(staff,/お店が公開設定のときは、お客さんにも表示されます/);assert.match(staff,/既存の端末内デモ写真は自動送信しません/);
+ assert.match(staff,/お店が公開設定のときは、お客さんにも表示されます/);assert.match(staff,/写真は「投稿する」「再投稿する」を押すと送信されます/);
  assert.doesNotMatch(customer,/listStaff|loadPosts|sampleNotices|POST_KEY/);
  const config=readFileSync(new URL('connection.js',root),'utf8');
  assert.match(config,/persistSession:false/);assert.match(config,/detectSessionInUrl:false/);

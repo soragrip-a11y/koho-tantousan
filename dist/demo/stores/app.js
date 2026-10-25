@@ -4,7 +4,7 @@ import {createNoticeRepository} from './notice-repository.js?v=20261025-10';
 import {createSharedWorkflow} from './shared-workflow.js?v=20261025-10';
 import {mountPostUI} from './post-ui.js?v=20261025-12';
 import {mountEditUI} from './edit-ui.js?v=20261025-12';
-import {noticeMedia} from './notice-view.js?v=20261025-11';
+import {noticeMedia} from './notice-view.js?v=20261025-13';
 import {postStatus} from './post-model.js?v=20261025-10';
 import './press-feedback.js';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

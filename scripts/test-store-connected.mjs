@@ -12,7 +12,7 @@ const enc=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
 const token=enc({alg:'HS256',typ:'JWT'})+'.'+enc({sub:'11111111-1111-4111-8111-111111111111',role:'authenticated',exp:Math.floor(Date.now()/1000)+3600})+'.mock';
 try{for(const width of [320,390,430,1280]){
  const context=await browser.newContext({viewport:{width,height:844},hasTouch:width<650,isMobile:width<650});
- const page=await context.newPage(),customer=await context.newPage(),rows=[],images=new Map(),jobs=new Map(),errors=[];let saves=0,fail=false,deleteFail=true,accept=true,fixturePublic=false,fixtureJpeg;
+ const page=await context.newPage(),customer=await context.newPage(),rows=[],images=new Map(),jobs=new Map(),errors=[];let saves=0,fail=false,deleteFail=true,accept=true,fixturePublic=false,fixtureJpeg,publicFail=false,publicRequests=0;
  for(const p of [page,customer])p.on('pageerror',e=>errors.push(e.message));
  await context.addInitScript(()=>localStorage.setItem('koho-post-experience-v3',JSON.stringify([{id:'private-legacy',image:'data:image/jpeg;base64,YQ==',text:'DO NOT MIGRATE'}])));
  await context.route('https://rnedesemnameergeksuo.supabase.co/**',async route=>{
@@ -28,7 +28,7 @@ try{for(const width of [320,390,430,1280]){
   }
   const name=url.pathname.split('/').at(-1);
   // Only a mocked response changes visibility; no real backend publication setting is changed.
-  if(name==='koho_list_notices')return reply(fixturePublic?rows:[]);
+  if(name==='koho_list_notices'){publicRequests++;await new Promise(r=>setTimeout(r,200));return reply(publicFail?{code:'mock read failure'}:fixturePublic?rows:[],publicFail?503:200);}
   if(!req.headers().authorization?.includes(token))return reply({code:'42501'},401);
   if(name==='koho_can_manage')return reply(true);
   if(name==='koho_list_staff_notices')return reply(rows);
@@ -63,6 +63,16 @@ try{for(const width of [320,390,430,1280]){
  fixturePublic=true;await customer.goto(base);await customer.waitForSelector('.card .picture');
  for(const p of [page,customer])assert.ok(await p.locator('.card').evaluate(c=>c.firstElementChild.classList.contains('notice-media')&&c.querySelector('.picture').getBoundingClientRect().bottom<=c.querySelector('.card-body').getBoundingClientRect().top+1));
  if(width===390)await customer.screenshot({path:'tmp/connected/photo-first.png',fullPage:true});
+ await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);
+ assert.ok(await customer.locator('#refresh').evaluate(b=>b.getBoundingClientRect().height>=80));
+ const beforeRefresh=publicRequests;rows[0].body='更新されたお知らせ';
+ await customer.locator('#refresh').evaluate(b=>{b.click();b.click();b.click();});
+ await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);
+ assert.equal(publicRequests,beforeRefresh+1);assert.ok((await customer.locator('.card').textContent()).includes('更新されたお知らせ'));
+ publicFail=true;await customer.locator('#refresh').click();await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);
+ assert.equal(await customer.locator('.card').count(),0);assert.ok((await customer.locator('.refresh-status').textContent()).includes('更新できません'));
+ publicFail=false;await customer.locator('#refresh').click();await customer.waitForSelector('.card');assert.ok((await customer.locator('.refresh-status').textContent()).includes('確認時刻'));
+ assert.equal(await customer.locator('#refresh').count(),1);assert.ok(await customer.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.locator('[data-edit]').click();await page.locator('#soldout').click();await page.waitForSelector('.soldout-cover');await customer.reload();await customer.waitForSelector('.soldout-cover');assert.equal(await customer.locator('.card .picture').count(),1);
  await page.locator('[data-edit]').click();await page.locator('#rewrite').click();await page.locator('#remove-photo').click();await page.locator('#words').fill('編集した本文');await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(rows.length,1);assert.equal(rows[0].image_path,null);
  await customer.reload();await customer.waitForSelector('.card');for(const p of [page,customer]){assert.equal(await p.locator('.card .notice-media').count(),0);assert.ok(await p.locator('.card').evaluate(c=>c.firstElementChild.classList.contains('card-body')));}
@@ -70,7 +80,7 @@ try{for(const width of [320,390,430,1280]){
  await customer.reload();await customer.waitForSelector('.soldout-cover');for(const p of [page,customer]){assert.equal(await p.locator('.card img').count(),0);assert.ok(await p.locator('.notice-media.no-photo').evaluate(e=>e.getBoundingClientRect().height<130));assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
  if(width===390)await customer.screenshot({path:'tmp/connected/no-photo-ended.png',fullPage:true});
  fixturePublic=false;
- await customer.goto(base+'#post');await customer.waitForSelector('.empty');await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
+ await customer.goto(base+'#post');await customer.waitForSelector('.empty');await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
  await page.locator('[data-edit]').click();assert.equal(await page.locator('#withdraw').textContent(),'削除する');accept=false;await page.locator('#withdraw').click();assert.equal(jobs.size,0);
  accept=true;await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows[0].state,'deleting');assert.match(await page.locator('[role=alert]').textContent(),/削除が完了していません/);
  await page.locator('[data-edit]').click();assert.equal(await page.locator('#rewrite,#soldout').count(),0);await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows.length,0);assert.equal(images.size,0);

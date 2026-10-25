@@ -1,6 +1,6 @@
 // Public demo data only. Never add owner records, private posts or credentials.
 export const STORES = Object.freeze([
-  { id: 'nakatomi', name: 'セブンイレブン中富店' },
+  { id: 'nakatomi', name: 'セブンイレブン君津中富店' },
   { id: 'b', name: 'B店' }, { id: 'c', name: 'C店' },
   { id: 'd', name: 'D店' }, { id: 'e', name: 'E店' },
 ]);
