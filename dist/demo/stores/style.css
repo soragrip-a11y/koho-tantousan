@@ -2,3 +2,5 @@
 .menu{grid-template-columns:repeat(3,minmax(0,1fr))}.menu .menu-main{grid-column:1/-1;min-height:130px}.menu .consult{font-size:14px;padding:12px 8px;min-height:104px;overflow-wrap:anywhere}.shop-link{display:block;padding:24px;max-width:600px;text-decoration:none}
 
 .menu-main small{color:#e5f3e8}@media(max-width:650px){.landing .phone{order:-1}}
+.six-menu{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.six-menu a{min-height:145px;padding:12px 6px;overflow-wrap:anywhere}.six-menu strong{font-size:18px;line-height:1.5}.six-menu small{color:inherit;font-size:12px}.six-menu .work-button{background:#f3dfc5;color:#6c411b;border-color:#bd8d56}.six-menu .work-button:hover{background:#ead0ac}.visit-panel{padding:24px;background:white;border:1px solid #c9d9ce;border-radius:20px}.picture[src$="placeholder.svg"]{object-fit:contain}.store-head h1{overflow-wrap:anywhere}@media(max-width:380px){.six-menu strong{font-size:16px}.six-menu a{min-height:150px}.phone{padding:12px}}@media(min-width:651px){.landing{grid-template-columns:1fr 1.3fr}}
+.six-menu strong span{display:block}

@@ -1,33 +1,89 @@
-import {LocalRepository, seed, status, validate} from './model.js';
-const app=document.querySelector('#app');
-const repo=new LocalRepository({getItem:k=>localStorage.getItem(k),setItem:(k,v)=>localStorage.setItem(k,v),removeItem:k=>localStorage.removeItem(k)});
-let items=[],editing=null,photo='',busy=false,loadError='',photoToken=0,renderedStates='';
-try{items=repo.load();}catch(e){items=seed();loadError='保存を読み込めませんでした。初期見本を表示しています。ブラウザの保存設定を確認してください。';}
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const labels={active:'掲載中の見本',soldout:'売り切れ',ended:'掲載終了',hidden:'非公開'};
-const date=s=>new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(s));
-const localDate=s=>{const d=new Date(s);return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16)};
-function announce(s){document.querySelector('#notice').textContent=s;}
-function save(next){try{repo.save(next);items=next;return true;}catch{announce('保存できません。容量不足または保存が無効です。写真を小さくするかブラウザ設定を確認してください。変更は保存されていません。');return false;}}
-function card(x,manage=false){const state=status(x);const src=/^data:image\/(png|jpeg|webp);base64,/.test(x.image)?x.image:'./placeholder.svg';return `<article class="card" data-id="${esc(x.id)}"><div class="card-body"><span class="badge ${state==='active'?'':'off'}">${labels[state]}</span><h2>${esc(x.title)}</h2><p class="deadline">${state==='ended'?'終了日時':'掲載期限'}：${date(x.end)}（日本時間）</p><p>${esc(x.text)}</p>${manage?`<div class="actions"><button data-action="edit" data-id="${esc(x.id)}">編集</button>${['soldout','ended','hidden'].map(s=>`<button class="quiet" data-action="${s}" data-id="${esc(x.id)}" ${x.state===s?'disabled':''}>${labels[s]}にする</button>`).join('')}</div>`:''}</div><img class="picture" src="${src}" alt="${x.image?'このブラウザで選んだデモ写真':'架空の商品イメージ。実際の販売写真ではありません'}"></article>`;}
-function render(){photoToken++;busy=false;renderedStates=items.map(x=>status(x)).join();const route=location.hash.slice(1)||'line';document.querySelectorAll('nav a').forEach(a=>{a.removeAttribute('aria-current');if(a.hash===location.hash||(!location.hash&&a.hash==='#line'))a.setAttribute('aria-current','page')});
- if(route==='line')app.innerHTML=`<div class="layout landing"><section class="intro"><p class="eyebrow">LOCAL INFORMATION / DEMO</p><h1>近くのお店の、<br>今のお知らせへ。</h1><p>広報担当さんの LINE から、気になるお店をひと押し。お得情報をすぐに見られる入口の体験です。</p><ol class="steps"><li>「お店のお得情報」を押す</li><li>見たい店舗を選ぶ</li><li>お知らせと期限を確認</li></ol><p class="note">LINEを模したWebデモです。実際のLINEアカウントやリッチメニューは変更していません。</p></section><section class="phone" aria-label="LINEの入口イメージ"><strong>広報担当さん</strong><div class="chat">こんにちは。地域のお店のお知らせはこちらから。発信のご相談も引き続き受け付けています。</div><div class="menu"><a class="button menu-main" href="#shops"><strong>お店のお得情報 →</strong><small>地域のお店から、今のお知らせ</small></a><a class="button consult" href="../../contact.html">広報担当さんへ相談</a><a class="button consult" href="../../pricing.html">サービス・料金</a><a class="button consult" href="../../blog.html">地域の記事</a></div><p class="muted">DEMO / 実際の販売情報ではありません</p></section></div>`;
- else if(route==='shops')app.innerHTML=`<p class="eyebrow">SHOP LIST / DEMO</p><h1>地域のお店</h1><p>中富エリアの店舗向けデモ。掲載店舗は架空です。</p><a class="card shop-link" href="#store"><span class="badge">架空店舗</span><h2>店舗 A →</h2><p>今のお知らせを見る</p></a><a href="#line">← LINEの入口へ</a>`;
- else if(route==='store'){const visible=items.filter(x=>status(x)!=='hidden');app.innerHTML=`<section class="store-head"><p class="eyebrow">NAKATOMI AREA / DEMO</p><h1>店舗 A</h1><p>中富エリアの架空店舗 · お客さま画面</p></section><div class="store-layout"><section class="cards" aria-label="店舗のお知らせ">${visible.length?visible.map(x=>card(x)).join(''):'<p class="empty">現在、掲載中のお知らせはありません。</p>'}</section><aside><p class="note">実際の販売情報ではありません。掲載中でも在庫を保証しません。期限を過ぎたお知らせは自動で「掲載終了」になります。</p><p><a href="#shops">← 店舗一覧へ</a></p><a href="#manage">このお知らせを編集体験する →</a></aside></div>`;}
- else if(route==='manage')renderManage();else{location.hash='line';return;}
- if(loadError)announce(loadError);
+import { STORES, VISIT_KEY, START_KEY, dayKey, readVisits, recordVisit, sampleNotices, status } from './model.js';
+
+const app = document.querySelector('#app');
+const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const date = value => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value));
+let start = Date.now();
+let storageError = false;
+let renderedSignature = '';
+let pending = false;
+try {
+  // Never read or publish the former owner-demo data.
+  localStorage.removeItem('koho-store-demo-v1');
+  const saved = Number(localStorage.getItem(START_KEY));
+  if (saved > 0 && Number.isFinite(saved)) start = saved;
+  else localStorage.setItem(START_KEY, String(start));
+} catch { storageError = true; }
+
+const currentStore = () => STORES.find(store => location.hash === '#store/' + store.id);
+function visitState(store) {
+  try { return readVisits(localStorage)[store.id + ':' + dayKey()] === true; }
+  catch { storageError = true; return false; }
 }
-function renderManage(){const item=items.find(x=>x.id===editing);photo=item?.image||'';app.innerHTML=`<p class="eyebrow">OWNER EXPERIENCE / DEMO</p><h1>店舗 A の操作体験</h1><p class="note">ログインのないローカルデモです。本番の認証ではありません。写真・内容はこのブラウザ内だけに保存され、他の端末には共有されません。個人情報や機密写真は入力しないでください。</p><div class="layout"><form class="form" id="editor"><h2>${item?'お知らせを編集':'お知らせを追加'}</h2><p class="muted">必須：見出し・本文・掲載終了日時</p><label for="title">見出し（40文字まで）</label><input id="title" name="title" required maxlength="40" value="${esc(item?.title||'')}"><label for="text">短い本文（180文字まで）</label><textarea id="text" name="text" required maxlength="180">${esc(item?.text||'')}</textarea><label for="end">掲載終了日時</label><input id="end" name="end" type="datetime-local" required value="${localDate(item?.end||new Date(Date.now()+86400000).toISOString())}"><small>入力は端末の時刻帯（${esc(Intl.DateTimeFormat().resolvedOptions().timeZone)}）。お客さま画面は日本時間で表示。過去の日時は掲載終了になります。</small><label for="photo">写真（任意・JPEG / PNG / WebP、2MBまで）</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><small>選択画像を最大960pxに縮小し、このブラウザに保存します。</small><img id="preview" class="preview" alt="選択写真のプレビュー" ${photo?`src="${photo}"`:'hidden'}><button type="button" class="quiet" id="remove-photo">写真を外す</button><p id="form-message" class="error" role="alert"></p><div class="actions"><button id="submit" type="submit">${item?'変更を保存':'追加して掲載体験'}</button>${item?'<button type="button" class="quiet" id="cancel">編集をやめる</button>':''}</div><p class="muted">編集保存は現在の状態を維持します。</p>${item&&item.state!=='active'?'<button type="button" class="quiet" data-action="active" data-id="'+esc(item.id)+'">再掲載する（保存済み内容）</button>':''}</form><section><h2>登録したお知らせ</h2><p><a href="#store">お客さま画面で確認 →</a></p>${items.map(x=>card(x,true)).join('')||'<p>お知らせはありません。</p>'}</section></div>`;
-document.querySelector('#photo').addEventListener('change',readPhoto);
-document.querySelector('#remove-photo').onclick=()=>{photoToken++;busy=false;document.querySelector('#submit').disabled=false;photo='';document.querySelector('#photo').value='';document.querySelector('#preview').hidden=true;};
-document.querySelector('#cancel')?.addEventListener('click',()=>{editing=null;render()});
-document.querySelector('#editor').onsubmit=e=>{e.preventDefault();if(busy)return;const f=e.currentTarget;try{const next=validate({id:item?.id||crypto.randomUUID(),title:f.elements.title.value,text:f.elements.text.value,end:new Date(f.elements.end.value).toISOString(),image:photo,state:item?.state||'active'});if(!item&&items.length>=30)throw Error('このデモでは30件までです。リセットすると初期状態に戻せます。');if(save(item?items.map(x=>x.id===item.id?next:x):[next,...items])){editing=null;render();announce('このブラウザに保存しました。お客さま画面で確認できます。');}}catch(err){document.querySelector('#form-message').textContent=err.message;}};
+function signature() {
+  const store = currentStore();
+  return location.hash + ':' + dayKey() + ':' + (store ? sampleNotices(store.id, start).map(x => status(x)).join() + visitState(store) : '');
 }
-async function readPhoto(e){const token=++photoToken;const file=e.target.files[0];if(!file)return;const message=document.querySelector('#form-message');message.textContent='';if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2*1024*1024){message.textContent='JPEG・PNG・WebPの2MB以下の写真を選んでください。';e.target.value='';return;}busy=true;document.querySelector('#submit').disabled=true;try{const bitmap=await createImageBitmap(file);if(token!==photoToken){bitmap.close();return;}if(bitmap.width*bitmap.height>24000000){bitmap.close();throw Error('画像が大きすぎます');}const canvas=document.createElement('canvas'),scale=Math.min(1,960/Math.max(bitmap.width,bitmap.height));canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();photo=canvas.toDataURL('image/jpeg',.8);const preview=document.querySelector('#preview');if(preview){preview.src=photo;preview.hidden=false;}}catch{if(message.isConnected)message.textContent='画像を読み込めません。別の写真を選んでください。';}finally{if(token===photoToken)busy=false;const submit=document.querySelector('#submit');if(submit)submit.disabled=false;}}
-app.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b||busy)return;const id=b.dataset.id,action=b.dataset.action;if(action==='edit'){editing=id;render();document.querySelector('#title').focus();return;}if(save(items.map(x=>x.id===id?{...x,state:action}:x))){render();announce('状態を変更しました。');}});
-document.querySelector('#reset').onclick=()=>{if(!confirm('このブラウザに保存したデモの文章・写真を消して、初期見本に戻しますか？'))return;try{items=repo.reset();editing=null;loadError='';render();announce('初期状態に戻しました。');}catch{announce('リセットできません。ブラウザの保存設定を確認してください。');}};
-window.addEventListener('hashchange',()=>{editing=null;render();window.scrollTo(0,0)});
-window.addEventListener('storage',e=>{if(e.key==='koho-store-demo-v1'){try{items=repo.load();if(location.hash!=='#manage')render();}catch{announce('別タブの保存を読み込めませんでした。');}}});
-setInterval(()=>{if(location.hash==='#store'&&renderedStates!==items.map(x=>status(x)).join())render()},1000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&location.hash==='#store')render()});
+function card(item) {
+  const ended = status(item) === 'ended';
+  return '<article class="card"><div class="card-body"><span class="badge ' + (ended ? 'off' : '') + '">' +
+    (ended ? '掲載終了の表示例' : 'サンプル表示') + '</span><h2>' + esc(item.title) +
+    '</h2><p class="deadline">サンプル期限：' + date(item.end) + '（日本時間）</p><p>' + esc(item.text) +
+    '</p></div><img class="picture" src="./placeholder.svg" alt="掲載画像のプレースホルダー。商品写真ではありません"></article>';
+}
+function render() {
+  const store = currentStore();
+  app.dataset.route = store ? store.id : 'line';
+  if (!store && !['', '#line', '#shops'].includes(location.hash)) {
+    // Legacy management URLs have no privileged UI or data source.
+    history.replaceState(null, '', '#line');
+  }
+  if (!store) {
+    app.innerHTML = '<div class="layout landing"><section class="intro"><p class="eyebrow">LOCAL INFORMATION / PROPOSAL DEMO</p>' +
+      '<h1>お店の情報へ、<br>ひと押しで。</h1><p>店舗ボタンから、そのお店のお知らせに直接進む提案デモです。</p>' +
+      '<p class="note">店舗名は提案のための表示です。店舗の公式ページではなく、掲載承認や実際の販売情報を示すものではありません。B〜E店は架空です。</p>' +
+      '<p>並び順はオーナーが週1回確認し、手動で編成する想定です。このデモが自動でLINEを並べ替えることはありません。</p></section>' +
+      '<section class="phone" aria-label="6分割リッチメニューのデモ"><strong>広報担当さん</strong><div class="chat">気になるお店を選んでください。店舗情報へ直接つながります。</div><div class="menu six-menu">' +
+      STORES.map(s => '<a class="button store-button" aria-label="' + esc(s.name) + 'の提案デモ" href="#store/' + s.id + '"><strong>' + (s.id === 'nakatomi' ? '<span>セブン</span><span>イレブン</span><span>中富店</span>' : esc(s.name)) + '</strong><small>提案デモ →</small></a>').join('') +
+      '<a class="button work-button" href="../../one-off.html"><strong><span>お仕事の</span><span>依頼</span></strong><small>広報担当さんへ</small></a></div><p class="muted">店舗向け提案デモ / 情報はサンプル</p></section></div>';
+  } else {
+    const visited = visitState(store);
+    app.innerHTML = '<section class="store-head"><p class="eyebrow">SHOP INFORMATION / PROPOSAL DEMO</p><h1>' + esc(store.name) +
+      '</h1><p>店舗向け提案デモ · 公式の店舗ページではありません</p></section><div class="store-layout"><section class="cards" aria-label="サンプルのお知らせ">' +
+      sampleNotices(store.id, start).map(card).join('') +
+      '<section class="visit-panel"><h2>「行ったよ」を体験</h2><p>来店の自己申告ボタンのサンプルです。</p><button id="visit" ' +
+      (visited || storageError || pending ? 'disabled' : '') + '>' + (visited ? '今日は受付済み' : '行ったよ（デモ）') +
+      '</button><p id="visit-message" role="status">' + (visited ? 'このブラウザーでは、この店舗の本日分を受付済みです。' : '') +
+      '</p><p class="muted">店舗ごとに1日1回、日本時間0時で日付が変わります。このブラウザー内だけの簡易制限で、実人数・来店証明・全利用者の集計ではありません。保存の削除や別ブラウザーで回避できるため、不正防止機能ではありません。</p></section></section>' +
+      '<aside><p class="note">情報はサンプルです。実際の商品・特売・在庫は案内していません。在庫保証はありません。表示期限を過ぎると終了表示に変わります。</p><a href="#line">← メニューへ戻る</a></aside></div>';
+    document.querySelector('#visit').addEventListener('click', submitVisit);
+  }
+  document.querySelector('#notice').textContent = storageError ? 'ブラウザーに保存できないため「行ったよ」の体験を停止しています。保存設定を確認してください。' : '';
+  renderedSignature = signature();
+}
+
+async function submitVisit() {
+  const store = currentStore();
+  if (!store || pending) return;
+  pending = true;
+  document.querySelector('#visit').disabled = true;
+  let result;
+  const persist = () => {
+    result = recordVisit(readVisits(localStorage), store.id);
+    if (result.added) localStorage.setItem(VISIT_KEY, JSON.stringify(result.ledger));
+  };
+  try {
+    // Cooperating same-origin tabs serialize their read/write. This is not authentication.
+    if (navigator.locks) await navigator.locks.request(VISIT_KEY, persist);
+    else persist();
+  } catch { storageError = true; }
+  finally { pending = false; render(); }
+  if (currentStore()?.id === store.id && result && !storageError) {
+    document.querySelector('#visit-message').textContent = result.added ? 'このブラウザーに記録しました。実際の来店記録ではありません。' : 'この店舗の本日分は受付済みです。';
+  }
+}
+window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+window.addEventListener('storage', e => { if (e.key === VISIT_KEY) render(); });
+setInterval(() => { if (signature() !== renderedSignature) render(); }, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
 render();
