@@ -43,7 +43,9 @@ try{
  await customer.waitForSelector('.soldout-cover');assert.equal(await customer.locator('.soldout-cover').count(),1);assert.equal(await staff.locator('.soldout-cover').count(),1);
  assert.equal(await customer.locator('.card').last().locator('.soldout-cover').count(),0);
  assert.equal(await customer.locator('.soldout-cover').getAttribute('aria-label'),'売り切れのため終了');
- await customer.screenshot({path:'tmp/store-demo-separated/soldout-no-photo.png',fullPage:true});
+ assert.equal(await customer.locator('.soldout-cover strong').textContent(),'終了しました');assert.equal(await staff.locator('.soldout-cover strong').textContent(),'終了しました');assert.equal(await customer.locator('.soldout-cross').count(),0);
+ for(const width of [320,390,430]){await customer.setViewportSize({width,height:844});assert.ok(await customer.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await customer.screenshot({path:'tmp/store-demo-separated/soldout-no-photo-'+width+'.png',fullPage:true});}
+ await customer.setViewportSize({width:390,height:844});await customer.screenshot({path:'tmp/store-demo-separated/soldout-no-photo.png',fullPage:true});
  await edit();assert.equal(await staff.locator('#words').inputValue(),'編集前のサンプル本文');assert.ok(await staff.locator('#remove-photo').isDisabled());
  await staff.locator('#words').fill('キャンセルされる本文');staff.once('dialog',d=>d.dismiss());await staff.locator('#cancel').tap();assert.equal(await staff.locator('#words').inputValue(),'キャンセルされる本文');
  staff.once('dialog',d=>d.accept());await staff.locator('#cancel').tap();await staff.waitForSelector('.staff-preview-note');assert.equal((await posts())[0].text,'編集前のサンプル本文');

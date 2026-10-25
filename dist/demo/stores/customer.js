@@ -1,4 +1,4 @@
-import {noticeMedia} from './notice-view.js';
+import {noticeMedia} from './notice-view.js?v=20261025-5';
 import './press-feedback.js';
 // Read-only customer surface. No staff UI module, navigation, history or remote API.
 import {STORES,VISIT_KEY,START_KEY,dayKey,readVisits,recordVisit,sampleNotices} from './model.js';
