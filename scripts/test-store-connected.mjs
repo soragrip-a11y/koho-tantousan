@@ -12,7 +12,7 @@ const enc=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
 const token=enc({alg:'HS256',typ:'JWT'})+'.'+enc({sub:'11111111-1111-4111-8111-111111111111',role:'authenticated',exp:Math.floor(Date.now()/1000)+3600})+'.mock';
 try{for(const width of [320,390,430]){
  const context=await browser.newContext({viewport:{width,height:844},hasTouch:true,isMobile:true});
- const page=await context.newPage(),customer=await context.newPage(),rows=[],images=new Map(),errors=[];let saves=0,fail=false;
+ const page=await context.newPage(),customer=await context.newPage(),rows=[],images=new Map(),jobs=new Map(),errors=[];let saves=0,fail=false,deleteFail=true,accept=true;
  for(const p of [page,customer])p.on('pageerror',e=>errors.push(e.message));
  await context.addInitScript(()=>localStorage.setItem('koho-post-experience-v3',JSON.stringify([{id:'private-legacy',image:'data:image/jpeg;base64,YQ==',text:'DO NOT MIGRATE'}])));
  await context.route('https://rnedesemnameergeksuo.supabase.co/**',async route=>{
@@ -21,6 +21,7 @@ try{for(const width of [320,390,430]){
   if(url.pathname==='/auth/v1/token')return reply({access_token:token,refresh_token:'mock-refresh',expires_in:3600,token_type:'bearer',user:{id:'11111111-1111-4111-8111-111111111111',email:'dummy@example.invalid',aud:'authenticated',app_metadata:{},user_metadata:{},created_at:new Date().toISOString()}});
   if(url.pathname==='/auth/v1/logout')return reply({});
   if(url.pathname.includes('/storage/v1/object/')){
+   if(req.method()==='DELETE'){if(deleteFail){deleteFail=false;return reply({error:'mock deletion failure'},403);}for(const name of p.prefixes)images.delete(name);return reply([]);}
    const key=url.pathname.split('koho-notice-images/')[1];
    if(req.method()==='POST'){const raw=req.postDataBuffer(),start=raw.indexOf(Buffer.from([255,216])),end=raw.lastIndexOf(Buffer.from([255,217]));images.set(key,raw.subarray(start,end+2));return reply({Key:key});}
    return route.fulfill({status:200,contentType:'image/jpeg',body:images.get(key)});
@@ -30,6 +31,14 @@ try{for(const width of [320,390,430]){
   if(!req.headers().authorization?.includes(token))return reply({code:'42501'},401);
   if(name==='koho_can_manage')return reply(true);
   if(name==='koho_list_staff_notices')return reply(rows);
+  if(name==='koho_prepare_delete'){
+   if(!jobs.has(p.p_id)){jobs.set(p.p_id,{id:p.p_id,done:false,paths:[...images.keys()],retained_count:0});const row=rows.find(r=>r.id===p.p_id);row.state='deleting';row.image_path=null;}
+   return reply(jobs.get(p.p_id));
+  }
+  if(name==='koho_finish_delete'){
+   if(images.size)return reply({code:'photos remain'},400);
+   const job=jobs.get(p.p_id);if(!job.done){rows.splice(rows.findIndex(r=>r.id===p.p_id),1);job.done=true;}return reply(job);
+  }
   if(name==='koho_change_notice'){
    await new Promise(r=>setTimeout(r,120));if(fail)return reply({code:'network'},503);
    let row=rows.find(r=>r.id===p.p_id);if(row?.request===p.p_request_id)return reply(row);
@@ -38,7 +47,7 @@ try{for(const width of [320,390,430]){
   }
   return reply({code:'unexpected'},404);
  });
- page.on('dialog',d=>d.accept());
+ page.on('dialog',d=>accept?d.accept():d.dismiss());
  await page.goto(base+'staff.html');await page.waitForSelector('input[name=email]');
  assert.ok(await page.locator('form button').evaluate(b=>b.getBoundingClientRect().height>=80));
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -51,8 +60,10 @@ try{for(const width of [320,390,430]){
  await page.locator('[data-edit]').click();await page.locator('#rewrite').click();await page.locator('#remove-photo').click();await page.locator('#words').fill('編集した本文');await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(rows.length,1);assert.equal(rows[0].image_path,null);
  await page.locator('[data-edit]').click();await page.locator('#soldout').click();await page.waitForSelector('.soldout-cover');
  await customer.goto(base+'#post');await customer.waitForSelector('#visit');assert.equal(await customer.locator('form,input,textarea,a,[data-edit]').count(),0);assert.equal(await customer.locator('.card').count(),0);
- await page.locator('[data-edit]').click();await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows[0].state,'withdrawn');
+ await page.locator('[data-edit]').click();assert.equal(await page.locator('#withdraw').textContent(),'削除する');accept=false;await page.locator('#withdraw').click();assert.equal(jobs.size,0);
+ accept=true;await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows[0].state,'deleting');assert.match(await page.locator('[role=alert]').textContent(),/削除が完了していません/);
+ await page.locator('[data-edit]').click();assert.equal(await page.locator('#rewrite,#soldout').count(),0);await page.locator('#withdraw').click();await page.waitForSelector('#new');assert.equal(rows.length,0);assert.equal(images.size,0);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.reload();await page.waitForSelector('input[name=password]');assert.equal(await page.locator('[data-edit]').count(),0);assert.equal(await page.locator('input[name=password]').inputValue(),'');
- assert.deepEqual(errors,[]);console.log(width+'px connected SDK: auth, photo, failure/retry, edit, end, withdraw, anonymous separation, reload PASS');await context.close();
+ assert.deepEqual(errors,[]);console.log(width+'px connected SDK: auth, photo, edit, end, delete confirmation/cancel/failure/retry, anonymous separation, reload PASS');await context.close();
 }}finally{await browser.close();await new Promise(r=>server.close(r));}
