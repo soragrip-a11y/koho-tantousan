@@ -1,3 +1,4 @@
+import './press-feedback.js';
 // Read-only customer surface. No staff UI module, navigation, history or remote API.
 import {STORES,VISIT_KEY,START_KEY,dayKey,readVisits,recordVisit,sampleNotices} from './model.js';
 import {POST_KEY,loadPosts,validPhoto,postStatus} from './post-model.js';

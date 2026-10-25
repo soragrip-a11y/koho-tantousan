@@ -1,3 +1,4 @@
+import './press-feedback.js';
 // Staff-only fictional practice surface. This module is not loaded by the customer page.
 import {mountPostUI} from './post-ui.js';
 import {STORES,START_KEY,VISIT_KEY,sampleNotices} from './model.js';

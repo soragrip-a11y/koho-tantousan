@@ -43,6 +43,14 @@ try{
  await customer.goBack();await readonly();await customer.goForward();await readonly();
  assert.ok(customerRequests.every(url=>!url.endsWith('/app.js')&&!url.endsWith('/post-ui.js')&&!url.includes('staff.html')));
  await staffRoute();
+ assert.equal(await staff.locator('h1').textContent(),'お店の情報を、お客さんに伝えましょう');
+ assert.equal(await staff.getByText('写真をつけますか？',{exact:true}).count(),0);
+ for(const type of ['pointerup','pointercancel','lostpointercapture','scroll']){
+  await staff.locator('#next').dispatchEvent('pointerdown',{pointerId:7,pointerType:'touch',isPrimary:true,button:0});
+  assert.ok(await staff.locator('#next').evaluate(e=>e.hasAttribute('data-pressed')));
+  await staff.locator('#next').dispatchEvent(type,{pointerId:7,pointerType:'touch',isPrimary:true});
+  assert.equal(await staff.locator('[data-pressed]').count(),0);
+ }
  await staff.locator('#next').scrollIntoViewIfNeeded();
  await staff.keyboard.press('Tab');await staff.locator('#next').focus();
  assert.equal(await staff.locator('#next').evaluate(e=>getComputedStyle(e).outlineWidth),'3px');

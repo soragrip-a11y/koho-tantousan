@@ -22,8 +22,10 @@ body.staff-demo :is(button,a.button){
   position:relative;
 }
 body.staff-demo :is(.easy-secondary,.easy-cancel,.quiet){--control-edge:#65796b}
-body.customer-demo :is(button,a.button):not(:disabled):active,
-body.staff-demo :is(button,a.button):not(:disabled):active{
+body.customer-demo:not(.pointer-input) :is(button,a.button):not(:disabled):active,
+body.customer-demo :is(button,a.button):not(:disabled)[data-pressed],
+body.staff-demo:not(.pointer-input) :is(button,a.button):not(:disabled):active,
+body.staff-demo :is(button,a.button):not(:disabled)[data-pressed]{
   transform:translateY(4px);
   box-shadow:0 2px 0 var(--control-edge),0 3px 5px rgba(17,45,29,.2),inset 0 2px 3px rgba(0,0,0,.15);
 }
@@ -46,6 +48,13 @@ body.staff-demo button:disabled{
 }
 @media(prefers-reduced-motion:reduce){
   body.customer-demo :is(button,a.button),body.staff-demo :is(button,a.button){transition:none}
-  body.customer-demo :is(button,a.button):not(:disabled):active,
-  body.staff-demo :is(button,a.button):not(:disabled):active{transform:none}
+  body.customer-demo:not(.pointer-input) :is(button,a.button):not(:disabled):active,
+body.customer-demo :is(button,a.button):not(:disabled)[data-pressed],
+  body.staff-demo:not(.pointer-input) :is(button,a.button):not(:disabled):active,
+body.staff-demo :is(button,a.button):not(:disabled)[data-pressed]{transform:none}
 }
+
+/* The transparent hit surface includes the original position while the face sinks. */
+body.customer-demo :is(button,a.button)::after,body.staff-demo :is(button,a.button)::after{content:"";position:absolute;inset:-6px 0;}
+
+.easy-post h1 .intro-phrase{white-space:nowrap}
