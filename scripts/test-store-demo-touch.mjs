@@ -52,7 +52,7 @@ try{
  assert.ok((await staff.locator('#easy-error').textContent()).includes('変更を保存できませんでした'));
  await staff.evaluate(()=>{Storage.prototype.setItem=window.savedSetItem;delete window.savedSetItem;});
  staff.once('dialog',d=>d.dismiss());await staff.locator('#soldout').tap();await staff.waitForSelector('#soldout');staff.once('dialog',d=>d.accept());await staff.locator('#soldout').tap();await staff.waitForSelector('.staff-preview-note');
- await customer.waitForFunction(()=>document.querySelector('.badge')?.textContent==='売り切れの表示例');
+ await customer.waitForFunction(()=>document.querySelector('.badge')?.textContent==='終了の表示例');
  await staff.locator('[data-edit-post]').first().tap();staff.once('dialog',d=>d.accept());await staff.locator('#withdraw').tap();await staff.waitForSelector('.staff-preview-note');
  await customer.waitForFunction(()=>document.querySelectorAll('.card').length===1);
  await customer.reload();await readonly();assert.equal(await customer.locator('.card').count(),1);

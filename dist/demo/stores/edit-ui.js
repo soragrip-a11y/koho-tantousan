@@ -10,7 +10,7 @@ export function mountEditUI({app,existing,onSave,onExit}) {
   function render(){
     if(disposed)return;
     app.classList.add('easy-post');app.dataset.step='edit';
-    app.innerHTML='<section class="easy-shell"><p class="easy-note">店員さんの練習です。<br>このスマホだけに残ります。<br>ほかの人には送られません。</p><p class="easy-step">お知らせの書き直し</p><h1>写真と文章を<br>書き直す</h1>'+
+    app.innerHTML='<section class="easy-shell"><p class="easy-note">店員さんの練習です。<br>このスマホだけに残ります。<br>ほかの人には送られません。</p><p class="easy-step" role="heading" aria-level="1">お知らせの書き直し</p>'+
       (photo?'<img class="easy-photo" src="'+photo+'" alt="現在の写真">':'<p>写真なし</p>')+
       '<input hidden id="camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><input hidden id="library" type="file" accept="image/jpeg,image/png,image/webp"><button id="take-photo" class="easy-primary">写真を撮り直す</button><button id="choose-photo" class="easy-secondary">スマホの写真を選ぶ</button><button id="remove-photo" class="easy-cancel" '+(photo?'':'disabled')+'>写真を消す</button><p class="easy-help">撮影できないときは、スマホの写真を選べます。写真なしでも大丈夫です。</p><label class="easy-label" for="words">お知らせの文章</label><textarea id="words" maxlength="180" rows="5">'+esc(text)+'</textarea><p class="easy-help">180文字まで書けます。</p><p>再投稿すると、今のお知らせを更新して掲載中に戻します。新しいお知らせは増えません。</p><p>掲載期限は、再投稿した時点から24時間後になります。その後は終了表示で残り、写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">再投稿する</button><p class="easy-help">このスマホだけに保存する練習です。ほかの人には公開・送信されません。</p><button id="cancel" class="easy-cancel">← 変更せずに戻る</button><p id="easy-error" class="error" role="alert"></p></section>';
     $('#words').oninput=event=>{text=event.target.value;};
@@ -23,7 +23,7 @@ export function mountEditUI({app,existing,onSave,onExit}) {
       if(busy||committed)return;
       text=$('#words').value.trim();
       if(!text){error('文章をひとこと書いてください。');$('#words').focus();return;}
-      const message=postStatus(existing)==='active'?'この内容で更新しますか？ 掲載期限は今から24時間後になります。':'終了・売り切れ・取り下げのお知らせを、掲載中に戻しますか？ 掲載期限は今から24時間後になります。';
+      const message=postStatus(existing)==='active'?'この内容で更新しますか？ 掲載期限は今から24時間後になります。':'終了・取り下げのお知らせを、掲載中に戻しますか？ 掲載期限は今から24時間後になります。';
       if(!confirm(message))return;
       committed=true;$('#publish').disabled=true;
       if(!onSave({...existing,text,image:photo,state:'active',end:new Date(Date.now()+86400000).toISOString()})){

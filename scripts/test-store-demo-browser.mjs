@@ -80,7 +80,7 @@ try{
  await controlAppearance(staff);await staff.screenshot({path:'tmp/store-demo-separated/actions-390.png',fullPage:true});
  staff.once('dialog',d=>d.dismiss());await staff.locator('#soldout').click();assert.equal(await staff.locator('#app').getAttribute('data-step'),'actions');
  staff.once('dialog',d=>d.accept());await staff.locator('#soldout').click();await staff.waitForSelector('.staff-preview-note');
- await customer.reload();await readonly();assert.equal(await customer.locator('.badge').first().textContent(),'売り切れの表示例');
+ await customer.reload();await readonly();assert.equal(await customer.locator('.badge').first().textContent(),'終了の表示例');
  await staff.locator('[data-edit-post]').first().click();await staff.waitForSelector('#withdraw');staff.once('dialog',d=>d.accept());await staff.locator('#withdraw').click();await staff.waitForSelector('.staff-preview-note');
  await customer.reload();await readonly();assert.equal(await customer.locator('.card').count(),1);
  await staffRoute();await staff.locator('#next').click();await staff.locator('#words').fill('写真なしの練習');staff.once('dialog',d=>d.dismiss());await staff.locator('#cancel').click();assert.equal(await staff.locator('#words').inputValue(),'写真なしの練習');

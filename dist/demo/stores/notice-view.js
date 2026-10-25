@@ -4,5 +4,5 @@ import {validPhoto} from './post-model.js';
 export function noticeMedia(post, state) {
   const image=validPhoto(post.image)?post.image:'./placeholder.svg';
   return '<div class="notice-media'+(state==='soldout'?' is-soldout':'')+'"><img class="picture" src="'+image+'" alt="サンプルの写真。実際の販売情報ではありません">'+
-    (state==='soldout'?'<div class="soldout-cover" role="img" aria-label="売り切れのため終了"><strong aria-hidden="true">終了しました</strong></div>':'')+'</div>';
+    (state==='soldout'?'<div class="soldout-cover" role="img" aria-label="終了しました"><strong aria-hidden="true">終了しました</strong></div>':'')+'</div>';
 }

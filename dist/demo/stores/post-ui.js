@@ -13,7 +13,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     app.classList.add('easy-post');app.dataset.step=String(step);
     let content='';
     if(step==='actions'){
-      content='<p class="easy-step">このお知らせを変更</p><h1>'+esc(existing.title)+'</h1><p>'+esc(existing.text)+'</p><button id="rewrite" class="easy-primary">書き直す</button><button id="soldout" class="easy-primary">売り切れにする</button><button id="withdraw" class="easy-secondary">取り下げる</button><p class="easy-help">取り下げると、お店の情報の見本から消えます。</p><button id="exit" class="easy-cancel">← 見え方の確認へ戻る</button>';
+      content='<p class="easy-step">このお知らせを変更</p><h1>'+esc(existing.title)+'</h1><p>'+esc(existing.text)+'</p><button id="rewrite" class="easy-primary">書き直す</button><button id="soldout" class="easy-primary">終了にする</button><button id="withdraw" class="easy-secondary">取り下げる</button><p class="easy-help">取り下げると、お店の情報の見本から消えます。</p><button id="exit" class="easy-cancel">← 見え方の確認へ戻る</button>';
     }else if(step===1){
       content='<p class="easy-step">1 / 3　写真</p><h1>お店の情報を、<br>お客さんに<wbr><span class="intro-phrase">伝えましょう</span></h1><p>写真がなくても大丈夫です。</p><input hidden id="camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><input hidden id="library" type="file" accept="image/jpeg,image/png,image/webp"><button id="take-photo" class="easy-primary">写真を撮る</button><button id="choose-photo" class="easy-secondary">スマホの写真を選ぶ</button>'+(photo?'<img class="easy-photo" src="'+photo+'" alt="選んだ写真"><button id="remove-photo" class="easy-cancel">この写真を外す</button>':'')+'<p class="easy-help">撮影画面はスマホによって異なります。</p><button id="next" class="easy-primary">'+(photo?'この写真で次へ →':'写真なしで次へ →')+'</button>'+cancel;
     }else if(step===2){
@@ -28,7 +28,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     if(step==='actions'){
       $('#exit').onclick=onExit;
       $('#rewrite').onclick=onEdit;
-      $('#soldout').onclick=()=>{if(confirm('このお知らせを「売り切れ」にしますか？')){if(onState(existing.id,'soldout')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
+      $('#soldout').onclick=()=>{if(confirm('このお知らせを終了にしますか？ お客さんの画面に「終了しました」と表示されます。')){if(onState(existing.id,'soldout')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
       $('#withdraw').onclick=()=>{if(confirm('このお知らせを取り下げますか？ 客向けの見本から消えます。')){if(onState(existing.id,'withdrawn')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
     }else if(step===1){
       $('#take-photo').onclick=()=>$('#camera').click();$('#choose-photo').onclick=()=>$('#library').click();
