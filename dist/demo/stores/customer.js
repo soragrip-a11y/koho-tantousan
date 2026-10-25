@@ -36,7 +36,14 @@ async function visit(){
 }
 // Every hash, including old #post and invalid routes, remains this customer page.
 window.addEventListener('hashchange',()=>{read();render();});
-window.addEventListener('storage',e=>{if([POST_KEY,VISIT_KEY,START_KEY].includes(e.key)){read();render();}});
+window.addEventListener('storage',e=>{if(e.key===null||[POST_KEY,VISIT_KEY,START_KEY].includes(e.key)){read();render();}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){read();render();}});
+function refreshSaved(){
+ const previous=JSON.stringify(posts),wasUnavailable=unavailable;
+ read();
+ if(previous!==JSON.stringify(posts)||wasUnavailable!==unavailable||last!==signature())render();
+}
+window.addEventListener('pageshow',refreshSaved);
+window.addEventListener('focus',refreshSaved);
 setInterval(()=>{if(last!==signature())render();},1000);
 read();render();

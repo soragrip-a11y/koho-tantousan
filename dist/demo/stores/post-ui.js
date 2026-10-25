@@ -28,8 +28,8 @@ export function mountPostUI({app,existing,onSave,onState,onExit}) {
     if(step==='actions'){
       $('#exit').onclick=onExit;
       $('#rewrite').onclick=()=>{step=1;render(true);};
-      $('#soldout').onclick=()=>{if(confirm('このお知らせを「売り切れ」にしますか？'))onState(existing.id,'soldout');};
-      $('#withdraw').onclick=()=>{if(confirm('このお知らせを取り下げますか？ 客向けの見本から消えます。'))onState(existing.id,'withdrawn');};
+      $('#soldout').onclick=()=>{if(confirm('このお知らせを「売り切れ」にしますか？')){if(onState(existing.id,'soldout')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
+      $('#withdraw').onclick=()=>{if(confirm('このお知らせを取り下げますか？ 客向けの見本から消えます。')){if(onState(existing.id,'withdrawn')===false)$('#easy-error').textContent='変更を保存できませんでした。再読み込みして、もう一度お試しください。';}};
     }else if(step===1){
       $('#take-photo').onclick=()=>$('#camera').click();$('#choose-photo').onclick=()=>$('#library').click();
       $('#camera').onchange=readPhoto;$('#library').onchange=readPhoto;

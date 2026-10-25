@@ -1,6 +1,6 @@
 import './press-feedback.js';
 // Staff-only fictional practice surface. This module is not loaded by the customer page.
-import {mountPostUI} from './post-ui.js?v=20261025-2';
+import {mountPostUI} from './post-ui.js?v=20261025-3';
 import {STORES,START_KEY,VISIT_KEY,sampleNotices} from './model.js';
 import {POST_KEY,validPhoto,loadPosts,savePosts,postStatus} from './post-model.js';
 const app=document.querySelector('#app'),store=STORES[0];
@@ -15,7 +15,7 @@ try{
  if(saved>0&&Number.isFinite(saved))start=saved;else localStorage.setItem(START_KEY,String(start));
  posts=loadPosts(localStorage,defaults());
 }catch{posts=defaults();announce('保存内容を読めませんでした。練習用の見本を表示します。');}
-function persist(next){try{posts=savePosts(localStorage,next);return true;}catch{announce('保存できませんでした。写真を外すか、ブラウザーの保存設定を確認してください。');return false;}}
+function persist(update){try{const latest=loadPosts(localStorage,defaults());posts=savePosts(localStorage,update(latest));return true;}catch{announce('保存できませんでした。写真を外すか、ブラウザーの保存設定を確認してください。');return false;}}
 function signature(){return posts.map(p=>postStatus(p)).join();}
 function render(){
  if(cleanup){cleanup();cleanup=null;}
@@ -24,8 +24,8 @@ function render(){
  if(!preview){
   const existing=posts.find(p=>p.id===editing);
   cleanup=mountPostUI({app,existing,
-   onSave:next=>{if(!persist(existing?posts.map(p=>p.id===existing.id?next:p):[next,...posts]))return false;editing=null;location.hash='preview';announce('このスマホに載せました。ほかの人には送られていません。');return true;},
-   onState:(id,state)=>{if(persist(posts.map(p=>p.id===id?{...p,state}:p))){editing=null;location.hash='preview';}},
+   onSave:next=>{if(!persist(latest=>{if(existing&&!latest.some(p=>p.id===existing.id))throw Error('missing post');return existing?latest.map(p=>p.id===existing.id?next:p):[next,...latest];}))return false;editing=null;location.hash='preview';announce('このスマホに載せました。ほかの人には送られていません。');return true;},
+   onState:(id,state)=>{if(!persist(latest=>{if(!latest.some(p=>p.id===id))throw Error('missing post');return latest.map(p=>p.id===id?{...p,state}:p);}))return false;editing=null;location.hash='preview';return true;},
    onExit:()=>{editing=null;location.hash='preview';}
   });
   return;
@@ -43,6 +43,12 @@ document.querySelector('#reset').onclick=()=>{
  try{for(const key of [POST_KEY,START_KEY,VISIT_KEY,'koho-store-demo-v1'])localStorage.removeItem(key);start=Date.now();localStorage.setItem(START_KEY,String(start));posts=defaults();editing=null;if(location.hash==='#post')render();else location.hash='post';announce('練習用の見本に戻しました。');}catch{announce('やり直せませんでした。ブラウザーの保存設定を確認してください。');}
 };
 window.addEventListener('hashchange',()=>{if(location.hash!=='#post')editing=null;render();window.scrollTo(0,0);});
-window.addEventListener('storage',event=>{if(event.key===POST_KEY&&location.hash==='#preview'){try{posts=loadPosts(localStorage,defaults());render();}catch{announce('保存内容を読み込めませんでした。');}}});
+function refreshSaved(){
+ try{const latest=loadPosts(localStorage,defaults()),changed=JSON.stringify(latest)!==JSON.stringify(posts);posts=latest;if(location.hash==='#preview'&&(changed||last!==signature()))render();}catch{announce('保存内容を読み込めませんでした。');}
+}
+window.addEventListener('storage',event=>{if(event.key===POST_KEY||event.key===null)refreshSaved();});
+window.addEventListener('pageshow',refreshSaved);
+window.addEventListener('focus',refreshSaved);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshSaved();});
 setInterval(()=>{if(location.hash==='#preview'&&last!==signature())render();},1000);
 render();
