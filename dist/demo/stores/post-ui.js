@@ -19,7 +19,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit}) {
     }else if(step===2){
       content='<p class="easy-step">2 / 3　ひとこと</p><h1>伝えたいことを<br>書いてください</h1><label class="easy-label" for="words">お知らせの文章</label><textarea id="words" maxlength="180" rows="5" placeholder="例：これはお知らせの練習です">'+esc(text)+'</textarea><p class="easy-help">180文字まで書けます。</p><button id="next" class="easy-primary">内容を確認する →</button>'+back+cancel;
     }else{
-      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>載せてから24時間で終了します。</p><button id="publish" class="easy-primary">このスマホに載せる</button><p class="easy-help">練習用です。ほかの人には公開されません。</p>'+back+cancel;
+      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>投稿から24時間たつと、終了したお知らせとして表示されます。写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">このスマホだけに保存する練習です。ほかの人には公開・送信されません。</p>'+back+cancel;
     }
     app.innerHTML='<section class="easy-shell">'+intro+content+'<p id="easy-error" class="error" role="alert"></p></section>';
     if(focus){window.scrollTo(0,0);$('h1').setAttribute('tabindex','-1');$('h1').focus({preventScroll:true});}
