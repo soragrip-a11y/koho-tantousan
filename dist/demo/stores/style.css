@@ -8,3 +8,44 @@
 [hidden]{display:none!important}
 .easy-post{max-width:650px;padding:16px}.easy-shell{background:white;border:2px solid #c6d2c9;border-radius:16px;padding:20px}.easy-post h1{font-size:32px;line-height:1.45;margin:12px 0 24px}.easy-post p,.easy-label{font-size:22px;line-height:1.65}.easy-note{background:#fff1cb;padding:14px;font-size:20px!important;color:#503714}.easy-step{font-weight:800;color:#265b42}.easy-post button{display:block;width:100%;min-height:80px;font-size:26px;line-height:1.4;margin:14px 0;padding:18px 12px;border-radius:12px;border-width:2px}.easy-primary{background:#174e35;color:white}.easy-post .easy-secondary{background:white;color:#174e35;border-color:#174e35}.easy-post .easy-cancel{background:#f0f2ef;color:#263d36;border-color:#75887b;font-size:23px;min-height:68px}.easy-post .easy-help{font-size:19px;color:#344d3e}.easy-post textarea{font-size:26px;line-height:1.6;min-height:210px;border:2px solid #536f5d}.easy-photo{display:block;width:100%;max-height:230px;object-fit:contain;background:#f1f4ef;margin:16px 0}.easy-review{border:2px solid #759382;padding:16px;border-radius:12px}.easy-words{white-space:pre-wrap;overflow-wrap:anywhere}.store-post-button{font-size:21px;min-height:64px;margin:8px 0}body:has(.easy-post) nav{display:none}.easy-post .error{font-size:22px}@media(max-width:360px){.easy-shell{padding:16px}.easy-post h1{font-size:30px}.easy-post button{font-size:24px}}
 .staff-preview-note{padding:20px;border:3px solid #94651d;background:#fff1cb;border-radius:16px;margin-bottom:24px}.staff-preview-note h1{font-size:30px}.staff-preview-note p{font-size:22px}.staff-controls{background:#fff1cb;border-top:2px solid #b58b4c}.staff-controls button{width:100%;min-height:80px;font-size:23px}.customer-demo .cards{margin:0 auto}.customer-demo .store-head{max-width:640px;margin:0 auto 24px}.customer-demo #visit{min-height:64px;font-size:22px}.customer-demo header img,.staff-demo header img{object-fit:contain}
+/* Raised controls are scoped to the store demo; informational cards remain flat. */
+body.customer-demo :is(button,a.button),
+body.staff-demo :is(button,a.button){
+  --control-edge:#0b3928;
+  appearance:none;
+  border:2px solid var(--control-edge);
+  border-bottom-width:3px;
+  background-image:linear-gradient(to bottom,rgba(255,255,255,.13),rgba(0,0,0,.04));
+  box-shadow:0 6px 0 var(--control-edge),0 9px 12px rgba(17,45,29,.22),inset 0 2px 0 rgba(255,255,255,.26);
+  transform:translateY(0);
+  transition:transform 90ms ease,box-shadow 90ms ease;
+  position:relative;
+}
+body.staff-demo :is(.easy-secondary,.easy-cancel,.quiet){--control-edge:#65796b}
+body.customer-demo :is(button,a.button):not(:disabled):active,
+body.staff-demo :is(button,a.button):not(:disabled):active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 var(--control-edge),0 3px 5px rgba(17,45,29,.2),inset 0 2px 3px rgba(0,0,0,.15);
+}
+body.customer-demo :is(button,a.button):focus-visible,
+body.staff-demo :is(button,a.button):focus-visible{
+  outline:3px solid #132e20;
+  outline-offset:6px;
+}
+body.customer-demo button:disabled,
+body.staff-demo button:disabled{
+  background-color:#e1e5e2!important;
+  background-image:none;
+  color:#535e56!important;
+  border-color:#a7b0aa;
+  box-shadow:none;
+  transform:none;
+  opacity:1;
+  cursor:not-allowed;
+  transition:none;
+}
+@media(prefers-reduced-motion:reduce){
+  body.customer-demo :is(button,a.button),body.staff-demo :is(button,a.button){transition:none}
+  body.customer-demo :is(button,a.button):not(:disabled):active,
+  body.staff-demo :is(button,a.button):not(:disabled):active{transform:none}
+}
