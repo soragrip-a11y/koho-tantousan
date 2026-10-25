@@ -53,13 +53,13 @@ try{for(const width of [320,390,430,1280]){
  assert.ok(await page.locator('form button').evaluate(b=>b.getBoundingClientRect().height>=80));
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  if(width===390){await mkdir('tmp/connected',{recursive:true});await page.screenshot({path:'tmp/connected/login.png',fullPage:true});}
- await page.locator('input[name=email]').fill('dummy@example.invalid');await page.locator('input[name=password]').fill('dummy');await page.locator('form button').click();await page.waitForSelector('#new');assert.equal(images.size,0);
+ await page.locator('input[name=email]').fill('dummy@example.invalid');await page.locator('input[name=password]').fill('dummy');await page.locator('form button').click();await page.waitForSelector('#new');assert.equal(images.size,0);assert.equal(await page.locator('#new').textContent(),'新規投稿');assert.equal(await page.locator('#reload').count(),0);
  await page.locator('#new').click();const fixture=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=c.height=32;c.getContext('2d').fillRect(0,0,32,32);return {png:c.toDataURL('image/png').split(',')[1],jpeg:c.toDataURL('image/jpeg').split(',')[1]};});
  fixtureJpeg=Buffer.from(fixture.jpeg,'base64');
  await page.locator('#library').setInputFiles({name:'dummy.png',mimeType:'image/png',buffer:Buffer.from(fixture.png,'base64')});await page.waitForSelector('.easy-photo');await page.locator('#next').click();await page.locator('#words').fill('架空のテスト投稿');await page.locator('#next').click();
  assert.ok(await page.locator('.easy-review').evaluate(e=>e.firstElementChild.tagName==='IMG'));
  fail=true;await page.locator('#publish').click();await page.waitForFunction(()=>!document.querySelector('#publish').disabled);assert.equal(saves,0);
- fail=false;await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(saves,1);assert.equal(images.size,1);
+ fail=false;await page.locator('#publish').click();await page.waitForSelector('[data-edit]');assert.equal(saves,1);assert.equal(images.size,1);assert.ok(await page.locator('#logout').evaluate(b=>b.getBoundingClientRect().height>=68 && !!(document.querySelector('article').compareDocumentPosition(b)&Node.DOCUMENT_POSITION_FOLLOWING)));assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));if(width===390)await page.screenshot({path:'tmp/connected/staff-actions-v16.png',fullPage:true});
  fixturePublic=true;await customer.goto(base);await customer.waitForSelector('.card .picture');
  for(const p of [page,customer])assert.ok(await p.locator('.card').evaluate(c=>c.firstElementChild.classList.contains('notice-media')&&c.querySelector('.picture').getBoundingClientRect().bottom<=c.querySelector('.card-body').getBoundingClientRect().top+1));
  if(width===390)await customer.screenshot({path:'tmp/connected/photo-first.png',fullPage:true});
@@ -89,3 +89,4 @@ try{for(const width of [320,390,430,1280]){
  await page.reload();await page.waitForSelector('input[name=password]');assert.equal(await page.locator('[data-edit]').count(),0);assert.equal(await page.locator('input[name=password]').inputValue(),'');
  assert.deepEqual(errors,[]);console.log(width+'px: photo-first staff/customer/confirmation, no-photo compact end, edit/delete regression and anonymous separation PASS');await context.close();
 }}finally{await browser.close();await new Promise(r=>server.close(r));}
+
