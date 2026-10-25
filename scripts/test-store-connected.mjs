@@ -64,7 +64,8 @@ try{for(const width of [320,390,430,1280]){
  for(const p of [page,customer])assert.ok(await p.locator('.card').evaluate(c=>c.firstElementChild.classList.contains('notice-media')&&c.querySelector('.picture').getBoundingClientRect().bottom<=c.querySelector('.card-body').getBoundingClientRect().top+1));
  if(width===390)await customer.screenshot({path:'tmp/connected/photo-first.png',fullPage:true});
  await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);
- assert.ok(await customer.locator('#refresh').evaluate(b=>b.getBoundingClientRect().height>=80));
+ assert.ok(await customer.locator('#refresh').evaluate(b=>{const r=b.getBoundingClientRect();return r.height>=48&&r.height<65&&r.width<150&&r.top>document.querySelector('.visit-panel').getBoundingClientRect().bottom&&b.closest('footer');}));
+ assert.ok(await customer.locator('.card').evaluate(c=>c.getBoundingClientRect().top<220));
  const beforeRefresh=publicRequests;rows[0].body='更新されたお知らせ';
  await customer.locator('#refresh').evaluate(b=>{b.click();b.click();b.click();});
  await customer.waitForFunction(()=>!document.querySelector('#refresh').disabled);
