@@ -3,19 +3,21 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
   <title>店舗向け提案デモ | 広報担当さん</title>
   <link rel="stylesheet" href="./style.css"><script type="module" src="./app.js"></script>
 </head>
 <body>
   <div class="demo-banner">店舗向け提案デモ / 実際の販売情報ではありません</div>
   <header><a class="brand" href="#line"><img src="../../assets/service-logo.png" alt="広報担当さん" width="120" height="60"></a><span>情報はサンプルです</span></header>
-  <nav aria-label="デモ画面"><a href="#line">← 6つのボタンへ</a></nav>
+  <nav aria-label="デモ画面"><a href="#line">入口</a><a href="#post">写真と文章の投稿体験</a><a href="#store/nakatomi">客向けプレビュー</a></nav>
   <main id="app"></main>
   <footer>
     <p>店舗向け提案デモです。店舗の公式表示・掲載承認・販売情報を示すものではありません。チェーンロゴは使用していません。</p>
     <a href="../../one-off.html">広報担当さんへのお仕事の依頼</a>
     <p>「行ったよ」は、このブラウザー内だけの自己申告サンプルです。全利用者の集計や来店証明ではありません。</p>
     <p id="notice" role="status" aria-live="polite"></p>
+    <button id="reset" class="quiet">デモをリセット</button>
   </footer>
   <noscript>この提案デモの操作には JavaScript が必要です。実際の販売情報ではありません。</noscript>
 </body></html>
