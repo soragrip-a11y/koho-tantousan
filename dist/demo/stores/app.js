@@ -1,8 +1,9 @@
+import {rememberMarkup} from './device-session.js?v=20261026-23';
 import {canReviewApplications} from './approval-refresh.js?v=20261026-21';
-import {createStoreClient} from './connection.js?v=20261025-9';
+import {createStoreClient} from './connection.js?v=20261026-23';
 import {createDeleteOperation} from './delete-operation.js?v=20261025-10';
-import {createNoticeRepository} from './notice-repository.js?v=20261025-17';
-import {createSharedWorkflow} from './shared-workflow.js?v=20261025-17';
+import {createNoticeRepository} from './notice-repository.js?v=20261026-23';
+import {createSharedWorkflow} from './shared-workflow.js?v=20261026-23';
 import {mountPostUI} from './post-ui.js?v=20261025-12';
 import {mountEditUI} from './edit-ui.js?v=20261025-12';
 import {noticeMedia} from './notice-view.js?v=20261025-13';
@@ -18,10 +19,10 @@ export function mountSharedStaff(app,client){
  function clear(){cleanup?.();cleanup=null;app.innerHTML='';}
  function message(text){app.querySelector('[role="alert"]')?.replaceChildren(document.createTextNode(text));}
  function login(){epoch++;clear();app.classList.add('easy-post');rows=[];session=false;
-  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label><button class="easy-primary">ログイン</button></form><p role="alert"></p><p><a href="./password-recovery.html">パスワードを忘れたとき</a></p></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form><label class="easy-label">メール<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label>'+rememberMarkup+'<button class="easy-primary">ログイン</button></form><p role="alert"></p><p><a href="./password-recovery.html">パスワードを忘れたとき</a></p></section>';
   app.querySelector('form').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const form=e.currentTarget;form.querySelector('button').disabled=true;
    const email=form.elements.email.value,password=form.elements.password.value;form.elements.password.value='';
-   try{await flow.login(email,password);session=true;await preview();}catch(error){login();message(error.message||accessError(error));}finally{busy=false;form.querySelector('button').disabled=false;}};
+   try{client.deviceSession?.choose(form.elements.remember.checked);await flow.login(email,password);session=true;await preview();}catch(error){login();message(error.message||accessError(error));}finally{busy=false;form.querySelector('button').disabled=false;}};
  }
  async function preview(){
   if(disposed||!session)return;
@@ -37,7 +38,7 @@ export function mountSharedStaff(app,client){
   for(const p of next){p.image='';if(p.imagePath)try{p.image=await dataUrl(await repo.downloadPhoto(p.imagePath));}catch{p.photoFailed=true;photoFailed=true;}}
   if(disposed||!session||currentEpoch!==epoch)return;
   rows=next;clear();app.classList.add('easy-post');
-  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新規投稿</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('')+'<section class="easy-shell"><button id="logout" class="easy-cancel">ログアウト</button></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新規投稿</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('')+'<section class="easy-shell"><button id="logout" class="easy-cancel">ログアウト（保持を解除）</button></section>';
   app.querySelector('#new').onclick=()=>edit(null,false);
   const ownerSlot=app.querySelector('#new').parentElement;
   void canReviewApplications(client).then(allowed=>{if(!allowed||disposed||!session||currentEpoch!==epoch||!ownerSlot.isConnected)return;const a=ownerSlot.ownerDocument.createElement('a');a.href='./staff-approvals.html';a.className='easy-secondary';a.textContent='店員さんの申請を確認';ownerSlot.append(a);});
@@ -62,7 +63,8 @@ export function mountSharedStaff(app,client){
  }
  const auth=client.auth.onAuthStateChange?.(event=>{if(event==='SIGNED_OUT'){session=false;rows=[];login();}});
  login();
+ if(client.deviceSession?.hasSession){busy=true;void flow.restore().then(async ok=>{if(disposed)return;if(ok){session=true;await preview();}else{await client.auth.signOut({scope:'local'});login();message('ログインし直してください。');}}).catch(()=>{if(!disposed){login();message('ログイン状態を確認できません。');}}).finally(()=>{busy=false;});}
  return ()=>{disposed=true;session=false;rows=[];cleanup?.();auth?.data?.subscription?.unsubscribe();app.innerHTML='';};
 }
 
-mountSharedStaff(document.querySelector("#app"),createStoreClient());
+mountSharedStaff(document.querySelector("#app"),createStoreClient({staff:true}));

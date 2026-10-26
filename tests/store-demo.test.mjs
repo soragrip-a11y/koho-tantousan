@@ -37,7 +37,7 @@ test('connected store has anonymous-only customer UI and a restricted backend or
  assert.match(staff,/お店が公開設定のときは、お客さんにも表示されます/);assert.match(staff,/写真は「投稿する」「再投稿する」を押すと送信されます/);
  assert.doesNotMatch(customer,/listStaff|loadPosts|sampleNotices|POST_KEY/);
  const config=readFileSync(new URL('connection.js',root),'utf8');
- assert.match(config,/persistSession:false/);assert.match(config,/detectSessionInUrl:false/);
+ assert.match(config,/staff=false/);assert.match(config,/persistSession:staff/);assert.match(config,/detectSessionInUrl:false/);
  assert.doesNotMatch(config,/service_role|sb_secret_/);
  assert.doesNotMatch(readFileSync(new URL('../dist/sitemap.xml',import.meta.url),'utf8'),/demo\/stores/);
 });

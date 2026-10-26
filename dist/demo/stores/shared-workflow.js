@@ -1,10 +1,11 @@
-import {prepareChange} from './notice-repository.js?v=20261025-17';
-// No credentials, persistent session, localStorage or automatic demo fallback.
+import {prepareChange} from './notice-repository.js?v=20261026-23';
+// Authorization is rechecked by the repository; no automatic demo fallback.
 export function createSharedWorkflow(repository){
  let authorized=false,pending=null,inflight=null;
  const requireStaff=()=>{if(!authorized)throw Error('ログインが必要です。');};
  return {
   async login(email,password){authorized=false;await repository.signIn(email,password);authorized=true;},
+  async restore(){authorized=false;authorized=await repository.restore();return authorized;},
   async logout(){authorized=false;pending=null;await repository.signOut();},
   async list(){requireStaff();return repository.listStaff();},
   save(action,existing,draft={}){

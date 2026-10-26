@@ -1,4 +1,4 @@
-import {prepareRegistration,mountRegistration} from './registration-ui.js?v=20261026-21';
+import {prepareRegistration,mountRegistration} from './registration-ui.js?v=20261026-23';
 
 // New callbacks can arrive in a tab that is already open. Each generation owns
 // its DOM and memory-only client, so a late response cannot replace a newer UI.

@@ -35,7 +35,8 @@ export function createNoticeRepository(client){
       try{if(!await rpc('koho_can_manage',{p_store_id:STORE}))throw Object.assign(new Error(),{code:'STORE_DENIED'});}
       catch(error){try{await client.auth.signOut({scope:'local'});}catch{}throw new Error(accessError(error,'permission'));}
     },
-    async signOut(){const {error}=await client.auth.signOut();if(error)throw failure(error);},
+    async restore(){const r=await client.auth.getUser();if(r.error||!r.data?.user)return false;try{return Boolean(await rpc('koho_can_manage',{p_store_id:STORE}));}catch{return false;}},
+    async signOut(){const {error}=await client.auth.signOut({scope:'local'});if(error)throw failure(error);},
     async save(operation){return notice(await rpc('koho_change_notice',operation));},
     async uploadPhoto(jpeg){
       if(jpeg.type!=='image/jpeg'||jpeg.size>2097152||jpeg.size===0)throw new Error('写真の形式かサイズを確認してください。');

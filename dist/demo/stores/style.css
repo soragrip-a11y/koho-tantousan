@@ -74,3 +74,5 @@ body.staff-demo header,body.customer-demo header{background:#fff}
 .notice-media.no-photo .soldout-cover strong{margin:0;font-size:clamp(28px,8vw,38px)}
 
 .customer-demo #refresh{display:inline-block;min-width:96px;min-height:48px;font-size:16px;margin:4px 0 12px}.refresh-status{font-size:14px;min-height:1.7em;overflow-wrap:anywhere}.customer-demo header{max-width:672px;padding:8px 16px}.customer-demo header img{width:80px;height:40px}.customer-demo main{padding-top:12px;padding-bottom:0}.customer-demo .store-head{margin-bottom:16px}.customer-demo .store-head h1{font-size:26px;margin:0}.customer-demo footer{max-width:640px;margin:16px auto 0;padding:16px}
+
+.remember-device{display:flex;align-items:center;gap:12px;font-size:20px;line-height:1.5;padding:12px 0}.remember-device input[type=checkbox]{width:32px;height:32px;min-width:32px;flex:0 0 32px}.remember-help{font-size:16px;line-height:1.6}
