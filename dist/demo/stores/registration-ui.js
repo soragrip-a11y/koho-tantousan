@@ -4,7 +4,7 @@ export function consumeSignup(location,history){
  const hash=location.hash,search=location.search;
  const p=new URLSearchParams(hash.slice(1)),query=new URLSearchParams(search);
  if(hash||search)history.replaceState(null,'',location.pathname);
- if(!hash&&!search)return null;
+ if(!hash&&!query.has('error')&&!query.has('error_code')&&!query.has('code'))return null;
  if(p.get('type')!=='signup'||!p.get('access_token')||!p.get('refresh_token')||p.has('error')||p.has('error_code')||query.has('error')||query.has('error_code'))return {invalid:true};
  return {access_token:p.get('access_token'),refresh_token:p.get('refresh_token')};
 }
