@@ -1,3 +1,4 @@
+import {canReviewApplications} from './approval-refresh.js?v=20261026-21';
 import {createStoreClient} from './connection.js?v=20261025-9';
 import {createDeleteOperation} from './delete-operation.js?v=20261025-10';
 import {createNoticeRepository} from './notice-repository.js?v=20261025-17';
@@ -38,6 +39,8 @@ export function mountSharedStaff(app,client){
   rows=next;clear();app.classList.add('easy-post');
   app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新規投稿</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('')+'<section class="easy-shell"><button id="logout" class="easy-cancel">ログアウト</button></section>';
   app.querySelector('#new').onclick=()=>edit(null,false);
+  const ownerSlot=app.querySelector('#new').parentElement;
+  void canReviewApplications(client).then(allowed=>{if(!allowed||disposed||!session||currentEpoch!==epoch||!ownerSlot.isConnected)return;const a=ownerSlot.ownerDocument.createElement('a');a.href='./staff-approvals.html';a.className='easy-secondary';a.textContent='店員さんの申請を確認';ownerSlot.append(a);});
   if(photoFailed)message('一部の写真を読み込めませんでした。文章は表示しています。写真が読めない投稿の書き直しは、読み直してから行えます。');
   app.querySelector('#logout').onclick=async()=>{session=false;rows=[];clear();try{await flow.logout();}finally{login();}};
   for(const b of app.querySelectorAll('[data-edit]'))b.onclick=()=>edit(rows.find(p=>p.id===b.dataset.edit),false);
