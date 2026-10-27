@@ -13,7 +13,7 @@ body.store-ui .badge,body.store-ui .demo-badge {border-radius:4px;font-weight:70
 body.store-ui .notice-media {background:#eef2ed}
 body.store-ui .notice-media .picture {max-height:400px;object-fit:contain}
 body.store-ui .notice-media.is-soldout .picture {opacity:.7}
-body.store-ui .soldout-cover {justify-content:flex-end;background:repeating-linear-gradient(135deg,#f4f6f31a 0,#f4f6f31a 3px,#5361580d 3px,#5361580d 12px)}
+body.store-ui .soldout-cover {justify-content:center;background:repeating-linear-gradient(135deg,#f4f6f31a 0,#f4f6f31a 3px,#5361580d 3px,#5361580d 12px)}
 body.store-ui .soldout-cover strong {width:100%;border:0;border-radius:0;margin:0;padding:12px 16px;font-size:1.125rem;line-height:1.5;text-align:center;color:#414e46;background:#eef2edf5}
 body.store-ui .notice-media.no-photo .soldout-cover {padding:0}
 body.store-ui .notice-media.no-photo .soldout-cover strong {font-size:1.125rem}
