@@ -1,0 +1,108 @@
+/* Nakatomi UI. DADS foundations inform type, spacing, contrast and focus.
+   Scoped to body.store-ui so the shared LINE entry and technical test page stay separate. */
+body.store-ui {
+  --ink:#1f2925; --muted:#526159; --green:#175b40; --green-hover:#10452f;
+  --line:#c6d1ca; --canvas:#f5f7f5; --focus:#ffd43b;
+  font-family:system-ui,-apple-system,"BIZ UDPGothic","Noto Sans JP","Yu Gothic",sans-serif;
+  font-size:1rem; line-height:1.75; color:var(--ink); background:var(--canvas);
+}
+body.store-ui *, body.store-ui *::before, body.store-ui *::after {box-sizing:border-box}
+body.store-ui :is(h1,h2,h3,p,a,label,button,small) {overflow-wrap:anywhere}
+body.store-ui :is(h1,h2,h3) {color:var(--ink);font-weight:700;letter-spacing:normal;text-wrap:pretty}
+body.store-ui h1,body.store-ui .easy-post h1 {font-size:1.75rem;line-height:1.5;margin:8px 0 24px}
+body.store-ui h2 {font-size:1.375rem;line-height:1.5;margin:0 0 16px}
+body.store-ui h3 {font-size:1.125rem;line-height:1.5}
+body.store-ui p,body.store-ui .easy-post p {font-size:1rem;line-height:1.75;margin:0 0 16px}
+body.store-ui a {color:#005eaa;text-decoration:underline;text-underline-offset:.2em}
+body.store-ui a:hover {text-decoration-thickness:2px}
+body.store-ui :is(a,button,input,textarea,select):focus-visible {
+  outline:3px solid #1a1a1a;outline-offset:3px;box-shadow:0 0 0 3px var(--focus)!important;
+}
+body.store-ui .skip-link {position:absolute;top:8px;left:16px;z-index:20;transform:translateY(-180%);background:white;padding:12px 16px}
+body.store-ui .skip-link:focus {transform:none}
+body.store-ui .demo-banner {background:#e8efea;color:#344b3d;font-size:.875rem;padding:8px 16px}
+body.store-ui header {max-width:100%;background:#fff;border-bottom:1px solid var(--line);padding:16px max(16px,calc((100% - 960px)/2));gap:16px;min-height:72px}
+body.store-ui header img {width:96px;height:40px;flex:none}
+body.store-ui header span {font-size:.875rem;line-height:1.5;text-align:right;max-width:12em}
+body.store-ui main {width:100%;max-width:768px;padding:32px 24px;margin:0 auto}
+body.store-ui .easy-post {max-width:768px}
+body.store-ui .easy-shell,body.store-ui .form {border:1px solid var(--line);border-radius:12px;background:white;padding:32px;margin-bottom:24px}
+body.store-ui .easy-shell > :last-child {margin-bottom:0}
+body.store-ui .store-context {font-size:.875rem!important;font-weight:700;color:var(--muted);margin:0!important}
+body.store-ui .easy-label {font-size:1rem;line-height:1.5;margin:24px 0 8px;font-weight:700}
+body.store-ui .easy-label input {margin-top:8px}
+body.store-ui :is(input:not([type=checkbox]),textarea,select) {font:inherit;width:100%;min-width:0;min-height:48px;border:1px solid #62776a;border-radius:6px;padding:12px;color:var(--ink);background:white}
+body.store-ui .easy-post textarea {font-size:1.125rem;line-height:1.75;min-height:200px;border-width:1px}
+body.store-ui textarea::placeholder {color:#5d6c63}
+body.store-ui form > button {margin-top:24px!important}
+body.store-ui :is(button,a.button,a.easy-primary,a.easy-secondary),body.store-ui .easy-post button {
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;max-width:100%;padding:12px 20px;font:inherit;font-size:1.125rem;font-weight:700;line-height:1.5;
+  border:1px solid var(--green);border-bottom-width:2px;border-radius:8px;
+  background:var(--green);color:white;text-decoration:none;box-shadow:0 2px 0 #0e3928;
+  margin:16px 0;cursor:pointer;transition:background-color .12s,transform .12s;
+}
+body.store-ui .easy-post :is(button,a.easy-primary,a.easy-secondary) {width:100%}
+body.store-ui :is(button,a.button,a.easy-primary):hover {background:var(--green-hover);color:white}
+body.store-ui :is(button,a.button)::after {content:none}
+body.store-ui :is(button,a.button)[data-pressed],body.store-ui :is(button,a.button):active {transform:translateY(1px);box-shadow:none}
+body.store-ui :is(button.quiet,.easy-post .easy-secondary,a.easy-secondary) {background:white;color:var(--green);border-color:var(--green);box-shadow:0 2px 0 #b5c6bb}
+body.store-ui :is(button.quiet,.easy-post .easy-secondary,a.easy-secondary):hover {background:#edf4ef;color:var(--green-hover)}
+body.store-ui .easy-post .easy-cancel {background:#fff;color:#414e46;border-color:#708076;font-size:1rem;min-height:48px;box-shadow:none}
+body.store-ui .easy-post .easy-cancel:hover {background:#f0f3f1}
+body.store-ui button:disabled {background:#e6ebe7!important;color:#536158!important;border-color:#a4b2a8!important;box-shadow:none!important;transform:none!important;opacity:1;cursor:not-allowed}
+body.store-ui .remember-device {font-size:1rem;line-height:1.5;padding:8px 0;min-height:48px;margin:20px 0 4px;gap:12px;font-weight:400}
+body.store-ui .remember-device input[type=checkbox] {width:24px;height:24px;min-width:24px;flex:0 0 24px;accent-color:var(--green);margin:0}
+body.store-ui .remember-help,body.store-ui .easy-post .easy-help {font-size:.875rem;line-height:1.75;color:var(--muted)}
+body.store-ui :is([role=status],[role=alert]) {overflow-wrap:anywhere;line-height:1.75}
+body.store-ui .easy-shell > [role=status]:not(:empty),body.store-ui .easy-shell > [role=alert]:not(:empty) {padding:16px;border-left:4px solid #346647;background:#eef5ef;margin:24px 0}
+body.store-ui .easy-shell > [role=alert]:not(:empty),body.store-ui .error:not(:empty) {color:#9b241b!important;background:#fff2ef!important;border-color:#b52c22!important;font-size:1rem!important}
+body.store-ui .easy-shell > :is([role=status],[role=alert]):empty {margin:0;padding:0}
+body.store-ui .account-links {display:flex;flex-direction:column;align-items:flex-start;gap:8px;border-top:1px solid var(--line);margin-top:24px;padding-top:16px}
+body.store-ui .account-links a {display:inline-flex;align-items:center;min-height:44px;font-size:1rem}
+body.store-ui .registration-tools {float:right;display:flex;justify-content:flex-end;margin:0 0 8px 16px}
+body.store-ui .registration-tools .registration-refresh,body.store-ui .store-head #refresh {width:auto;min-width:72px;min-height:44px;font-size:1rem;margin:0;padding:8px 16px;box-shadow:none}
+body.store-ui .easy-shell:has(.registration-tools) > h1 {clear:both}
+body.store-ui .request-card {margin:24px 0;border-radius:8px;border:1px solid var(--line);box-shadow:none}
+body.store-ui .request-card .card-body {padding:24px}
+body.store-ui .request-card .applicant-email {font-size:1.125rem;margin:12px 0 16px;overflow-wrap:anywhere;line-height:1.75}
+body.store-ui .request-card .deadline {font-size:1rem;color:#4a5c4f;font-weight:400}
+body.store-ui .request-actions {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:24px}
+body.store-ui .request-actions button {margin:0;font-size:1rem}
+body.store-ui .badge {font-size:.875rem;line-height:1.5;color:#145237;background:#e4f1e8;padding:4px 10px;border-radius:4px}
+body.store-ui .badge.off {color:#4a554e;background:#e9ece9}
+body.store-ui .empty {background:#f3f6f3;border:1px solid var(--line);border-radius:8px;padding:24px}
+body.store-ui .easy-note {font-size:1rem!important;background:#fff6db;color:#554012;border-left:4px solid #a27b16;border-radius:4px;padding:16px;margin-bottom:24px!important}
+body.store-ui .easy-step {font-size:.875rem!important;letter-spacing:.04em;font-weight:700;color:var(--green);margin-bottom:8px}
+body.store-ui .easy-post h1 .intro-phrase {white-space:normal}
+body.store-ui .easy-review {border:1px solid #859b8b;border-radius:8px;padding:20px;margin-bottom:24px}
+body.store-ui .easy-photo {border-radius:8px;max-height:320px;margin:16px 0 24px}
+body.store-ui .card {border-radius:12px;border-color:var(--line);margin-bottom:24px}
+body.store-ui .card-body {padding:24px}
+body.store-ui .easy-post > .card > button {width:calc(100% - 48px);margin:0 24px 24px}
+body.store-ui .store-head {max-width:none;margin:0 0 24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+body.store-ui .store-head h1 {font-size:1.75rem;line-height:1.5;margin:4px 0 0}
+body.store-ui .store-head #refresh-area {display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+body.store-ui .refresh-status {font-size:.875rem!important;max-width:13em;margin:0!important;text-align:right;color:var(--muted)}
+body.store-ui .cards {max-width:none}
+body.store-ui .deadline {font-size:.875rem;color:#69501e;margin-bottom:16px}
+body.store-ui .card-body > p:last-child {white-space:pre-wrap;margin-bottom:0}
+body.store-ui .visit-panel {border-radius:12px;border-color:var(--line);padding:24px;margin-top:32px}
+body.store-ui .visit-panel #visit {font-size:1.125rem;min-height:48px;width:100%}
+body.store-ui .visit-panel p {font-size:.875rem;color:var(--muted);margin:0}
+body.store-ui footer {max-width:720px;padding:24px;margin:0 auto;font-size:.875rem;border-color:var(--line)}
+body.store-ui footer p {font-size:.875rem;color:var(--muted)}
+@media(max-width:600px) {
+ body.store-ui main {padding:24px 16px}
+ body.store-ui .easy-shell,body.store-ui .form {padding:24px 20px}
+ body.store-ui h1,body.store-ui .easy-post h1,body.store-ui .store-head h1 {font-size:1.5rem}
+ body.store-ui h2 {font-size:1.25rem}
+ body.store-ui .card-body,body.store-ui .request-card .card-body,body.store-ui .visit-panel {padding:20px}
+ body.store-ui .request-actions {grid-template-columns:1fr}
+ body.store-ui .store-head {gap:12px}
+ body.store-ui .store-head #refresh-area {max-width:100px}
+ body.store-ui .store-head .refresh-status {font-size:.875rem}
+ body.store-ui .easy-post > .card > button {width:calc(100% - 40px);margin:0 20px 20px}
+}
+@media(prefers-reduced-motion:reduce) {body.store-ui :is(button,a.button) {transition:none;transform:none!important}}
+@media(forced-colors:active) {body.store-ui :is(button,a.button,input,textarea) {border:2px solid ButtonText}body.store-ui :focus-visible {outline:3px solid Highlight!important}}
