@@ -82,7 +82,7 @@ test('official LINE destination stays verified and always-contact wording has a 
 test('compact proposal preserves recommended videos and the existing homepage sections',()=>{
  const {document}=parseHTML(read('index.html'));
  assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
- assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube.com/.test(x)&&!x.includes("2H3bwkASc2M")),['https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=OO4kyMZvhpE','https://www.youtube.com/watch?v=YCXll8IjTB8']);
+ assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)&&!x.includes("2H3bwkASc2M")),['https://youtu.be/lGHOQvbA8BQ','https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
  assert.equal(document.querySelectorAll('main > section').length,10);
  assert.equal(document.querySelectorAll('.mini-price-table').length,1);
  assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
