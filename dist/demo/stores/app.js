@@ -5,8 +5,8 @@ import {createStoreClient} from './connection.js?v=20261026-23';
 import {createDeleteOperation} from './delete-operation.js?v=20261025-10';
 import {createNoticeRepository} from './notice-repository.js?v=20261027-2';
 import {createSharedWorkflow} from './shared-workflow.js?v=20261027-2';
-import {mountPostUI} from './post-ui.js?v=20261027-2';
-import {mountEditUI} from './edit-ui.js?v=20261027-2';
+import {mountPostUI} from './post-ui.js?v=20261027-3';
+import {mountEditUI} from './edit-ui.js?v=20261027-3';
 import {noticeMedia} from './notice-view.js?v=20261027-2';
 import {postStatus} from './post-model.js?v=20261027-2';
 import './press-feedback.js';
@@ -20,7 +20,7 @@ export function mountSharedStaff(app,client){
  function clear(){cleanup?.();cleanup=null;app.innerHTML='';}
  function message(text){app.querySelector('[role="alert"]')?.replaceChildren(document.createTextNode(text));}
  function login(){epoch++;clear();app.classList.add('easy-post');rows=[];session=false;
-  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿は共有保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form aria-describedby="login-feedback"><p class="required-note">メールアドレス・パスワードは必須です。</p><label class="easy-label">メールアドレス<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label>'+rememberMarkup+'<button class="easy-primary">ログイン</button></form><p id="login-feedback" role="alert" aria-atomic="true"></p><div class="account-links"><a href="./staff-register.html">初めての方は新規登録</a><a href="./password-recovery.html">パスワードを忘れたとき</a></div></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんのログイン</h1><p>投稿はお店のお知らせとして保存されます。お店が公開設定のときは、お客さんにも表示されます。</p><form aria-describedby="login-feedback"><p class="required-note">メールアドレス・パスワードは必須です。</p><label class="easy-label">メールアドレス<input name="email" type="email" autocomplete="username" required></label><label class="easy-label">パスワード<input name="password" type="password" autocomplete="current-password" required></label>'+rememberMarkup+'<button class="easy-primary">ログイン</button></form><p id="login-feedback" role="alert" aria-atomic="true"></p><div class="account-links"><a href="./staff-register.html">初めての方は新規登録</a><a href="./password-recovery.html">パスワードを忘れたとき</a></div></section>';
   app.querySelector('form').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const form=e.currentTarget;form.querySelector('button').disabled=true;
    const email=form.elements.email.value,password=form.elements.password.value;form.elements.password.value='';
    try{client.deviceSession?.choose(form.elements.remember.checked);await flow.login(email,password);session=true;await preview();}catch(error){login();message(error.message||accessError(error));}finally{busy=false;form.querySelector('button').disabled=false;}};

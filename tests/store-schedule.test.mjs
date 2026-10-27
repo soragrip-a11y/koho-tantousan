@@ -41,14 +41,15 @@ test('open customer page refreshes boundaries, polls only when visible, resumes 
  doc.hidden=true;timers.get(30000)();assert.equal(reads,1);now=2000;doc.hidden=false;doc.dispatchEvent(new Event('visibilitychange'));assert.equal(reads,2);assert.equal(paints,2);
  win.dispatchEvent(new Event('pageshow'));assert.equal(reads,3);stop();win.dispatchEvent(new Event('focus'));assert.equal(reads,3);assert.equal(timers.size,0);
 });
-test('synthetic demo shares lifecycle; future hidden, exact bounds and unlimited footer without backend',()=>{
- const {document}=parseHTML('<div id="demo"></div>'),root=document.querySelector('#demo');const stop=mountDemo(root),$=s=>root.querySelector(s);
+test('synthetic demo shares lifecycle; future hidden, exact bounds and unlimited footer without backend',async()=>{
+ const {document}=parseHTML('<div id="demo"></div>'),root=document.querySelector('#demo');const stop=mountDemo(root,{readPhoto:async()=>'data:image/jpeg;base64,YQ=='}),$=s=>root.querySelector(s);
+ await $('#demo-library').onchange({target:{files:[{}]}});$('#demo-title').value='Test';$('#demo-text').value='Synthetic';
  // linkedom select value is derived from the selected option.
  const select=$('#schedule-mode');for(const o of select.querySelectorAll('option'))o.selected=o.value==='timed';
  $('#schedule-start').value='2099-01-01T15:00';$('#schedule-end').value='2099-01-01T19:00';$('#demo-form').onsubmit({preventDefault(){}});$('#demo-publish').click();
  assert.equal(root.querySelectorAll('.demo-customer article').length,0);$('#clock-start').click();assert.equal(root.querySelectorAll('.demo-customer article').length,1);assert.equal(root.querySelectorAll('.demo-customer .demo-ended-overlay').length,0);
  $('#clock-end').click();assert.equal(root.querySelectorAll('.demo-customer .demo-ended-overlay').length,1);
- $('#demo-form').onsubmit({preventDefault(){}});$('#demo-publish').click();assert.match($('.demo-customer').textContent,/すでに終了している場合があります/);stop();
+ await $('#demo-library').onchange({target:{files:[{}]}});$('#demo-title').value='Unlimited';$('#demo-text').value='Synthetic';$('#demo-form').onsubmit({preventDefault(){}});$('#demo-publish').click();assert.match($('.demo-customer').textContent,/すでに終了している場合があります/);stop();
 });
 test('real edit preserves existing expiry, rejects reversed dates and can explicitly remove expiry',async()=>{
  const {document}=parseHTML('<div id="app"></div>'),app=document.querySelector('#app');const original=globalThis.confirm;globalThis.confirm=()=>true;

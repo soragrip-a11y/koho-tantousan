@@ -7,7 +7,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
   let step=existing?'actions':1,photo=existing?.image||'',text=existing?.text||'',busy=false,disposed=false,token=0,committed=false;
   const timing=scheduleDraft(existing);let schedule={start:null,end:null},readSchedule;
   const $=s=>app.querySelector(s);
-  const intro='<p class="easy-note">投稿すると、写真と文章を共有保存します。<br>お店が公開設定のときは、お客さんにも表示されます。</p>';
+  const intro='';
   const back='<button class="easy-secondary" id="back" type="button">← 戻る</button>';
   const cancel='<button class="easy-cancel" id="cancel" type="button">入力をやめる</button>';
   function cancelFlow(){if(confirm('入力をやめますか？ 保存していない内容は消えます。'))onExit();}
@@ -22,7 +22,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
     }else if(step===2){
       content='<p class="easy-step">2 / 3　ひとこと</p><h1>お店の情報を、<br>お客さんに伝えましょう</h1><label class="easy-label" for="words">お知らせの文章</label><textarea aria-describedby="words-help easy-error" id="words" maxlength="180" rows="5" placeholder="お客さんに伝える内容を書いてください">'+esc(text)+'</textarea><p id="words-help" class="easy-help">180文字まで書けます。</p>'+scheduleFields(timing)+'<button id="next" class="easy-primary">内容を確認する →</button>'+back+cancel;
     }else{
-      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>'+esc(scheduleLabel(schedule))+'。終了した投稿も写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">お店が公開設定のときは、この内容がお客さんに公開されます。非公開設定のときは、権限のある店員さんだけが確認できます。</p>'+back+cancel;
+      content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>'+esc(scheduleLabel(schedule))+'。終了した投稿も写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">お店が公開設定のときは、指定した開始時刻からお客さんに表示されます。時間指定なしはすぐに表示されます。お店のページが非公開の場合は、店員さんだけが確認できます。</p>'+back+cancel;
     }
     app.innerHTML='<section class="easy-shell">'+intro+content+'<p id="easy-error" class="error" role="alert"></p></section>';
     if(focus){window.scrollTo(0,0);$('h1').setAttribute('tabindex','-1');$('h1').focus({preventScroll:true});}

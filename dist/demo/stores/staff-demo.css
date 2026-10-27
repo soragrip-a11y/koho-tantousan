@@ -13,3 +13,5 @@ body.staff-demo input[type=radio]{width:20px;height:20px;min-height:20px;min-wid
 .schedule-fields{min-width:0;margin:20px 0;padding:16px;border:1px solid #718579;border-radius:10px}.schedule-fields label{display:block;margin:12px 0 6px}.schedule-fields input,.schedule-fields select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:12px}.schedule-fields p,.expiry-note{font-size:14px;line-height:1.7}.schedule-fields [hidden]{display:none}.demo-customer{border-top:2px solid #718579;margin-top:24px;padding-top:16px}
 
 .demo-card{position:relative}.demo-ended-overlay{padding:12px;background:repeating-linear-gradient(135deg,#203b2eeb,#203b2eeb 8px,#3c5548eb 8px,#3c5548eb 16px);color:#fff;text-align:center;font-weight:700}.demo-ended>img{opacity:.5}
+
+.staff-demo .photo-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:16px 0}.staff-demo .photo-actions button{margin:0;min-height:48px;white-space:normal}

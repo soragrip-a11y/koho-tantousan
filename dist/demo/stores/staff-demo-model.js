@@ -1,12 +1,11 @@
-import {validDemoPhoto} from './demo-photo.js?v=20261027-2';
+import {validDemoPhoto} from './demo-photo.js?v=20261027-3';
 import {validateSchedule} from './schedule.js?v=20261027-2';
 // Synthetic in-memory model. No user identity, persistence or network adapter.
-export const samples=Object.freeze({bread:{label:'パンの見本',src:'./demo-bread.svg'},drink:{label:'飲みものの見本',src:'./demo-drink.svg'},none:{label:'写真なし',src:''}});
-export const initialDraft=()=>({title:'今日のおすすめ',text:'焼きたてパンが並びました。\nお近くにお越しの際は、ぜひお立ち寄りください。',photo:'bread',start:null,end:null});
+export const initialDraft=()=>({title:'',text:'',photo:'local',image:'',start:null,end:null});
 export function validateDraft(draft){
+ if(draft.photo!=='local'||!validDemoPhoto(draft.image))throw Error('写真を撮るか、端末の写真を選んでください。');
  if(typeof draft.title!=='string'||!draft.title.trim()||draft.title.length>40)throw Error('見出しを1〜40文字で入力してください。');
  if(typeof draft.text!=='string'||!draft.text.trim()||draft.text.length>180)throw Error('本文を1〜180文字で入力してください。');
- if(!Object.hasOwn(samples,draft.photo)&&!(draft.photo==='local'&&validDemoPhoto(draft.image)))throw Error('見本の写真を選び直してください。');
  return {title:draft.title.trim(),text:draft.text.trim(),photo:draft.photo,image:draft.photo==='local'?draft.image:'',...validateSchedule(draft)};
 }
 export function createDemo(){let posts=[],next=1;return Object.freeze({

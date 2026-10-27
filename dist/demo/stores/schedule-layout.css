@@ -1,0 +1,34 @@
+/* iOS native datetime controls must shrink inside the fieldset, not set its intrinsic width. */
+body.store-ui .schedule-fields,
+body.store-ui .schedule-fields #schedule-times {
+  min-width:0;
+  min-inline-size:0;
+  max-width:100%;
+  max-inline-size:100%;
+}
+body.store-ui .schedule-fields {margin-inline:0;inline-size:100%;box-sizing:border-box}
+body.store-ui .schedule-fields input[type="datetime-local"] {
+  -webkit-appearance:none;
+  appearance:none;
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  inline-size:100%;
+  min-width:0;
+  min-inline-size:0;
+  max-width:100%;
+  max-inline-size:100%;
+  min-height:48px;
+  padding:12px 8px;
+  font:inherit;
+}
+body.store-ui .schedule-fields input[type="datetime-local"]::-webkit-date-and-time-value {
+  min-width:0;
+  min-inline-size:0;
+  text-align:start;
+}
+body.store-ui .schedule-fields input[type="datetime-local"]::-webkit-datetime-edit {
+  min-width:0;
+  min-inline-size:0;
+  padding:0;
+}
