@@ -3,8 +3,8 @@ import {DELETE_CONFIRMATION} from './delete-operation.js?v=20261025-10';
 // Posting UI. The authenticated parent supplies persistence and state changes.
 import {validPhoto} from './post-model.js?v=20261027-2';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
-  let step=existing?'actions':1,photo=existing?.image||'',text=existing?.text||'',busy=false,disposed=false,token=0,committed=false;
+export function mountPostUI({app,existing,onSave,onState,onExit,onEdit,initialText=''}) {
+  let step=existing?'actions':(initialText?2:1),photo=existing?.image||'',text=existing?.text||initialText,busy=false,disposed=false,token=0,committed=false;
   const timing=scheduleDraft(existing);let schedule={start:null,end:null},readSchedule;
   const $=s=>app.querySelector(s);
   const intro='';
@@ -25,6 +25,7 @@ export function mountPostUI({app,existing,onSave,onState,onExit,onEdit}) {
       content='<p class="easy-step">3 / 3　確認</p><h1>この内容で<br>載せますか？</h1><div class="easy-review">'+(photo?'<img class="easy-photo" src="'+photo+'" alt="載せる写真">':'<p>写真なし</p>')+'<p class="easy-words">'+esc(text)+'</p></div><p>'+esc(scheduleLabel(schedule))+'。終了した投稿も写真や文章は自動では消えません。</p><button id="publish" class="easy-primary">投稿する</button><p class="easy-help">お店が公開設定のときは、指定した開始時刻からお客さんに表示されます。時間指定なしはすぐに表示されます。お店のページが非公開の場合は、店員さんだけが確認できます。</p>'+back+cancel;
     }
     app.innerHTML='<section class="easy-shell">'+intro+content+'<p id="easy-error" class="error" role="alert"></p></section>';
+    if(step===2)$('#words').value=text;
     if(focus){window.scrollTo(0,0);$('h1').setAttribute('tabindex','-1');$('h1').focus({preventScroll:true});}
     $('#cancel')?.addEventListener('click',cancelFlow);
     $('#back')?.addEventListener('click',()=>{if(step===3)step=2;else{ text=$('#words').value;try{readSchedule();}catch{}step=1;}render(true);});
