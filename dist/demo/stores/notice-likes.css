@@ -1,5 +1,5 @@
-body.store-ui button.notice-heart{display:flex;align-items:center;justify-content:center;width:48px;height:48px;min-width:48px;min-height:48px;margin:12px 0 0;padding:4px;border:1px solid transparent;border-radius:10px;background:transparent;color:#9e293a;font-size:32px;line-height:1;box-shadow:none}
-body.store-ui button.notice-heart:hover,body.store-ui button.notice-heart:active{background:#fff0f2;color:#9e293a}
+body.store-ui button.notice-heart{display:flex;align-items:center;justify-content:center;width:48px;height:48px;min-width:48px;min-height:48px;margin:12px 0 0;padding:4px;border:0;border-radius:10px;background:transparent;color:#9e293a;font-size:32px;line-height:1;box-shadow:none}
+body.store-ui button.notice-heart:hover,body.store-ui button.notice-heart:active{background:transparent;color:#9e293a}
 body.store-ui button.notice-heart[aria-pressed=true]{color:#c51d39;background:transparent}
 body.store-ui button.notice-heart:focus-visible{outline:3px solid #005fcc;outline-offset:3px}
 body.store-ui button.notice-heart:disabled{opacity:.55;cursor:wait}
@@ -7,3 +7,8 @@ body.store-ui button.notice-heart:disabled{opacity:.55;cursor:wait}
 .like-status:empty{display:none}
 @media(forced-colors:active){body.store-ui button.notice-heart{color:ButtonText;border-color:ButtonText}body.store-ui button.notice-heart[aria-pressed=true]{background:Highlight;color:HighlightText}}
 
+
+body.store-ui button.notice-heart:disabled{background:transparent!important;color:#9e293a!important;border:0!important;opacity:.55}
+.heart-icon{display:block;width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.notice-heart[aria-pressed=true] .heart-icon,.staff-heart .heart-icon{fill:currentColor}
+.staff-heart{display:inline-flex;color:#c51d39;vertical-align:middle;margin-right:6px}.staff-heart .heart-icon{width:20px;height:20px}

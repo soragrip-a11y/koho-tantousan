@@ -38,5 +38,5 @@ export function createNoticeLikes(client,{storage,locks,randomUUID=()=>crypto.ra
 export function likeMarkup(id,state,busy=false){
  // IDs originate from the server; restrict before interpolating an attribute.
  if(!/^[0-9a-f-]{36}$/i.test(id))return '';
- return '<button type="button" class="notice-heart" data-like="'+id+'" aria-label="'+(state?.liked?'いいねを取り消す':'いいねする')+'" aria-pressed="'+Boolean(state?.liked)+'" '+(!state||busy?'disabled':'')+'><span aria-hidden="true">'+(state?.liked?'♥':'♡')+'</span></button><p class="like-status" data-like-status="'+id+'" role="status" aria-live="polite"></p>';
+ return '<button type="button" class="notice-heart" data-like="'+id+'" aria-label="'+(state?.liked?'いいねを取り消す':'いいねする')+'" aria-pressed="'+Boolean(state?.liked)+'" '+(!state||busy?'disabled':'')+'><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button><p class="like-status" data-like-status="'+id+'" role="status" aria-live="polite"></p>';
 }

@@ -1,4 +1,4 @@
-import {createNoticeLikes,likeMarkup} from './notice-likes.js?v=20261027-1';
+import {createNoticeLikes,likeMarkup} from './notice-likes.js?v=20261027-3';
 import {watchCustomer} from './customer-refresh.js?v=20261027-2';
 import {publicPosts,scheduleLabel,NO_EXPIRY_NOTE} from './schedule.js?v=20261027-4';
 import {createStoreClient} from './connection.js?v=20261025-9';
