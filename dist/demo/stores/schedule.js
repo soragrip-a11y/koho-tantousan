@@ -22,7 +22,14 @@ export function lifecycle(p,now=Date.now()){
 export function publicPosts(posts,now=Date.now()){
  return posts.filter(p=>['active','ended','soldout'].includes(lifecycle(p,now))).sort((a,b)=>
   Number(lifecycle(a,now)!=='active')-Number(lifecycle(b,now)!=='active')||
-  (Date.parse(b.start||b.publishedAt)||0)-(Date.parse(a.start||a.publishedAt)||0)||String(a.id).localeCompare(String(b.id)));
+  postingOrder(a,b));
+}
+// Current API exposes latest publication/republication time, not immutable creation time.
+// Missing timestamps follow dated rows and retain source order, without inventing chronology.
+function postingOrder(a,b){const x=Date.parse(a.publishedAt),y=Date.parse(b.publishedAt),validX=Number.isFinite(x),validY=Number.isFinite(y);if(!validX||!validY)return Number(validY)-Number(validX);return y-x||String(a.id).localeCompare(String(b.id));}
+export function staffPosts(posts,now=Date.now()){
+ const rank={active:0,scheduled:1,ended:2,soldout:2,withdrawn:3,deleting:3};
+ return [...posts].sort((a,b)=>(rank[lifecycle(a,now)]??3)-(rank[lifecycle(b,now)]??3)||postingOrder(a,b));
 }
 const formatter=new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 export function scheduleLabel(p){return p.end?'表示期間：'+formatter.format(new Date(p.start||p.publishedAt||Date.now()))+' 〜 '+formatter.format(new Date(p.end))+'（日本時間）':'時間指定なし・終了期限なし';}

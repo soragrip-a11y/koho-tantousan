@@ -1,5 +1,5 @@
 import {watchCustomer} from './customer-refresh.js?v=20261027-2';
-import {publicPosts,scheduleLabel,NO_EXPIRY_NOTE} from './schedule.js?v=20261027-2';
+import {publicPosts,scheduleLabel,NO_EXPIRY_NOTE} from './schedule.js?v=20261027-4';
 import {createStoreClient} from './connection.js?v=20261025-9';
 import {createNoticeRepository} from './notice-repository.js?v=20261027-2';
 import {noticeMedia} from './notice-view.js?v=20261027-2';
