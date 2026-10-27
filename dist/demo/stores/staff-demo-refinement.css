@@ -1,0 +1,17 @@
+/* Demo-only visual review. Never applies to real staff/customer pages. */
+body.store-ui.staff-demo {--canvas:#f4f6f3;--line:#c6d1ca}
+body.store-ui.staff-demo main {padding-block:32px 48px}
+body.store-ui.staff-demo header {min-height:64px;padding-block:12px}
+body.store-ui.staff-demo .demo-panel {box-shadow:0 2px 8px #1f292508}
+body.store-ui.staff-demo .demo-card-content {padding:24px}
+body.store-ui.staff-demo .demo-body {line-height:1.85}
+body.store-ui.staff-demo .expiry-note {display:block;color:#526159;font-size:.875rem;border-top:1px solid #dde4de;margin-top:20px;padding-top:12px}
+body.store-ui.staff-demo .demo-badge {border-radius:4px;font-weight:700}
+body.store-ui.staff-demo :is(button,a.button) {box-shadow:none;border-bottom-width:1px}
+body.store-ui.staff-demo button.quiet {box-shadow:none}
+body.store-ui.staff-demo .schedule-fields {background:#f8faf7;border-color:#829487}
+body.store-ui.staff-demo .schedule-fields legend {padding-inline:6px}
+body.store-ui.staff-demo .demo-ended-overlay {background:#e9eeea;color:#414e46;font-size:1rem}
+body.store-ui.staff-demo .demo-entry {padding-bottom:20px;border-bottom:1px solid var(--line)}
+@media(max-width:600px){body.store-ui.staff-demo main{padding-block:24px 32px}body.store-ui.staff-demo .demo-card-content{padding:20px}}
+@media(forced-colors:active){body.store-ui.staff-demo .demo-ended-overlay{border:1px solid CanvasText;background:Canvas;color:CanvasText}}
