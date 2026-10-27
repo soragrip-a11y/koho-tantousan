@@ -82,7 +82,7 @@ test('official LINE destination stays verified and always-contact wording has a 
 test('compact proposal preserves recommended videos and the existing homepage sections',()=>{
  const {document}=parseHTML(read('index.html'));
  assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
- assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)&&!x.includes("2H3bwkASc2M")),['https://youtu.be/lGHOQvbA8BQ','https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
+ assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)&&!x.includes("pN2GGSA9wR0")),['https://youtu.be/lGHOQvbA8BQ','https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
  assert.equal(document.querySelectorAll('main > section').length,10);
  assert.equal(document.querySelectorAll('.mini-price-table').length,1);
  assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
@@ -100,4 +100,4 @@ test('published prices and new document guidance agree',()=>{
  for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
 });
 
-test("intro video uses the approved ID without autoplay and offers a fallback",()=>{const {document}=parseHTML(read("index.html"));const f=document.querySelector(".intro-video iframe");assert.ok(f);assert.equal(new URL(f.getAttribute("src")).pathname,"/embed/2H3bwkASc2M");assert.equal(new URL(f.getAttribute("src")).searchParams.get("autoplay"),"0");assert.ok(document.querySelector(".intro-video a").getAttribute("href").endsWith("/shorts/2H3bwkASc2M"));});
+test("intro video uses the approved ID without autoplay and offers a fallback",()=>{const {document}=parseHTML(read("index.html"));const f=document.querySelector(".intro-video iframe");assert.ok(f);assert.equal(new URL(f.getAttribute("src")).pathname,"/embed/pN2GGSA9wR0");assert.equal(new URL(f.getAttribute("src")).searchParams.get("autoplay"),"0");assert.ok(document.querySelector(".intro-video a").getAttribute("href").endsWith("/shorts/pN2GGSA9wR0"));});
