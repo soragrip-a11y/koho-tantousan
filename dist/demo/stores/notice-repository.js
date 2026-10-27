@@ -3,12 +3,12 @@ import {accessError} from './access-errors.js';
 const STORE='nakatomi',BUCKET='koho-notice-images';
 const allowedActions=new Set(['publish','end','withdraw']);
 function failure(error){
-  const message=error?.code==='40001'?'別の変更が保存されています。再読み込みして確認してください。':'保存先に接続できませんでした。保存は完了していません。';
+  const message=error?.code==='40001'?'別の変更が保存されています。再読み込みして確認してください。':'処理結果を確認できませんでした。接続を確認してください。';
   return Object.assign(new Error(message),{code:error?.code||'BACKEND_ERROR'});
 }
 function notice(row){
   return {id:row.id,storeId:row.store_id,title:row.title,text:row.body,
-    imagePath:row.image_path,end:row.expires_at,publishedAt:row.published_at,
+    imagePath:row.image_path,start:row.starts_at??row.published_at,end:row.expires_at,publishedAt:row.published_at,
     state:row.state,version:row.version};
 }
 // Keep the operation object through retries. New edits get new request IDs.
@@ -17,7 +17,8 @@ export function prepareChange(action,existing,draft={}){
   return Object.freeze({p_id:existing?.id||crypto.randomUUID(),p_action:action,
     p_expected_version:existing?.version||0,p_request_id:crypto.randomUUID(),
     p_title:action==='publish'?draft.title:null,p_body:action==='publish'?draft.text:null,
-    p_image_path:action==='publish'?(draft.imagePath??null):null});
+    p_image_path:action==='publish'?(draft.imagePath??null):null,
+    ...(action==='publish'&&Object.hasOwn(draft,'start')?{p_starts_at:draft.start,p_expires_at:draft.end}: {})});
 }
 export function createNoticeRepository(client){
   async function rpc(name,parameters){
@@ -37,7 +38,7 @@ export function createNoticeRepository(client){
     },
     async restore(){const r=await client.auth.getUser();if(r.error||!r.data?.user)return false;try{return Boolean(await rpc('koho_can_manage',{p_store_id:STORE}));}catch{return false;}},
     async signOut(){const {error}=await client.auth.signOut({scope:'local'});if(error)throw failure(error);},
-    async save(operation){return notice(await rpc('koho_change_notice',operation));},
+    async save(operation){return notice(await rpc(Object.hasOwn(operation,'p_starts_at')?'koho_change_notice_scheduled':'koho_change_notice',operation));},
     async uploadPhoto(jpeg){
       if(jpeg.type!=='image/jpeg'||jpeg.size>2097152||jpeg.size===0)throw new Error('写真の形式かサイズを確認してください。');
       const path=STORE+'/'+crypto.randomUUID()+'.jpg';

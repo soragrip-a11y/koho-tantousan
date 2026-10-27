@@ -1,13 +1,14 @@
+import {scheduleLabel} from './schedule.js?v=20261027-2';
 import {rememberMarkup} from './device-session.js?v=20261026-23';
 import {canReviewApplications} from './approval-refresh.js?v=20261026-21';
 import {createStoreClient} from './connection.js?v=20261026-23';
 import {createDeleteOperation} from './delete-operation.js?v=20261025-10';
-import {createNoticeRepository} from './notice-repository.js?v=20261026-23';
-import {createSharedWorkflow} from './shared-workflow.js?v=20261026-23';
-import {mountPostUI} from './post-ui.js?v=20261027-1';
-import {mountEditUI} from './edit-ui.js?v=20261027-1';
-import {noticeMedia} from './notice-view.js?v=20261025-13';
-import {postStatus} from './post-model.js?v=20261025-10';
+import {createNoticeRepository} from './notice-repository.js?v=20261027-2';
+import {createSharedWorkflow} from './shared-workflow.js?v=20261027-2';
+import {mountPostUI} from './post-ui.js?v=20261027-2';
+import {mountEditUI} from './edit-ui.js?v=20261027-2';
+import {noticeMedia} from './notice-view.js?v=20261027-2';
+import {postStatus} from './post-model.js?v=20261027-2';
 import './press-feedback.js';
 import {accessError} from './access-errors.js';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -38,7 +39,7 @@ export function mountSharedStaff(app,client){
   for(const p of next){p.image='';if(p.imagePath)try{p.image=await dataUrl(await repo.downloadPhoto(p.imagePath));}catch{p.photoFailed=true;photoFailed=true;}}
   if(disposed||!session||currentEpoch!==epoch)return;
   rows=next;clear();app.classList.add('easy-post');
-  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新規投稿</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(({active:'掲載中',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('')+'<section class="easy-shell"><button id="logout" class="easy-cancel">ログアウト（保持を解除）</button></section>';
+  app.innerHTML='<section class="easy-shell"><h1>店員さんの確認画面</h1><p>お店が公開設定のときは、投稿がお客さんにも表示されます。取り下げ済み・削除未完了のお知らせは店員さんだけに表示します。</p><button id="new" class="easy-primary">新規投稿</button><p role="alert"></p></section>'+rows.map(p=>'<article class="card">'+noticeMedia(p,postStatus(p))+'<div class="card-body"><h2>'+esc(p.title)+'</h2><p>'+esc(p.text)+'</p><p>'+esc(scheduleLabel(p))+'</p><p>'+esc(({active:'掲載中',scheduled:'予約中（開始前・お客さんには非表示）',soldout:'終了しました',ended:'掲載期限終了',withdrawn:'取り下げ済み（旧データ）',deleting:'削除未完了'})[postStatus(p)])+'</p></div><button class="easy-primary" data-edit="'+esc(p.id)+'">このお知らせを変更</button></article>').join('')+'<section class="easy-shell"><button id="logout" class="easy-cancel">ログアウト（保持を解除）</button></section>';
   app.querySelector('#new').onclick=()=>edit(null,false);
   const ownerSlot=app.querySelector('#new').parentElement;
   void canReviewApplications(client).then(allowed=>{if(!allowed||disposed||!session||currentEpoch!==epoch||!ownerSlot.isConnected)return;const a=ownerSlot.ownerDocument.createElement('a');a.href='./staff-approvals.html';a.className='easy-secondary button';a.textContent='店員さんの申請を確認';ownerSlot.append(a);});

@@ -22,9 +22,4 @@ export function savePosts(storage, posts) {
   storage.setItem(POST_KEY,JSON.stringify(next));
   return next;
 }
-export function postStatus(post, now=Date.now()) {
-  if(post.state==='deleting')return 'deleting';
-  if(post.state==='withdrawn')return 'withdrawn';
-  if(post.state==='soldout')return 'soldout';
-  return post.state==='ended'||Date.parse(post.end)<=now?'ended':'active';
-}
+export {lifecycle as postStatus} from './schedule.js?v=20261027-2';

@@ -1,4 +1,4 @@
-import {prepareChange} from './notice-repository.js?v=20261026-23';
+import {prepareChange} from './notice-repository.js?v=20261027-2';
 // Authorization is rechecked by the repository; no automatic demo fallback.
 export function createSharedWorkflow(repository){
  let authorized=false,pending=null,inflight=null;
@@ -12,7 +12,7 @@ export function createSharedWorkflow(repository){
    requireStaff();
    if(inflight)return inflight;
    // UI-generated timestamps/temporary IDs change on retry; only persisted input defines an edit.
-   const signature=JSON.stringify([action,existing?.id,existing?.version,draft.title,draft.text,draft.image]);
+   const signature=JSON.stringify([action,existing?.id,existing?.version,draft.title,draft.text,draft.image,...(Object.hasOwn(draft,'start')?[draft.start,draft.end]:[])]);
    inflight=(async()=>{
     if(pending?.signature!==signature){
      let imagePath=existing?.imagePath??null;
