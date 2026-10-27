@@ -1,4 +1,3 @@
-import {createNoticeLikes,likeMarkup} from './notice-likes.js?v=20261027-3';
 import {watchCustomer} from './customer-refresh.js?v=20261027-2';
 import {publicPosts,scheduleLabel,NO_EXPIRY_NOTE} from './schedule.js?v=20261027-4';
 import {createStoreClient} from './connection.js?v=20261025-9';
@@ -12,21 +11,19 @@ const area=document.querySelector('#customer-content'),store=STORES[0];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const date=s=>new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(s));
 const client=createStoreClient(),repository=createNoticeRepository(client);
-let disk;try{disk=localStorage;}catch{}
-const likes=createNoticeLikes(client,{storage:disk,locks:navigator.locks});let likeError='';
 let posts=[],last='',loading=false,readError=false,checkedAt=null;
 async function read(){
  if(loading)return;loading=true;render();
  try{const next=await repository.listPublic();
   for(const p of next){p.image='';if(p.imagePath)try{p.image=await new Promise(async(resolve,reject)=>{try{const blob=await repository.downloadPhoto(p.imagePath),reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);}catch(e){reject(e);}});}catch{p.photoFailed=true;}}
-  posts=next;try{await likes.refresh(store.id);likeError='';}catch(error){likeError=error.message;}readError=false;checkedAt=new Date();
+  posts=next;readError=false;checkedAt=new Date();
  }catch{posts=[];readError=true;checkedAt=null;}finally{loading=false;render();}
 }
 function signature(){return posts.map(p=>postStatus(p)).join();}
 function render(){
   const cards=publicPosts(posts).map(p=>{
     const state=postStatus(p),labels={active:'お知らせ',soldout:'終了しました',ended:'終了しました'};
-    return '<article class="card">'+noticeMedia(p,state)+'<div class="card-body">'+(p.photoFailed?'<p role="status">写真を読み込めませんでした。右上の「更新」で読み直せます。</p>':'')+'<span class="badge '+(state==='active'?'':'off')+'">'+labels[state]+'</span><h2>'+esc(p.title)+'</h2><p class="deadline">'+esc(scheduleLabel(p))+'</p><p>'+esc(p.text)+'</p>'+likeMarkup(p.id,likeError?null:likes.state(p.id),likes.busy(p.id))+(!p.end?'<small class="expiry-note">'+NO_EXPIRY_NOTE+'</small>':'')+'</div></article>';
+    return '<article class="card">'+noticeMedia(p,state)+'<div class="card-body">'+(p.photoFailed?'<p role="status">写真を読み込めませんでした。右上の「更新」で読み直せます。</p>':'')+'<span class="badge '+(state==='active'?'':'off')+'">'+labels[state]+'</span><h2>'+esc(p.title)+'</h2><p class="deadline">'+esc(scheduleLabel(p))+'</p><p>'+esc(p.text)+'</p>'+(!p.end?'<small class="expiry-note">'+NO_EXPIRY_NOTE+'</small>':'')+'</div></article>';
   }).join('');
   area.innerHTML='<section class="store-head"><div><p class="store-context">お店のお知らせ</p><h1>'+esc(store.name)+'</h1></div><div id="refresh-area"></div></section><section class="cards">'+(cards||'<p class="empty">'+(loading?'お知らせを読み込んでいます。':readError?'お知らせを読み込めませんでした。':'現在、一般公開中のお知らせはありません。')+'</p>')+'</section>';
   document.querySelector('#refresh-area').innerHTML='<button id="refresh" class="quiet" '+(loading?'disabled':'')+'>更新</button><p class="refresh-status" role="status" aria-live="polite" aria-atomic="true">'+(loading?'更新中…':readError?'更新できませんでした。「更新」を押して、もう一度お試しください。':checkedAt?'確認時刻：'+date(checkedAt):'')+'</p>';
