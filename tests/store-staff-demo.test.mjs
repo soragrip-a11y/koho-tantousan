@@ -24,8 +24,8 @@ test('demo input escapes markup; preview, save, edit, end and cancelled reset wo
  }finally{globalThis.fetch=originalFetch;}
 });
 test('standalone demo denies connections/forms; only bundled assets and explicit application link',()=>{
- const html=read('staff-demo.html'),js=read('staff-demo.js')+read('staff-demo-model.js');
+ const html=read('staff-demo.html'),js=read('staff-demo.js')+read('staff-demo-model.js')+read('demo-photo.js')+read('schedule.js');
  assert.match(html,/connect-src 'none'/);assert.match(html,/form-action 'none'/);assert.match(html,/href="\.\/staff-register.html"/);assert.match(html,/登録不要/);
- assert.doesNotMatch(html+js,/supabase|resend|connection\.js|localStorage|sessionStorage|indexedDB|sendBeacon|XMLHttpRequest|WebSocket|fetch\(|type="file"|createStoreClient|notify-staff/i);
- const imports=[...js.matchAll(/from ['"]([^'"]+)['"]/g)].map(x=>x[1]);assert.deepEqual(imports,['./staff-demo-model.js?v=20261027-1']);
+ assert.doesNotMatch(html+js,/supabase|resend|connection\.js|localStorage|sessionStorage|indexedDB|sendBeacon|XMLHttpRequest|WebSocket|fetch\(|createStoreClient|notify-staff/i);
+ const imports=[...js.matchAll(/from ['"]([^'"]+)['"]/g)].map(x=>x[1]);assert.ok(imports.every(p=>/^\.\/(schedule|staff-demo-model|demo-photo)\.js\?v=20261027-2$/.test(p)));assert.match(html,/img-src 'self' data:/);assert.match(js,/capture="environment"/);
 });
