@@ -17,7 +17,7 @@ export async function mountLineEntry({enabled=false,applicationEnabled=false,cli
     if(link){
       if(link.invalid || !link.code){$('status').textContent='LINEログインからやり直してください。';return ()=>flow.invalidate();}
       const result=await client.auth.exchangeCodeForSession(link.code);
-      if(result.error){$('status').textContent='LINEログインを確認できませんでした。';return ()=>flow.invalidate();}
+      if(result.error){const failure=safeExchangeFailure(result.error);$('status').textContent=failure.text+'（確認区分：'+failure.code+'）';return ()=>flow.invalidate();}
     }
     const verified=await client.auth.getUser();
     if(!verified.error && verified.data?.user?.identities?.some(i=>i.provider==='custom:line'))$('status').textContent='LINEとの接続を確認できました。申請はまだ保存していません。';
@@ -52,4 +52,13 @@ export async function mountLineEntry({enabled=false,applicationEnabled=false,cli
     if(!error && user?.user?.id)await screen.refresh();
   }
   return ()=>{flow.invalidate();screen.dispose();data?.subscription?.unsubscribe();document.removeEventListener('visibilitychange',resume);};
+}
+
+// Return fixed labels only. Never copy error.message, URL, IDs, tokens or bodies.
+export function safeExchangeFailure(error){
+ if(error?.code==='pkce_code_verifier_not_found'||error?.name==='AuthPKCECodeVerifierMissingError')return {code:'LOCAL_PROOF_MISSING',text:'ログインを始めた画面の確認情報を引き継げませんでした。別のブラウザーやタブに移動した可能性があります。'};
+ if(['flow_state_expired','flow_state_not_found'].includes(error?.code))return {code:'REQUEST_EXPIRED_OR_USED',text:'ログインの確認期限が切れたか、確認済みの要求です。'};
+ if(error?.code==='bad_code_verifier')return {code:'LOCAL_PROOF_MISMATCH',text:'ログイン開始時と戻り先の確認情報が一致しませんでした。'};
+ if(error?.name==='AuthRetryableFetchError')return {code:'CONNECTION_FAILED',text:'ログインの確認先と通信できませんでした。'};
+ return {code:'EXCHANGE_FAILED',text:'LINEログインを確認できませんでした。'};
 }

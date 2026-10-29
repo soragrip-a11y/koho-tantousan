@@ -1,6 +1,6 @@
 import {createClient} from './supabase-client.js?v=20261025-9';
 import {createDeviceSession,SESSION_KEY} from './device-session.js?v=20261026-23';
-import {mountLineEntry} from './mount-line-entry.mjs';
+import {mountLineEntry} from './mount-line-entry.mjs?v=20261029-diagnostics-1';
 // Remains OFF until explicit deployment approval and reviewed DB migration.
 const LINE_RELEASE_ENABLED=true;
 const APPLICATION_RELEASE_ENABLED=false;
