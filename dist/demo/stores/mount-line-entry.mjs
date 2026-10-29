@@ -1,5 +1,5 @@
 import {consumeOAuthCode,createLineFlow} from './line-flow.mjs';
-import {createLineClient} from './line-client.mjs';
+import {createLineClient} from './line-client.mjs?v=20261029-proof-1';
 import {createScreen} from './line-screen.mjs';
 // Not imported by production. Explicit injected release flag defaults OFF.
 export async function mountLineEntry({enabled=false,applicationEnabled=false,clientOptions,document,location,history,navigate}) {
@@ -56,7 +56,7 @@ export async function mountLineEntry({enabled=false,applicationEnabled=false,cli
 
 // Return fixed labels only. Never copy error.message, URL, IDs, tokens or bodies.
 export function safeExchangeFailure(error){
- if(error?.code==='pkce_code_verifier_not_found'||error?.name==='AuthPKCECodeVerifierMissingError')return {code:'LOCAL_PROOF_MISSING',text:'ログインを始めた画面の確認情報を引き継げませんでした。別のブラウザーやタブに移動した可能性があります。'};
+ if(error?.code==='pkce_code_verifier_not_found'||error?.name==='AuthPKCECodeVerifierMissingError')return {code:'LOCAL_PROOF_MISSING',text:'ログインを始めた画面の確認情報を引き継げませんでした。iPhoneの通常のSafariでこのページを開き、そこからLINEログインを始めてください。'};
  if(['flow_state_expired','flow_state_not_found'].includes(error?.code))return {code:'REQUEST_EXPIRED_OR_USED',text:'ログインの確認期限が切れたか、確認済みの要求です。'};
  if(error?.code==='bad_code_verifier')return {code:'LOCAL_PROOF_MISMATCH',text:'ログイン開始時と戻り先の確認情報が一致しませんでした。'};
  if(error?.name==='AuthRetryableFetchError')return {code:'CONNECTION_FAILED',text:'ログインの確認先と通信できませんでした。'};
