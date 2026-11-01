@@ -5,7 +5,7 @@ export const PLANS = Object.freeze({
  standard:{name:'スタンダード',short:6,long:0,months:1,includedShoots:0,scope:'ショート月6本の編集・完成データ納品のみ。企画相談・投稿代行・タイトル説明文・月次分析は含まない。素材持ち込みは要相談。'},
  companion:{name:'伴走型',short:6,long:0,months:1,includedShoots:2,scope:'ショート月6本、現地半日撮影を月2回、企画相談、YouTube投稿代行、タイトル・説明文、月次振り返り・改善提案。公開内容・日時は事前にお客様が確認する。'},
  premium:{name:'プレミアム',short:8,long:2,months:1,includedShoots:2,scope:'ショート月8本＋ロング月2本、現地半日撮影を月2回、企画相談、YouTube投稿代行、タイトル・説明文、月次振り返り・改善提案。公開内容・日時は事前にお客様が確認する。'},
- single:{name:'初回お試し',short:3,long:0,months:0,includedShoots:0,scope:'初回限定。ショート1本5,000円（税込）、3本からの編集・納品。初回半日撮影は別途15,000円（税込）。投稿代行・運用支援は本料金に含まない。'}
+ single:{name:'初回お試し',short:1,long:0,months:0,includedShoots:0,scope:'初回限定。ショート1本5,000円（税込）、1本からの編集・納品。初回半日撮影は別途15,000円（税込）。投稿代行・運用支援は本料金に含まない。'}
 });
 export const yen = n => new Intl.NumberFormat('ja-JP').format(n) + '円';
 export const clean = value => String(value ?? '').normalize('NFC').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, '').trim();
@@ -35,7 +35,7 @@ export function calculate(data) {
  const months=monthly?integer(data.months,'契約月数',60):1;
  if(monthly&&months<1)throw new Error('合意した契約月数を1以上で入力してください。最低利用期間や自動更新を設定するものではありません。');
  const shorts=integer(data.shorts,'ショート本数',100),longs=integer(data.longs,'ロング本数',100);
- if(shorts<p.short||longs<p.long)throw new Error(monthly?'標準本数の変更・交換は個別相談です。':'初回お試しはショート3本からです。');
+ if(shorts<p.short||longs<p.long)throw new Error(monthly?'標準本数の変更・交換は個別相談です。':'初回お試しはショート1本からです。');
  if(!monthly&&longs)throw new Error('初回お試しの対象はショートです。ロングの単発制作は個別見積もりをご相談ください。');
  if(Number(data.shoot4)||Number(data.shoot7))throw new Error('旧撮影区分は使用できません。新しいフォームで入力してください。');
  const shootHalf=integer(data.shootHalf??0,'別料金の半日撮影回数',31);

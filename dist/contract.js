@@ -57,7 +57,7 @@ function update() {
   if (monthly) { try { $('end').value = periodEnd(value('start'),value('months')); } catch { $('end').value = ''; } }
   $('period-hint').textContent = monthly ? '個別に合意した月数を入力します。最低利用期間や自動更新を設定するものではありません。開始日から1か月単位で計算し、継続・更新は別途合意します。' : '初回お試しです。完了予定日を指定してください。自動更新はありません。';
   $('plan-scope').textContent = plan.scope;
-  $('quantity-hint').textContent = monthly ? `各月の本数。基本料金内はショート${plan.short}本・ロング${plan.long}本。超過分は合意済みの単価（税込）を入力してください。` : '初回お試しはショート3本以上、1本5,000円（税込）。ロングは対象外です。';
+  $('quantity-hint').textContent = monthly ? `各月の本数。基本料金内はショート${plan.short}本・ロング${plan.long}本。超過分は合意済みの単価（税込）を入力してください。` : '初回お試しはショート1本以上、1本5,000円（税込）。ロングは対象外です。';
   $('shoot-hint').textContent = !monthly ? '初回お試しの半日撮影は1回15,000円（税込）、交通費別途。追加撮影は個別相談です。' : value('plan')==='standard' ? 'スタンダードの半日撮影は別途17,000円／回（税込）。各月の回数を入力します。交通費別途。' : '月2回の半日撮影は基本料金内です。ここには月2回を超える追加分のみ入力し、合意済み単価を指定します。交通費別途。';
   [0,1,2].forEach(i=>{ $('extraTiming'+i).disabled=!monthly; if(!monthly) $('extraTiming'+i).value='once'; });
   const data = collect();
