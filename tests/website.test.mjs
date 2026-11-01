@@ -83,7 +83,7 @@ test('homepage retains genuine works and sends purpose cards directly to useful 
  assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)),['https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
  for(const id of ['photo-video','sns','web-line'])assert.ok(document.querySelector('#'+id+' .card-links a'));
  assert.match(document.querySelector('#price').textContent,/月6本/);assert.match(document.querySelector('#price').textContent,/30,000/);
- assert.match(document.querySelector('#price').textContent,/1本だけでも/);
+ assert.match(document.querySelector('#price').textContent,/30秒以内/);
 });
 test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
@@ -93,7 +93,7 @@ test('published prices and new document guidance agree',()=>{
  assert.match(heads[2],/おすすめ.*伴走型/);
  const rows=[...document.querySelectorAll('.mini-price-table tbody tr')];
  for(const label of ['企画相談','YouTube投稿','タイトル・説明文','月次振り返り・改善提案'])assert.deepEqual([...rows.find(r=>r.querySelector('th').textContent===label).querySelectorAll('td')].map(x=>x.textContent),['×','○','○']);
- for(const text of ['3本15,000円＋半日撮影15,000円＝合計30,000円','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません'])assert.ok(document.body.textContent.includes(text));
+ for(const text of ['30秒超〜60秒以内：10,000円／本','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません'])assert.ok(document.body.textContent.includes(text));
  for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
 });
 

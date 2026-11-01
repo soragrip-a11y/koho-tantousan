@@ -38,8 +38,7 @@ test('plan switches show included filming and require quoted extras',()=>{
  h.change('shootHalf','1');assert.match(h.el('summary-error').textContent,/合意済み単価/);
  h.change('extraShootUnit','18000');assert.equal(h.el('summary-total').textContent,'98,000円');
  h.change('plan','premium');assert.equal(h.el('months').value,'1');assert.equal(h.el('longs').value,'2');assert.equal(h.el('summary-total').textContent,'120,000円');
- h.change('plan','single');assert.equal(h.el('shorts').value,'1');assert.equal(h.el('summary-total').textContent,'5,000円');assert.equal(h.el('end').readOnly,false);
- h.change('shootHalf','1');assert.equal(h.el('summary-total').textContent,'20,000円');
+ assert.ok(![...h.el('plan').options].some(o=>o.getAttribute('value')==='single'));
 });
 test('form generates selected invoice locally and invalidates stale downloads',async()=>{
  const h=setup(),d=fixture({documentType:'invoice'});
