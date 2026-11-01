@@ -4,11 +4,13 @@ import{calculate,periodEnd,validateContract,clean,DEFAULT_PROVIDER}from'../dist/
 test('three monthly plans charge the approved inclusive amount and bundled filming once',()=>{
  for(const [plan,shorts,longs,total,shoots]of [['standard',6,0,30000,0],['companion',6,0,80000,2],['premium',8,2,120000,2]]){const c=calculate(fixture({plan,shorts,longs}));assert.equal(c.total,total);assert.equal(c.includedShoots,shoots);assert.equal(c.rows.length,1);}
 });
-test('trial requires three shorts and distinguishes first filming from normal filming',()=>{
+test('trial accepts one short and distinguishes first filming from normal filming',()=>{
+ assert.equal(calculate(fixture({plan:'single',shorts:1,shootHalf:0})).total,5000);
+ assert.equal(calculate(fixture({plan:'single',shorts:1,shootHalf:1})).total,20000);
  assert.equal(calculate(fixture({plan:'single',shorts:3,shootHalf:1})).total,30000);
  assert.equal(calculate(fixture({plan:'single',shorts:4,shootHalf:0})).total,20000);
  assert.equal(calculate(fixture({shootHalf:1})).total,47000);
- for(const d of [{plan:'single',shorts:2},{plan:'single',shorts:3,longs:1},{plan:'single',shootHalf:2},{plan:'single',tiktok:1}])assert.throws(()=>calculate(fixture(d)));
+ for(const d of [{plan:'single',shorts:0},{plan:'single',shorts:3,longs:1},{plan:'single',shootHalf:2},{plan:'single',tiktok:1}])assert.throws(()=>calculate(fixture(d)));
 });
 test('TikTok and recurring additions multiply by months; transport is charged once',()=>{
  const c=calculate(fixture({plan:'companion',months:3,tiktok:1,extras:[{label:'交通費・駐車場代',amount:3000,timing:'once'}]}));

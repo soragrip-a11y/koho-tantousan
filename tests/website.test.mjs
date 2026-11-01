@@ -46,9 +46,12 @@ test('contract fields expose their quantity, shooting, and period explanations',
   const hint=document.querySelector('#'+id).getAttribute('aria-describedby');assert.ok(hint,id);assert.ok(document.getElementById(hint),hint);
  }
 });
-test('homepage section numbers remain sequential',()=>{
+test('homepage identifies the maker and offers direct work and consultation routes',()=>{
  const {document}=parseHTML(read('index.html'));
- assert.deepEqual([...document.querySelectorAll('main .section .eyebrow')].map(x=>x.textContent).filter(x=>/^\d{2} \/ (SERVICE|WORKS|PLAN|FLOW|FAQ)$/.test(x)),['01 / SERVICE','02 / WORKS','03 / PLAN','04 / FLOW','05 / FAQ']);
+ assert.match(document.querySelector('h1').textContent,/須永空和.*広報担当さん/);
+ const links=[...document.querySelectorAll('.home-actions a')].map(a=>a.getAttribute('href'));
+ assert.deepEqual(links,['works.html','https://line.me/R/ti/p/%40699bksee']);
+ assert.match(document.querySelector('.intro-value').textContent,/何をどう発信するかの相談/);
 });
 test('all local website links, assets and fragment targets exist',()=>{
  for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){
@@ -62,31 +65,25 @@ test('all local website links, assets and fragment targets exist',()=>{
 
 test('general audience leads, with political experience retained as a secondary specialty',()=>{
  const {document}=parseHTML(read('index.html'));
- assert.match(document.querySelector('.service-label').textContent,/個人・お店・企業・団体/);
- assert.equal(document.querySelectorAll('.strength-grid article').length,4);
- const sections=[...document.querySelector('main').children];
- assert.ok(sections.findIndex(x=>x.classList.contains('expertise'))>sections.findIndex(x=>x.id==='service'));
- for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){
-  const {document:page}=parseHTML(read(file));
-  if(page.querySelector('footer'))assert.doesNotMatch(page.querySelector('footer').textContent,/地方議員向け/);
- }
+ assert.match(document.querySelector('.intro-copy').textContent,/お店や人/);
+ assert.match(document.querySelector('.about-short').textContent,/県議会議員/);
+ assert.ok(document.querySelector('a[href="political-guide.html"]'));
+ for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){const {document:page}=parseHTML(read(file));if(page.querySelector('footer'))assert.doesNotMatch(page.querySelector('footer').textContent,/地方議員向け/);}
 });
-test('official LINE destination stays verified and always-contact wording has a reply window',()=>{
+test('official LINE destination stays verified and contact wording has a reply window',()=>{
  for(const file of ['index.html','contact.html','pricing.html']){
-  const {document}=parseHTML(read(file));
-  const band=document.querySelector('.contact-band');
-  assert.match(band.textContent,/いつでも送信/);assert.match(band.textContent,/順次、原則2営業日以内/);
-  for(const a of document.querySelectorAll('a.line-button'))assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
+  const {document}=parseHTML(read(file));const band=document.querySelector('.contact-band,.home-contact');
+  assert.match(band.textContent,/順次、原則2営業日以内/);
+  const links=[...document.querySelectorAll('a[href*="line.me"]')];assert.ok(links.length);
+  for(const a of links)assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
  }
 });
-test('compact proposal preserves recommended videos and the existing homepage sections',()=>{
+test('homepage retains genuine works and sends purpose cards directly to useful detail',()=>{
  const {document}=parseHTML(read('index.html'));
- assert.deepEqual([...document.querySelectorAll('[data-video]')].map(x=>x.dataset.video),['YCXll8IjTB8']);
- assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)&&!x.includes("pN2GGSA9wR0")),['https://youtu.be/lGHOQvbA8BQ','https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
- assert.equal(document.querySelectorAll('main > section').length,10);
- assert.equal(document.querySelectorAll('.mini-price-table').length,1);
- assert.equal(document.querySelectorAll('.mini-price-table tbody tr').length,3);
- assert.ok(document.querySelectorAll('main > section')[6].classList.contains('pricing-teaser'));
+ assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)),['https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
+ for(const id of ['photo-video','sns','web-line'])assert.ok(document.querySelector('#'+id+' .card-links a'));
+ assert.match(document.querySelector('#price').textContent,/月6本/);assert.match(document.querySelector('#price').textContent,/30,000/);
+ assert.match(document.querySelector('#price').textContent,/1本だけでも/);
 });
 test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
@@ -100,4 +97,4 @@ test('published prices and new document guidance agree',()=>{
  for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/55,000|100,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
 });
 
-test("intro video uses the approved ID without autoplay and offers a fallback",()=>{const {document}=parseHTML(read("index.html"));const f=document.querySelector(".intro-video iframe");assert.ok(f);assert.equal(new URL(f.getAttribute("src")).pathname,"/embed/pN2GGSA9wR0");assert.equal(new URL(f.getAttribute("src")).searchParams.get("autoplay"),"0");assert.ok(document.querySelector(".intro-video a").getAttribute("href").endsWith("/shorts/pN2GGSA9wR0"));});
+test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,0);assert.doesNotMatch(document.body.textContent,/20人限定/);});
