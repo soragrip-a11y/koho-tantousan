@@ -1,5 +1,4 @@
 import {inquiryText} from './one-off-core.js';
-import {RECEPTION,publicFormUrl} from './one-off-config.js';
 const form=document.querySelector('#one-inquiry'),$=id=>document.getElementById(id);let composed=false;
 const collect=()=>Object.fromEntries([...form.querySelectorAll('[name]')].map(el=>[el.name,el.type==='checkbox'?el.checked:el.value.trim()]));
 function update(){const blocked=$('category').value==='political';$('political-warning').hidden=!blocked;$('compose').disabled=blocked||composed;$('copy-request').disabled=blocked;}
@@ -9,4 +8,3 @@ $('copy-request').addEventListener('click',async()=>{const text=message();if(!te
 form.addEventListener('input',()=>{composed=false;$('inquiry-error').textContent='';$('copy-fallback').hidden=true;$('inquiry-status').textContent='未送信です。入力内容は自動保存しません。';update();});form.addEventListener('change',update);
 document.querySelectorAll('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('service').value=a.dataset.service;composed=false;update();}));
 $('inquiry-fields').disabled=false;update();
-try{const link=publicFormUrl(RECEPTION.formUrl),embed=publicFormUrl(RECEPTION.embedUrl);if(link&&RECEPTION.receiptTested){$('reception-link').href=link;$('reception-link').hidden=false;$('reception-status').textContent='Googleフォームで相談・見積依頼を送信できます。送信だけで契約は確定しません。';if(embed){const frame=document.createElement('iframe');frame.src=embed;frame.title='単発作業の相談・見積依頼フォーム';frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';$('reception-embed').append(frame);}}}catch{$('reception-status').textContent='直接受付フォームを利用できません。下のメール・LINEをご利用ください。';}
