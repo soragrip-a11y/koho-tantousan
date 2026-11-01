@@ -13,3 +13,8 @@
 
 /* Keep the approved full-body artwork intact. */
 .guide-art{background:#fff8ee;height:170px}.guide-art img{display:block;object-fit:contain}@media(max-width:760px){.guide-art{width:104px;height:136px}}@media(max-width:350px){.guide-art{width:82px;height:116px}}
+
+/* Keep short Japanese phrases and CTA arrows together on narrow screens. */
+.purpose-short,.intro-value,.intro-note,.guide-intro,.shared-consult p,.section-top h2{line-break:strict;text-wrap:pretty}.copy-phrase{display:inline-block;max-width:100%;text-wrap:pretty}.home-button>span{flex-shrink:0;white-space:nowrap}.intro-copy>h2{text-wrap:balance}.split>a{flex-shrink:0;text-wrap:balance}
+@media(min-width:761px) and (max-width:1000px){.intro{gap:28px;grid-template-columns:1.5fr 1fr}.intro-copy>h2{font-size:30px}.intro-copy .mobile-break{display:block}.home-actions{flex-direction:column}}
+.intro-note a{display:inline-block}.guide-intro>span{text-wrap:balance}@media(min-width:761px) and (max-width:1000px){.intro-note-card h2{font-size:22px}}
