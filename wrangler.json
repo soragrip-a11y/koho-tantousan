@@ -9,5 +9,9 @@
     "directory": "./dist",
     "html_handling": "none",
     "not_found_handling": "none"
-  }
+  },
+  "build": {
+    "command": "node --test scripts/check-public.test.mjs && node scripts/check-public.mjs"
+  },
+  "previews": {}
 }
