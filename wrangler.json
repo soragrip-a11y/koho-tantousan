@@ -1,0 +1,13 @@
+{
+  "name": "koho-static-preview",
+  "compatibility_date": "2026-10-31",
+  "workers_dev": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "send_metrics": false,
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "none",
+    "not_found_handling": "none"
+  }
+}
