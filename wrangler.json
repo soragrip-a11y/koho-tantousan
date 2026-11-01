@@ -12,5 +12,6 @@
   },
   "build": {
     "command": "node --test scripts/check-public.test.mjs && node scripts/check-public.mjs"
-  }
+  },
+  "previews": {}
 }
