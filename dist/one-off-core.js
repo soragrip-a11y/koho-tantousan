@@ -1,14 +1,17 @@
+import {AD_CM,adCmPrice} from './ad-cm-pricing.js';
 import {editPrice,EDIT_PRICE_VERSION,SHORT_SCOPE,LONG_SCOPE,EDIT_EXCLUSIONS} from './edit-pricing.js';
 import { ACCEPTANCE_POLICY, AI_POLICY } from './acceptance-policy.js?v=20261024';
 import { TERMS } from './contract-terms.js?v=20261024-policy';
 export const LAUNCH_READY=true; // Published reception URL and final scope reviewed.
 export const SERVICES=Object.freeze({
+ adcm:{...AD_CM,scope:AD_CM.scope+' '+AD_CM.exclusions},
  short:{name:'単発ショート編集',price:5000,scope:SHORT_SCOPE},
  long:{name:'単発ロング標準編集',price:30000,scope:LONG_SCOPE+' '+EDIT_EXCLUSIONS},
  repair:{name:'Web・SNSの困ったところ1つ修正',price:3000,scope:'文章・画像の差し替えやプロフィール整備など1件。対象箇所と作業範囲を確認して総額を決定します。追加作業は事前見積もりです。'},
  website:{name:'新規Web・基本1ページ制作',price:10000,scope:'文章・写真支給を基本に、1ページ税込10,000円〜。2ページ20,000円〜、3ページ30,000円〜が基本目安。構成・ページの長さ・フォーム・予約・決済・ログイン機能・素材制作・ドメインやサーバー費は見積もり段階で別途明示します。ページ数だけで複雑な機能を含む総額は確定しません。'}
 });
 export function basePrice(d){
+ if(d.service==='adcm')return adCmPrice(d.seconds);
  if(d.service==='repair')return 3000;
  if(['short','long'].includes(d.service)){
   if(d.pricingVersion==='legacy-20261025'){
@@ -32,7 +35,7 @@ export function validateDocument(d){validateCommon(d);if(!['estimate','contract'
 const yen=n=>Number(n).toLocaleString('ja-JP')+'円';
 export function documentContent(d){validateDocument(d);const labels={estimate:'単発業務 見積書',contract:'単発業務 委託契約書',invoice:'単発業務 請求書',receipt:'単発業務 領収書'},isReceipt=d.documentType==='receipt';
  const sections=[{title:'当事者・書類番号',paragraphs:['書類番号：'+d.number+'／作成日：'+d.issueDate,'宛名：'+d.customer+'／返信先：'+d.customerEmail,...(d.documentType==='contract'?['依頼者署名者：'+d.customerSigner+'／住所：'+d.customerAddress,'受託者住所：'+(d.providerAddress||'________________（契約時に記入）')]:[]),'発行者：'+d.provider+'／担当：'+d.providerSigner+'／連絡先：'+d.providerEmail,...(d.sample?['【見本】動作確認用です。実際の契約・請求・入金を証明するものではありません。']:[])]},
- {title:isReceipt?'受領金額・入金記録':'個別の業務範囲・総額',paragraphs:['サービス：'+SERVICES[d.service].name,...(['short','long'].includes(d.service)?['合意した完成尺：'+d.seconds+'秒']:d.service==='website'?['合意したページ数：'+d.pages+'ページ']:[]),'基本料金の目安（税込）：'+yen(documentPrice(d))+'〜（追加費用を含む確定額は下記総額）',...(d.pricingVersion===EDIT_PRICE_VERSION&&['short','long'].includes(d.service)?['単発編集料金版：'+EDIT_PRICE_VERSION+'（税込・撮影費別）',SERVICES[d.service].scope,EDIT_EXCLUSIONS]:d.pricingVersion===EDIT_PRICE_VERSION?[]:['旧料金データ：既存の合意額・範囲を維持します。新規申込み用の料金ではありません。']),'対象作業・納品物：'+d.scope,'含まない作業：'+d.exclusions,'金額（税込・総額）：'+yen(d.amount),'修正回数：'+d.revisions+'回。合意範囲の修正を対象とし、こちらの過失による修正は回数に数えず無料です。追加作業は実施前に別途見積もり・合意します。',...(isReceipt?['実入金額：'+yen(d.paidAmount),'入金日：'+d.paidOn+'／入金方法：'+d.paymentMethod,'入金確認記録：'+d.paymentReference,'上記金額を、合意済み単発業務の代金として受領しました。']:[])]},
+ {title:isReceipt?'受領金額・入金記録':'個別の業務範囲・総額',paragraphs:['サービス：'+SERVICES[d.service].name,...(['short','long','adcm'].includes(d.service)?['合意した完成尺：'+d.seconds+'秒']:d.service==='website'?['合意したページ数：'+d.pages+'ページ']:[]),'基本料金の目安（税込）：'+yen(documentPrice(d))+'〜（追加費用を含む確定額は下記総額）',...(d.service==='adcm'?[AD_CM.scope,AD_CM.exclusions]:d.pricingVersion===EDIT_PRICE_VERSION&&['short','long'].includes(d.service)?['単発編集料金版：'+EDIT_PRICE_VERSION+'（税込・撮影費別）',SERVICES[d.service].scope,EDIT_EXCLUSIONS]:d.pricingVersion===EDIT_PRICE_VERSION?[]:['旧料金データ：既存の合意額・範囲を維持します。新規申込み用の料金ではありません。']),'対象作業・納品物：'+d.scope,'含まない作業：'+d.exclusions,'金額（税込・総額）：'+yen(d.amount),'修正回数：'+d.revisions+'回。合意範囲の修正を対象とし、こちらの過失による修正は回数に数えず無料です。追加作業は実施前に別途見積もり・合意します。',...(isReceipt?['実入金額：'+yen(d.paidAmount),'入金日：'+d.paidOn+'／入金方法：'+d.paymentMethod,'入金確認記録：'+d.paymentReference,'上記金額を、合意済み単発業務の代金として受領しました。']:[])]},
  {title:'納品・検収・素材・支払',paragraphs:['合意した納期：'+d.deadline,'検収方法・確認期限：'+d.inspection,'素材の権利・許諾と成果物の利用範囲：'+d.rights,'合意した支払条件：'+d.payment,...(d.documentType==='invoice'?['支払期限：'+d.paymentDue,'振込先：'+d.bankDetails]:[]),'合意書面・確認記録：'+(d.agreementReference||'見積内容確認後に合意を記録します。'),'適格請求書発行事業者の登録番号はありません。適格請求書ではありません。','既存契約・既発行見積り・月額プランの料金や条件は変更しません。個別合意した上記範囲が対象です。']},
  {title:'受託条件・AI利用',paragraphs:[ACCEPTANCE_POLICY,AI_POLICY,'既存の締結済み契約は変更しません。この書類の生成だけで契約締結・メール送付・入金照合は行われません。',...(d.documentType==='estimate'?['見積書は相談に基づく条件案です。内容・納期・総額の合意前に着手しません。']:[])]}];
  const titles=new Set(['政治・選挙関係の受託条件','AIの制作補助と素材の取扱い','キャンセル・日程変更','公開承認・権限・素材','保管期間','契約・法令に関する確認']);

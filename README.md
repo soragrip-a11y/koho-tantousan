@@ -37,3 +37,6 @@ https://design.digital.go.jp/dads/foundations/
 
 ## 地域ニュースの原本型ブログ（2026-10-24）
 未公開記事は非公開のGoogle Drive「広報担当さん_ブログ下書き（非公開）」に保存し、公開GitHubには保存しません。本人が記事全文を確認して明示承認した後に限り、`content/site-articles.json` に `status: published`・`approved: true` として登録し、`scripts/render-original-blog.mjs` でWebページ・SEOメタ情報・記事一覧・サイトマップを生成します。従来のnote転載19記事は維持します。公開前に `npm test` を実行します。運用方法は [docs/site-original-blog-workflow.md](docs/site-original-blog-workflow.md) を参照してください。
+
+## SNS広告CM制作（2026-11-04）
+30秒以内55,000円（税込）〜。構成・基本AI画像素材制作から行う広告動画の独立メニューです。詳細は `dist/pricing.html#sns-ad-cm`、書類用価格・範囲は `dist/ad-cm-pricing.js` に定義。単発相談・書類フォームに対応。既存編集・月額料金、旧見積りと契約は維持します。
