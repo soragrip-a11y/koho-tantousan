@@ -88,13 +88,10 @@ test('homepage retains genuine works and sends purpose cards directly to useful 
 test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
  const heads=[...document.querySelectorAll('.mini-price-table thead th')].map(x=>x.textContent);
- assert.equal(heads.length,4);
- for(const [i,p]of [[1,'30,000円'],[2,'80,000円'],[3,'120,000円']])assert.ok(heads[i].includes(p));
- assert.match(heads[2],/おすすめ.*伴走型/);
- const rows=[...document.querySelectorAll('.mini-price-table tbody tr')];
- for(const label of ['企画相談','YouTube投稿','タイトル・説明文','月次振り返り・改善提案'])assert.deepEqual([...rows.find(r=>r.querySelector('th').textContent===label).querySelectorAll('td')].map(x=>x.textContent),['×','○','○']);
- for(const text of ['30秒超〜60秒以内：10,000円／本','2回目以降は内容により相談','独自動画制作・別途の運用コンサルは含みません'])assert.ok(document.body.textContent.includes(text));
- for(const f of ['index.html','pricing.html','terms.html','contact.html']){const {document:d}=parseHTML(read(f));assert.doesNotMatch(d.body.textContent,/100,000/);assert.doesNotMatch(d.querySelector(".mini-price-table")?.textContent||"",/55,000/);assert.doesNotMatch(d.body.textContent,/相談用の仮案|旧条件のため/);}
+ assert.equal(heads.length,5);
+ for(const [i,p]of [[1,'55,000円'],[2,'88,000円'],[3,'132,000円'],[4,'165,000円']])assert.ok(heads[i].includes(p));
+ for(const term of ['翌々月末','3,300円','前月末','月6本','33,000円'])assert.ok(document.body.textContent.includes(term));
+ assert.doesNotMatch(document.querySelector('.mini-price-table').textContent,/80,000|120,000/);
 });
 
 test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,0);assert.doesNotMatch(document.body.textContent,/20人限定/);});

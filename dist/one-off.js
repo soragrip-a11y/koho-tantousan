@@ -1,4 +1,4 @@
-import {inquiryText} from './one-off-core.js';
+import {inquiryText} from './one-off-core.js?v=20261106';
 const form=document.querySelector('#one-inquiry'),$=id=>document.getElementById(id);let composed=false;
 const collect=()=>Object.fromEntries([...form.querySelectorAll('[name]')].map(el=>[el.name,el.type==='checkbox'?el.checked:el.value.trim()]));
 function update(){const blocked=$('category').value==='political';$('political-warning').hidden=!blocked;$('compose').disabled=blocked||composed;$('copy-request').disabled=blocked;}
