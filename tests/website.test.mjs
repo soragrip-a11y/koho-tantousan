@@ -82,7 +82,7 @@ test('homepage retains genuine works and sends purpose cards directly to useful 
  const {document}=parseHTML(read('index.html'));
  assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)),['https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
  for(const id of ['photo-video','sns','web-line'])assert.ok(document.querySelector('#'+id+' .card-links a'));
- assert.match(document.querySelector('#price').textContent,/月6本/);assert.match(document.querySelector('#price').textContent,/30,000/);
+ assert.doesNotMatch(document.querySelector('#price').textContent,/月6本|30,000/);assert.match(document.querySelector('#price').textContent,/初回お試し/);assert.match(document.querySelector('#price').textContent,/15,000/);
  assert.match(document.querySelector('#price').textContent,/30秒以内/);
 });
 test('published prices and new document guidance agree',()=>{
@@ -95,3 +95,12 @@ test('published prices and new document guidance agree',()=>{
 });
 
 test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,0);assert.doesNotMatch(document.body.textContent,/20人限定/);});
+test('active pages and FAQ do not advertise retired video tariffs',()=>{
+ for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html')&&!x.startsWith('google'))){
+ const {document}=parseHTML(read(file));const text=document.body.textContent;
+ if(file==='expenses-guide.html'){assert.match(text,/旧料金による架空の履歴例/);continue;}
+ assert.doesNotMatch(text,/月額スタンダード|ショート動画 月6本|以後30秒ごとに5,000円|ロング標準編集は10分以内30,000円/,file);
+ }
+ const {document}=parseHTML(read('index.html'));const faq=[...document.querySelectorAll('details')].map(x=>x.textContent).join(' ');
+ for(const term of ['初回お試し','15,000円','27,500円','翌々月末','3,300円','2,750円','20円','最低2か月','前月末','媒体ごとに1投稿'])assert.ok(faq.includes(term),term);
+});
