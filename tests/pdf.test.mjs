@@ -10,9 +10,9 @@ vm.runInThisContext(readFileSync(new URL('../dist/vendor/fontkit-1.1.1.min.js',i
 const deps={PDFLib:globalThis.PDFLib,fontkit:globalThis.fontkit,fontBytes:new Uint8Array(readFileSync(new URL('../dist/assets/fonts/NotoSansJP-Regular.ttf',import.meta.url)))};
 mkdirSync(new URL('../tmp/pdfs/',import.meta.url),{recursive:true});
 const cases=[
- ['monthly-new',fixture({plan:'monthly55000',shorts:3,longs:0,shootHalf:2})],
- ['monthly-premium-new',fixture({plan:'monthly165000',shorts:7,longs:2,shootHalf:0,documentType:'estimate'})],
- ['monthly-invoice-new',fixture({plan:'monthly88000',shorts:3,longs:2,shootHalf:0,documentType:'invoice',paymentDue:'2026-10-30'})],
+ ['monthly-new',fixture({plan:'monthly55000',months:2,shorts:3,longs:0,shootHalf:2})],
+ ['monthly-premium-new',fixture({plan:'monthly165000',months:2,shorts:7,longs:2,shootHalf:0,documentType:'estimate'})],
+ ['monthly-invoice-new',fixture({plan:'monthly88000',months:2,shorts:3,longs:2,shootHalf:0,documentType:'invoice',paymentDue:'2026-10-30'})],
  ['political-review',fixture({requestCategory:'political',scopeAttachment:'技術制作：具体的指示に基づく編集の検討。企画・投稿・広告は対象外。',instructionOwner:'指示者と意思決定者は確認中',expertRecord:'未確認'})],
  ['election-review-blank',{requestCategory:'election',contractDate:'2026-10-24',purpose:'確認用',reviewed:true}],
  ['political-review-long',fixture({requestCategory:'political',scopeAttachment:'技術制作・企画・投稿・広告・実費の境界を個別に確認する。'.repeat(55),expertRecord:'確認事項を記録し、未回答の点は受託前に照会する。'.repeat(60)})],

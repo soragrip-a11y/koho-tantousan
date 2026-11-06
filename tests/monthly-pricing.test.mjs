@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {parseHTML} from 'linkedom';
 import {calculate,validateContract} from '../dist/contract-core.js';import {contractSections} from '../dist/contract-pdf.js';import {MONTHLY_TERMS} from '../dist/monthly-pricing.js';import {documentPrice,documentContent} from '../dist/one-off-core.js';import {fixture} from './fixture.mjs';import {oneFixture} from './one-off-fixture.mjs';
-const f=(o={})=>fixture({plan:'monthly55000',shorts:3,longs:0,shootHalf:2,...o});
+const f=(o={})=>fixture({plan:'monthly55000',months:2,shorts:3,longs:0,shootHalf:2,...o});
 test('equivalent mixes retain pack price; no double charging filming',()=>{
  for(const o of [{shorts:5,shootHalf:0},{shorts:0,longs:2,shootHalf:0},{shorts:3,shootHalf:2}]){const c=calculate(f(o));assert.equal(c.recurring,55000);assert.equal(c.allocation,55000);assert.equal(c.rows.length,1);}
  assert.throws(()=>calculate(f({shorts:4})),/制作枠を超え/);
@@ -24,3 +24,5 @@ test('previous monthly and CM agreements retain their historical amounts',()=>{
  const old=oneFixture({service:'adcm',seconds:30,amount:55000,revisions:2});assert.equal(documentPrice(old),55000);assert.match(JSON.stringify(documentContent(old)),/修正2回/);
  const current={...old,adCmVersion:'20261106',amount:33000,revisions:1};assert.equal(documentPrice(current),33000);assert.doesNotMatch(JSON.stringify(documentContent(current)),/修正2回まで|55,000円/);
 });
+
+test('new monthly agreements require two initial months and renew monthly',()=>{assert.throws(()=>calculate(f({months:1})),/最低2か月/);const c=calculate(f({months:2}));assert.equal(c.total,110000);const text=JSON.stringify(contractSections(f()));assert.match(text,/1か月ごとの自動更新/);assert.match(text,/通知期限/);});
