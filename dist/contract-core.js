@@ -1,7 +1,9 @@
+import {NEW_PLANS,calculateMonthly} from './monthly-pricing.js?v=20261106';
 export const DEFAULT_PROVIDER = Object.freeze({ provider: 'ソラグリップ（広報担当さん）', providerSigner: '須永 空和', providerEmail: 'sora.grip@gmail.com', providerAddress: '' });
 // All amounts are tax-inclusive. Quoted additions must be explicitly entered.
 export const PRICES = Object.freeze({standard:30000,companion:80000,premium:120000,trialShort:5000,standardShoot:17000,trialShoot:15000,tiktok:15000});
 export const PLANS = Object.freeze({
+ ...NEW_PLANS,
  standard:{name:'スタンダード',short:6,long:0,months:1,includedShoots:0,scope:'ショート月6本の編集・完成データ納品のみ。企画相談・投稿代行・タイトル説明文・月次分析は含まない。素材持ち込みは要相談。'},
  companion:{name:'伴走型',short:6,long:0,months:1,includedShoots:2,scope:'ショート月6本、現地半日撮影を月2回、企画相談、YouTube投稿代行、タイトル・説明文、月次振り返り・改善提案。公開内容・日時は事前にお客様が確認する。'},
  premium:{name:'プレミアム',short:8,long:2,months:1,includedShoots:2,scope:'ショート月8本＋ロング月2本、現地半日撮影を月2回、企画相談、YouTube投稿代行、タイトル・説明文、月次振り返り・改善提案。公開内容・日時は事前にお客様が確認する。'},
@@ -30,6 +32,7 @@ export function periodEnd(start, months) {
 export function renewalDeadline(end) { const d = dateValue(end); d.setUTCDate(d.getUTCDate()-14); return iso(d); }
 
 export function calculate(data) {
+ if(NEW_PLANS[data.plan])return calculateMonthly(data,integer,clean);
  const p=PLANS[data.plan];if(!p)throw new Error('プランを選択してください。');
  const monthly=data.plan!=='single';
  const months=monthly?integer(data.months,'契約月数',60):1;

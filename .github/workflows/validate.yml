@@ -16,4 +16,5 @@ jobs:
           node-version: '24'
       - run: node --test scripts/check-public.test.mjs
       - run: node scripts/check-public.mjs
-      - run: node --test tests/edit-pricing.test.mjs
+      - run: npm ci
+      - run: npm test

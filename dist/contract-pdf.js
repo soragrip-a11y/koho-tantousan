@@ -1,10 +1,12 @@
+import {monthlyDocument} from './monthly-document.js?v=20261106';
 
-import { validateContract, clean, yen } from './contract-core.js?v=20261024-policy';
-import { TERMS } from './contract-terms.js?v=20261024-policy';
+import { validateContract, clean, yen } from './contract-core.js?v=20261106';
+import { TERMS } from './legacy-contract-terms-20261024.js';
 import { ACCEPTANCE_POLICY, POLITICAL_DETAIL, AI_POLICY, REQUEST_LABELS, REVIEW_FIELDS } from './acceptance-policy.js?v=20261024';
 export const DOCUMENT_TITLES={contract:'動画制作・運用支援 業務委託契約書',estimate:'動画制作・運用支援 見積書',invoice:'動画制作・運用支援 請求書'};
 export function contractSections(data) {
  const c=validateContract(data),d=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,typeof v==='string'?clean(v):v]));
+ if(c.newMonthly)return monthlyDocument(d,c);
  const type=d.documentType||'contract',sections=[];
  const section=(title,paragraphs)=>sections.push({title,paragraphs:paragraphs.map(clean)});
  if(c.reviewOnly){

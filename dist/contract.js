@@ -1,5 +1,5 @@
-import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261024-policy';
-import { generateContract } from './contract-pdf.js?v=20261024-policy';
+import { calculate, PLANS, DEFAULT_PROVIDER, clean, yen, periodEnd, validateContract } from './contract-core.js?v=20261106';
+import { generateContract } from './contract-pdf.js?v=20261106';
 
 const form = document.querySelector('#contract-form');
 const $ = id => document.getElementById(id);
@@ -46,10 +46,10 @@ function update() {
   $('create-pdf').textContent='選択した書類のPDFを作成・保存';
   const plan = PLANS[value('plan')], monthly = value('plan') !== 'single';
   show('invoice-fields',value('documentType')==='invoice');$('paymentDue').required=value('documentType')==='invoice';
-  show('extra-short-unit',monthly&&Number(value('shorts'))>plan.short);
-  show('extra-long-unit',monthly&&Number(value('longs'))>plan.long);
-  show('extra-shoot-unit',monthly&&value('plan')!=='standard'&&Number(value('shootHalf'))>0);
-  show('tiktok-wrap',monthly);if(!monthly)$('tiktok').value='0';
+  show('extra-short-unit',false);
+  show('extra-long-unit',false);
+  show('extra-shoot-unit',false);
+  show('tiktok-wrap',false);$('tiktok').value='0';
   show('months-wrap', monthly);
   show('payer-fields', !$('payerSame').checked); $('payer').required = !$('payerSame').checked;
   $('end').readOnly = monthly; $('months').setAttribute('min', plan.months || 1);
@@ -57,8 +57,8 @@ function update() {
   if (monthly) { try { $('end').value = periodEnd(value('start'),value('months')); } catch { $('end').value = ''; } }
   $('period-hint').textContent = monthly ? '個別に合意した月数を入力します。最低利用期間や自動更新を設定するものではありません。開始日から1か月単位で計算し、継続・更新は別途合意します。' : '初回お試しです。完了予定日を指定してください。自動更新はありません。';
   $('plan-scope').textContent = plan.scope;
-  $('quantity-hint').textContent = monthly ? `各月の本数。基本料金内はショート${plan.short}本・ロング${plan.long}本。超過分は合意済みの単価（税込）を入力してください。` : '初回お試しはショート1本以上、1本5,000円（税込）。ロングは対象外です。';
-  $('shoot-hint').textContent = !monthly ? '初回お試しの半日撮影は1回15,000円（税込）、交通費別途。追加撮影は個別相談です。' : value('plan')==='standard' ? 'スタンダードの半日撮影は別途17,000円／回（税込）。各月の回数を入力します。交通費別途。' : '月2回の半日撮影は基本料金内です。ここには月2回を超える追加分のみ入力し、合意済み単価を指定します。交通費別途。';
+  $('quantity-hint').textContent = '通常の有料枠に配分する各月の本数。ショート11,000円・ロング27,500円・撮影11,000円の基準で制作枠内に組み替えできます。無料特典・繰越残額の利用は別途、月ごとに確認します。';
+  $('shoot-hint').textContent = '通常の有料枠で予定する各月の撮影回数。1回11,000円・4時間想定。無料特典や繰越利用分はここへ重ねて入力せず、月ごとに確認します。交通費別途、千葉県内の移動時間は追加請求なし。';
   [0,1,2].forEach(i=>{ $('extraTiming'+i).disabled=!monthly; if(!monthly) $('extraTiming'+i).value='once'; });
   const data = collect();
   $('summary-plan').textContent = plan.name + (monthly ? ` / 初回${value('months') || '—'}か月` : ' / 1契約');
@@ -100,7 +100,7 @@ form.addEventListener('change',e=>{
   if(busy)return;
   invalidatePDF(); if(e.target.id !== 'reviewed') $('reviewed').checked=false;
   if(e.target.id==='plan') {
-    const p=PLANS[value('plan')]; $('shorts').value=p.short||1; $('longs').value=p.long;
+    const p=PLANS[value('plan')]; $('shorts').value=p.short; $('longs').value=p.long;
     $('months').value=p.months||1; $('end').value='';
     $('shootHalf').value=0; $('tiktok').value='0';$('invoiceMonth').value='1';['extraShortUnit','extraLongUnit','extraShootUnit'].forEach(id=>$(id).value='');
   }
