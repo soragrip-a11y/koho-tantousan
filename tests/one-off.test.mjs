@@ -11,3 +11,8 @@ for(const service of ['short','repair','website'])for(const documentType of ['es
 test('long single-job scope wraps within pages',async()=>{const bytes=await renderDocument(documentContent(oneFixture({documentType:'contract',scope:'対象箇所と納品物を確認します。'.repeat(90)})),deps);writeFileSync(new URL('../tmp/one-off-pdfs/long-contract.pdf',import.meta.url),bytes);});
 
 for(const service of ['short','long'])test('new tariff PDF '+service,async()=>{const d=oneFixture({pricingVersion:'2026-11-01',service,seconds:service==='short'?'31':'601',amount:service==='short'?'10000':'40000',documentType:'contract'});const bytes=await renderDocument(documentContent(d),deps);const pdf=await deps.PDFLib.PDFDocument.load(bytes);assert.ok(pdf.getPageCount()>0);writeFileSync(new URL('../tmp/one-off-pdfs/current-'+service+'.pdf',import.meta.url),bytes);});
+for(const [service,amount,seconds] of [['short',11000,30],['long',27500,420],['trialshort',5000,30],['triallong',15000,180]])test('approved regular or trial PDF '+service,async()=>{
+ const d=oneFixture({pricingVersion:'2026-11-06-trial',service,amount,seconds,firstTimeConfirmed:true,documentType:'contract',scope:'検証用の個別合意：支給素材を編集し動画1本を納品。実取引には使用しません。'});
+ const content=documentContent(d),bytes=await renderDocument(content,deps);assert.equal(content.sections[1].paragraphs.some(p=>p.includes('金額（税込・総額）')),true);
+ writeFileSync(new URL('../tmp/one-off-pdfs/approved-'+service+'.pdf',import.meta.url),bytes);
+});
