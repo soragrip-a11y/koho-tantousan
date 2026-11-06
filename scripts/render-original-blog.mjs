@@ -1,6 +1,7 @@
 import {readFileSync, writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
+import {parseHTML} from 'linkedom';
 
 const root = new URL('../', import.meta.url);
 const read = p => readFileSync(new URL(p, root), 'utf8');
@@ -39,6 +40,15 @@ export function validateArticle(a) {
  }
  if(a.image !== undefined && !/^assets\/[a-zA-Z0-9_./-]+\.(?:png|jpe?g|webp)$/.test(a.image)) throw Error('Invalid image path');
  if(a.image && a.image.includes('..')) throw Error('Unsafe image path');
+ if(a.bodyHtml !== undefined) {
+  assertText(a.bodyHtml, 'reviewed article body', 30000);
+  const {document}=parseHTML('<html><body>'+a.bodyHtml+'</body></html>');
+  for(const el of document.body.querySelectorAll('*')) {
+   if(!['P','BR','A','STRONG','EM','UL','OL','LI','H2','H3','SECTION'].includes(el.tagName)) throw Error('Unsupported reviewed body markup');
+   for(const attr of [...el.attributes]) if(!['href','target','rel','class'].includes(attr.name)) throw Error('Unsupported reviewed body attribute');
+   if(el.tagName==='A' && !urlIsSafe(el.getAttribute('href'))) throw Error('Unsafe reviewed body link');
+  }
+ }
  // A draft is never published merely because it exists in the content file.
  if(a.status !== 'draft' && a.status !== 'published') throw Error('Invalid status');
  if(a.status === 'published' && a.approved !== true) throw Error('Unapproved publication refused: '+a.id);
@@ -75,7 +85,7 @@ export function renderOriginalArticle(a, indexHtml) {
  const faq = a.faq?.length ? '<section><h2>よくある質問</h2>'+a.faq.map(q=>'<h3>'+escape(q.question)+'</h3><p>'+escape(q.answer)+'</p>').join('')+'</section>' : '';
  const sources = '<section class="article-sources"><h2>出典・確認日</h2><ul>'+a.sources.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.title)+'</a>（確認：'+escape(s.checkedAt)+'）</li>').join('')+'</ul></section>';
  const figure = a.image ? '<figure><img src="'+escape(a.image)+'" alt="'+escape(a.imageAlt || a.title+'の参考画像')+'" loading="eager"></figure>' : '';
- const main='<main id="main" class="news-article"><article><header><a class="text-link" href="blog.html">ブログ一覧へ</a><p class="eyebrow">'+escape(a.area)+' / LOCAL NEWS</p><h1>'+escape(a.title)+'</h1><p class="muted">広報担当さん · <time datetime="'+escape(a.publishedAt)+'">'+isoJa(a.publishedAt)+'</time></p><p class="article-origin">この記事の原本は広報担当さん公式サイトです。</p>'+figure+'</header><div class="article-body"><p class="lead">'+escape(a.intro)+'</p>'+paragraphs+faq+sources+'</div><footer class="article-end"><a class="text-link" href="blog.html">ブログ一覧へ戻る</a></footer></article></main>';
+ const main='<main id="main" class="news-article"><article><header><a class="text-link" href="blog.html">ブログ一覧へ</a><p class="eyebrow">'+escape(a.area)+' / LOCAL NEWS</p><h1>'+escape(a.title)+'</h1><p class="muted">広報担当さん · <time datetime="'+escape(a.publishedAt)+'">'+isoJa(a.publishedAt)+'</time></p><p class="article-origin">この記事の原本は広報担当さん公式サイトです。</p>'+figure+'</header><div class="article-body">'+(a.bodyHtml || '<p class="lead">'+escape(a.intro)+'</p>'+paragraphs+faq+sources)+'</div><footer class="article-end"><a class="text-link" href="blog.html">ブログ一覧へ戻る</a></footer></article></main>';
  return head + main + indexHtml.slice(indexHtml.indexOf('<footer>'));
 }
 
