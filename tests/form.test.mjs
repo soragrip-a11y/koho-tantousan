@@ -34,14 +34,14 @@ test('page connects all labels and controls; referenced local files exist',()=>{
 
 test('new plans expose flexible paid allocations and block overflow',()=>{
  const h=setup();h.change('requestCategory','general');h.change('start','2026-11-01');h.change('plan','monthly55000');
- assert.equal(h.el('shorts').value,'0');assert.equal(h.el('summary-total').textContent,'55,000円');
- h.change('shorts','3');h.change('shootHalf','2');assert.equal(h.el('summary-total').textContent,'55,000円');
+ assert.equal(h.el('shorts').value,'0');assert.equal(h.el('summary-total').textContent,'110,000円');
+ h.change('shorts','3');h.change('shootHalf','2');assert.equal(h.el('summary-total').textContent,'110,000円');
  h.change('shootHalf','3');assert.match(h.el('summary-error').textContent,/制作枠を超え/);
- h.change('plan','monthly165000');assert.equal(h.el('summary-total').textContent,'165,000円');assert.equal(h.el('tiktok-wrap').hidden,true);
+ h.change('plan','monthly165000');assert.equal(h.el('summary-total').textContent,'330,000円');assert.equal(h.el('tiktok-wrap').hidden,true);
  assert.ok([...h.el('plan').options].every(o=>o.getAttribute('value').startsWith('monthly')));
 });
 test('form generates selected invoice locally and invalidates stale downloads',async()=>{
- const h=setup(),d=fixture({documentType:'invoice',plan:'monthly55000',shorts:'3'});
+ const h=setup(),d=fixture({documentType:'invoice',plan:'monthly55000',months:'2',shorts:'3'});
  for(const[key,v]of Object.entries(d))if(typeof v==='string'&&h.el(key))h.el(key).value=v;
  h.change('extraLabel0','交通費');h.change('extraAmount0','2000');h.el('payerSame').checked=false;h.change('payer','検証用請求先');
  h.el('reviewed').checked=true;h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));await new Promise(setImmediate);
@@ -58,7 +58,7 @@ test('numeric editing supports replacing zero and deletion',()=>{
 
 test('classification changes hide standard terms and invalidate generated agreements',async()=>{
  const h=setup();assert.equal(h.el('requestCategory').value,'');assert.equal(h.el('summary-total').textContent,'未確定');
- const d=fixture({plan:'monthly55000',shorts:'3'});for(const[k,v]of Object.entries(d))if(typeof v==='string'&&h.el(k))h.el(k).value=v;
+ const d=fixture({plan:'monthly55000',months:'2',shorts:'3'});for(const[k,v]of Object.entries(d))if(typeof v==='string'&&h.el(k))h.el(k).value=v;
  h.change('requestCategory','general');h.el('reviewed').checked=true;
  h.form.dispatchEvent(new h.window.Event('submit',{bubbles:true,cancelable:true}));await new Promise(setImmediate);
  assert.equal(h.downloads(),1);

@@ -55,7 +55,7 @@ function update() {
   $('end').readOnly = monthly; $('months').setAttribute('min', plan.months || 1);
   $('shorts').setAttribute('min', plan.short); $('longs').setAttribute('min', plan.long);
   if (monthly) { try { $('end').value = periodEnd(value('start'),value('months')); } catch { $('end').value = ''; } }
-  $('period-hint').textContent = monthly ? '個別に合意した月数を入力します。最低利用期間や自動更新を設定するものではありません。開始日から1か月単位で計算し、継続・更新は別途合意します。' : '初回お試しです。完了予定日を指定してください。自動更新はありません。';
+  $('period-hint').textContent = monthly ? '月額契約は最低2か月、その後は1か月ごとの自動更新です。更新・解約の通知期限や手続きは契約時に相談して書面で確認します。初回契約期間の月数を2以上で入力します。終了予定日は初回期間の末日です。' : '初回お試しです。完了予定日を指定してください。自動更新はありません。';
   $('plan-scope').textContent = plan.scope;
   $('quantity-hint').textContent = '通常の有料枠に配分する各月の本数。ショート11,000円・ロング27,500円・撮影11,000円の基準で制作枠内に組み替えできます。無料特典・繰越残額の利用は別途、月ごとに確認します。';
   $('shoot-hint').textContent = '通常の有料枠で予定する各月の撮影回数。1回11,000円・4時間想定。無料特典や繰越利用分はここへ重ねて入力せず、月ごとに確認します。交通費別途。車の交通費は往復走行距離×1kmあたり20円（税込）、高速代・駐車場代は実費です。千葉県内の移動時間は追加請求なし。';
