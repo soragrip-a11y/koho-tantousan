@@ -133,3 +133,11 @@ test('active pages and FAQ do not advertise retired video tariffs',()=>{
 });
 
 test('pricing display is monthly-only while legacy anchors survive',()=>{const {document}=parseHTML(read('pricing.html'));assert.doesNotMatch(document.querySelector('main').textContent,/ちょこっと|アニメーションCM|初回お試し/);for(const id of ['monthly','sns-ad-cm','business-help'])assert.ok(document.getElementById(id));});
+
+test('contact keeps inquiry functionality without retired one-off promotions',()=>{
+ const {document}=parseHTML(read('contact.html'));
+ assert.ok(document.querySelector('#contact-form'));
+ assert.ok(document.querySelector('#client-line'));
+ assert.ok(document.querySelector('a[href^="contract.html"]'));
+ assert.doesNotMatch(document.body.textContent,/ONE-OFF SUPPORT|初回お試し|Web・SNSの小修正/);
+});
