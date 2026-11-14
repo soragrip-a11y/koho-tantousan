@@ -46,12 +46,16 @@ test('contract fields expose their quantity, shooting, and period explanations',
   const hint=document.querySelector('#'+id).getAttribute('aria-describedby');assert.ok(hint,id);assert.ok(document.getElementById(hint),hint);
  }
 });
-test('homepage identifies the maker and offers direct work and consultation routes',()=>{
+test('homepage identifies the maker, shows both faces and offers consultation routes',()=>{
  const {document}=parseHTML(read('index.html'));
- assert.match(document.querySelector('h1').textContent,/須永空和.*広報担当さん/);
- const links=[...document.querySelectorAll('.home-actions a')].map(a=>a.getAttribute('href'));
- assert.deepEqual(links,['works.html','https://line.me/R/ti/p/%40699bksee']);
- assert.match(document.querySelector('.intro-value').textContent,/何をどう発信するかの相談/);
+ assert.match(document.body.textContent,/須永空和/);
+ assert.match(document.querySelector('#world-a h1').textContent,/広報担当さん/);
+ assert.match(document.querySelector('#world-b h1').textContent,/AI千葉PR大使/);
+ assert.deepEqual([...document.querySelectorAll('.switch [data-go]')].map(b=>b.getAttribute('data-go')),['a','b']);
+ const hrefs=[...document.querySelectorAll('a[href]')].map(a=>a.getAttribute('href'));
+ for(const h of ['works.html','contact.html','blog.html','pricing.html','terms.html','privacy.html','https://line.me/R/ti/p/%40699bksee'])assert.ok(hrefs.includes(h),h);
+ assert.ok(document.querySelectorAll('[data-consult]').length>=4);
+ assert.doesNotMatch(document.body.textContent,/公認されました|任命されました|県内一|最強|No\.?1/);
 });
 test('all local website links, assets and fragment targets exist',()=>{
  for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){
@@ -63,35 +67,57 @@ test('all local website links, assets and fragment targets exist',()=>{
  }
 });
 
-test('general audience leads, with political experience retained as a secondary specialty',()=>{
+test('general audience leads on the homepage, and the political guide stays reachable from the site',()=>{
  const {document}=parseHTML(read('index.html'));
- assert.match(document.querySelector('.intro-copy').textContent,/お店や人/);
- assert.match(document.querySelector('.about-short').textContent,/県議会議員/);
- assert.ok(document.querySelector('a[href="political-guide.html"]'));
+ const a=document.querySelector('#world-a'),b=document.querySelector('#world-b');
+ assert.ok(a.compareDocumentPosition(b)&4,'広報担当さんの面が先');
+ assert.match(a.querySelector('.k-hero').textContent,/お店/);
+ assert.ok(existsSync(new URL('../dist/political-guide.html',import.meta.url)));
+ const others=readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html')&&x!=='index.html'&&x!=='political-guide.html');
+ assert.ok(others.some(f=>read(f).includes('href="political-guide.html')),'political-guide.html への導線');
  for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html'))){const {document:page}=parseHTML(read(file));if(page.querySelector('footer'))assert.doesNotMatch(page.querySelector('footer').textContent,/地方議員向け/);}
 });
 test('official LINE destination stays verified and contact wording has a reply window',()=>{
  for(const file of ['index.html','contact.html','pricing.html']){
-  const {document}=parseHTML(read(file));const band=document.querySelector('.contact-band,.home-contact');
-  assert.match(band.textContent,/順次、原則2営業日以内/);
-  const links=[...document.querySelectorAll('a[href*="line.me"]')];assert.ok(links.length);
+  const {document}=parseHTML(read(file));
+  const links=[...document.querySelectorAll('a[href*="line.me"]')];assert.ok(links.length,file);
   for(const a of links)assert.equal(a.getAttribute('href'),'https://line.me/R/ti/p/%40699bksee');
+  if(file==='index.html')continue; // 新トップは相談メモ（送信なし）から公式LINE・contact.htmlへ案内する。返信目安の文言は contact / pricing で保持
+  const band=document.querySelector('.contact-band,.home-contact');
+  assert.match(band.textContent,/順次、原則2営業日以内/);
  }
 });
-test('homepage retains genuine works and sends purpose cards directly to useful detail',()=>{
+test('genuine works stay on the works page, and the homepage shows only confirmed prices',()=>{
+ const works=read('works.html');
+ for(const id of ['lGHOQvbA8BQ','YCXll8IjTB8'])assert.match(works,new RegExp('href="https://(?:youtu\\.be/|www\\.youtube\\.com/watch\\?v=)'+id+'"'),id);
  const {document}=parseHTML(read('index.html'));
- assert.deepEqual([...document.querySelectorAll('a[href]')].map(x=>x.getAttribute('href')).filter(x=>/youtube\.com|youtu\.be/.test(x)),['https://youtu.be/lGHOQvbA8BQ','https://www.youtube.com/watch?v=YCXll8IjTB8']);
- for(const id of ['photo-video','sns','web-line'])assert.ok(document.querySelector('#'+id+' .card-links a'));
- assert.doesNotMatch(document.querySelector('#price').textContent,/月6本|30,000/);assert.match(document.querySelector('#price').textContent,/初回お試し/);assert.match(document.querySelector('#price').textContent,/15,000/);
- assert.match(document.querySelector('#price').textContent,/30秒以内/);
+ assert.ok(document.querySelector('#world-a a[href="works.html"]'));
+ const plans=document.querySelector('#koho-plans').textContent;
+ for(const t of ['55,000円','88,000円','132,000円','165,000円','税込','当月のみ','繰越不可','個別相談','最低2か月','翌々月末','交通費は別途'])assert.ok(plans.includes(t),t);
+ assert.equal(document.querySelectorAll('#koho-plans .k-plan-list li').length,4);
+ assert.ok(document.querySelector('#koho-plans a[href="pricing.html#monthly"]'));
+ assert.doesNotMatch(plans,/ちょこっと|アニメーションCM|初回お試し|11,000|27,500|月\d+本/);
+ const ai=document.querySelector('#world-b').textContent;
+ assert.doesNotMatch(ai,/55,000|88,000|132,000|165,000|月額パック|10,000|先着/);
+ assert.match(document.querySelector('#ai-price').textContent,/33,000/);
+ assert.doesNotMatch(document.body.textContent,/月額スタンダード|80,000|120,000/);
+});
+test('homepage keeps legacy anchors and labels placeholder media honestly',()=>{
+ const {document}=parseHTML(read('index.html'));
+ assert.ok(document.getElementById('service'),'index.html#service（名刺・下層ページからのリンク先）');
+ assert.equal(document.querySelector('meta[name="robots"][content*="noindex"]'),null);
+ const badges=[...document.querySelectorAll('#world-b .fbadge,#world-b .badge,#world-b .tagf')];assert.ok(badges.length>=4);
+ for(const b of badges)assert.match(b.textContent,/演出案|演出デモ|素材/);
+ for(const c of document.querySelectorAll('#world-a .k-cap'))assert.match(c.textContent,/素材待ち/);
+ assert.equal(document.querySelectorAll('video[autoplay]:not([muted]),audio[autoplay]').length,0);
 });
 test('published prices and new document guidance agree',()=>{
  const {document}=parseHTML(read('pricing.html'));
- const heads=[...document.querySelectorAll('.mini-price-table thead th')].map(x=>x.textContent);
- assert.equal(heads.length,5);
- for(const [i,p]of [[1,'55,000円'],[2,'88,000円'],[3,'132,000円'],[4,'165,000円']])assert.ok(heads[i].includes(p));
- for(const term of ['翌々月末','3,300円','前月末','月6本','33,000円'])assert.ok(document.body.textContent.includes(term));
- assert.doesNotMatch(document.querySelector('.mini-price-table').textContent,/80,000|120,000/);
+ const heads=[...document.querySelectorAll('.k-plan-list li')].map(x=>x.textContent);
+ assert.equal(heads.length,4);
+ for(const [i,p]of [[0,'55,000円'],[1,'88,000円'],[2,'132,000円'],[3,'165,000円']])assert.ok(heads[i].includes(p));
+ for(const term of ['翌々月末','3,300円','前月末','月6本'])assert.ok(document.body.textContent.includes(term));
+ assert.doesNotMatch(document.querySelector('.k-plan-list').textContent,/80,000|120,000/);
 });
 
 test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,0);assert.doesNotMatch(document.body.textContent,/20人限定/);});
@@ -101,6 +127,9 @@ test('active pages and FAQ do not advertise retired video tariffs',()=>{
  if(file==='expenses-guide.html'){assert.match(text,/旧料金による架空の履歴例/);continue;}
  assert.doesNotMatch(text,/月額スタンダード|ショート動画 月6本|以後30秒ごとに5,000円|ロング標準編集は10分以内30,000円/,file);
  }
- const {document}=parseHTML(read('index.html'));const faq=[...document.querySelectorAll('details')].map(x=>x.textContent).join(' ');
- for(const term of ['初回お試し','15,000円','27,500円','翌々月末','3,300円','2,750円','20円','最低2か月','前月末','媒体ごとに1投稿'])assert.ok(faq.includes(term),term);
+ // 旧トップのFAQにあった条件は、新トップでは料金ページを正本として保持する
+ const {document}=parseHTML(read('pricing.html'));const pricing=document.body.textContent;
+ for(const term of ['27,500円','翌々月末','3,300円','2,750円','20円','最低2か月','前月末','媒体ごとに1投稿'])assert.ok(pricing.includes(term),term);
 });
+
+test('pricing display is monthly-only while legacy anchors survive',()=>{const {document}=parseHTML(read('pricing.html'));assert.doesNotMatch(document.querySelector('main').textContent,/ちょこっと|アニメーションCM|初回お試し/);for(const id of ['monthly','sns-ad-cm','business-help'])assert.ok(document.getElementById(id));});

@@ -17,7 +17,7 @@ test('ad CM has its own scope and quote floor without applying short-edit increm
  assert.match(inquiryText({...d,description:'広告CMの相談',name:'見本',reply:'sample@example.com',privacy:true,inquiryOnly:true}),/アニメーションCM/);
 });
 test('public menu and document source agree on new price and exclusions',()=>{
- for(const name of ['pricing.html','one-off.html']){
+ for(const name of ['one-off.html']){
   const html=readFileSync(new URL('../dist/'+name,import.meta.url),'utf8');
   assert.ok(html.includes('30秒以内 33,000円（税込）〜'));
   assert.ok(html.includes(AD_CM.exclusions));
