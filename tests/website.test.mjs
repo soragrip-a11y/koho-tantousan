@@ -142,3 +142,9 @@ test('contact keeps inquiry functionality without retired one-off promotions',()
  assert.equal(document.querySelector('a[href^="contract.html"]'),null);
  assert.doesNotMatch(document.body.textContent,/ONE-OFF SUPPORT|初回お試し|Web・SNSの小修正/);
 });
+test('retained pages common navigation leads to current plans instead of retired terms',()=>{
+ for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(f=>f.endsWith('.html'))){
+  const {document}=parseHTML(read(file));
+  for(const a of document.querySelectorAll('nav a,footer a'))assert.doesNotMatch(a.getAttribute('href')||'',/^(?:\.\/)?(?:pricing|terms|contract|one-off)\.html/,file);
+ }
+});
