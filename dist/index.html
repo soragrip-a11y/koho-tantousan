@@ -425,6 +425,7 @@ footer{padding-bottom:130px}
 /* ===================== v5: スマホ再設計（PCと同じ型を保ち、読みやすく） ===================== */
 html:has(dialog[open]){overflow:hidden}
 .foot-links{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:0 18px;margin-top:22px;padding-top:14px;border-top:1px solid rgba(128,128,128,.25);font-size:13px}
+.foot-links button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;min-height:44px;font-weight:700}
 .foot-links a{display:inline-flex;align-items:center;min-height:44px;font-weight:700}
 .dlg-links{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 2px}
 .dlg-links a{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;font-weight:800;font-size:14px;text-decoration:none;border:1px solid currentColor}
@@ -741,20 +742,18 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
   <section class="k-sec k-plans" id="koho-plans" aria-labelledby="k-h-plans">
     <p class="k-eyebrow">MONTHLY</p>
     <h2 class="k-plans-h rv" id="k-h-plans">続けるときの、月額プラン</h2>
-    <p class="k-sub rv">実写動画の月額パックです（税込・月額、2026年11月6日改定の現行料金）。撮影と編集を、制作枠の範囲で組み替えて使えます。</p>
+    <p class="k-sub rv">料金と制作内容の目安を、ここでまとめて確認できます。すべて税込・月額です。詳細はご相談ください。</p>
     <ul class="k-plan-list rv">
-      <li><b>実写月額パック</b><span class="pr">55,000円<small>／月（税込）</small></span><span class="ds">撮影・編集の制作枠 55,000円分</span></li>
-      <li><b>実写月額パック</b><span class="pr">88,000円<small>／月（税込）</small></span><span class="ds">撮影・編集の制作枠 88,000円分</span></li>
-      <li><b>実写月額パック</b><span class="pr">132,000円<small>／月（税込）</small></span><span class="ds">撮影・編集の制作枠 132,000円分</span></li>
-      <li><b>プレミアム</b><span class="pr">165,000円<small>／月（税込）</small></span><span class="ds">制作枠 132,000円分 ＋ 企画立案・SNS運用代行</span></li>
+      <li><b>週1本の発信に</b><span class="pr">55,000円<small>／月（税込）</small></span><span class="ds">週1本・月4本目安<br>半日撮影 1回</span></li>
+      <li><b>週2本の発信に</b><span class="pr">88,000円<small>／月（税込）</small></span><span class="ds">週2本・月8本目安<br>撮影についてはご相談</span></li>
+      <li><b>週3本＋ロング動画</b><span class="pr">132,000円<small>／月（税込）</small></span><span class="ds">週3本・月12本目安<br>ロング動画 1本＋撮影 2回</span></li>
+      <li><b>企画から運用まで</b><span class="pr">165,000円<small>／月（税込）</small></span><span class="ds">企画・SNS運用代行<br>ロング動画 1本<br>本数・撮影についてはご相談</span></li>
     </ul>
     <ul class="k-plan-notes rv">
-      <li>全プラン共通：毎月、ショート1本または撮影1回が無料です（当月のみ・繰越不可）。</li>
-      <li>55,000円・88,000円・132,000円のプランで企画立案・SNS運用代行を追加する場合は、個別相談です。</li>
-      <li>制作本数は固定ではありません。組み合わせは契約時に相談して決めます。</li>
-      <li>月額契約は最低2か月、その後は1か月ごとの自動更新です。交通費は別途。有料枠の未使用分は翌々月末まで繰り越せます。</li>
+      <li>追加撮影：1日17,000円。交通費は別途です。</li>
+      <li>本数は目安です。動画の長さ・撮影内容・納期など、詳細はすべて相談して決めます。</li>
     </ul>
-    <p class="k-plan-more rv"><a href="pricing.html#monthly">条件の詳細は、料金ページへ →</a></p>
+    <p class="k-plan-more rv"><button class="k-btn" type="button" data-consult="a" aria-haspopup="dialog">このプランについて相談する →</button></p>
   </section>
 
   <section class="k-sec k-contact" id="koho-contact" aria-labelledby="k-h-contact">
@@ -762,14 +761,14 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
     <h2 class="k-h2 rv" id="k-h-contact">まずは、<br>話してみませんか。</h2>
     <p class="k-sub rv">撮るかどうか決まっていなくても大丈夫です。お店のこと、伝えたいことを聞かせてください。料金は、相談の内容に合わせてご案内します。</p>
     <button class="k-btn" type="button" data-consult="a" aria-haspopup="dialog">相談メモをつくる <span aria-hidden="true">→</span></button>
-    <p class="k-note">押すと、コピーして使える相談メモと、公式LINE・お問い合わせページが開きます。このページからは送信されません。</p>
+    <p class="k-note">このページ内で相談メモを作れます。送るときだけ公式LINEかメールをご自身で開いてください。自動送信はしません。</p>
   </section>
 
   <footer class="k-foot">
     <div><h4>同じ制作者の、2つの表現</h4><p>「広報担当さん」と「AI千葉PR大使」は、同じ制作者（須永空和／ソラグリップ）による2つの表現です。</p></div>
     <div><h4>ブログ</h4><p>地域ニュース・ブログも続けています。</p></div>
     <div><h4>このページについて</h4><p>実写の枠は素材待ちです。制作例は実績ページをご覧ください。</p></div>
-  <nav class="foot-links" aria-label="サイト内のページ"><a href="blog.html">地域ニュース・ブログ</a><a href="works.html">実績</a><a href="pricing.html">料金</a><a href="contact.html">お問い合わせ</a><a href="terms.html">サービス利用条件</a><a href="privacy.html">プライバシー</a></nav>
+  <nav class="foot-links" aria-label="サイト内のページ"><a href="blog.html">地域ニュース・ブログ</a><a href="works.html">実績</a><a href="#koho-plans">月額プラン</a><a href="#ai-price">AI CM料金</a><button type="button" data-consult aria-haspopup="dialog">相談する</button><a href="privacy.html">プライバシー</a></nav>
   </footer>
 </div>
 
@@ -944,7 +943,7 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
     <h2 class="h2 gl" id="h-contact">あなたのお店も、<br><em>映像</em>にしてみませんか。</h2>
     <p class="lead">「うちの商品だとどうなる？」くらいの段階でも大丈夫です。見せたい表情と手元の素材を、一緒に整理するところから始めます。</p>
     <button class="cta" type="button" id="cta" aria-haspopup="dialog" data-consult="b">相談する <span aria-hidden="true">→</span></button>
-    <p class="note-s">押すと、コピーして使える相談メモと、公式LINE・お問い合わせページが開きます。このページからは送信されません。</p>
+    <p class="note-s">このページ内で相談メモを作れます。送るときだけ公式LINEかメールをご自身で開いてください。自動送信はしません。</p>
     <p class="note-s">対面での企画相談・実写の撮影や編集は <a href="#koho-contact">広報担当さんの面</a> へ。</p>
   </section>
 <footer id="ai-journal">
@@ -953,7 +952,7 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
     <div><h4>活動名について</h4><p>「AI千葉PR大使」は須永空和（ソラグリップ）個人の活動名です。公的機関・団体による任命や公認を示すものではありません。</p></div>
     <div><h4>このページについて</h4><p>「広報担当さん」と「AI千葉PR大使」は、同じ制作者による2つの表現です。店舗・商品の映像枠は演出案（素材待ち）、AI CMの条件（税・尺・修正回数・広告配信費）は確認中です。この面の映像は実績ではありません。</p></div>
   </div>
-  <nav class="foot-links" aria-label="サイト内のページ"><a href="blog.html">地域ニュース・ブログ</a><a href="works.html">実績</a><a href="pricing.html">料金</a><a href="contact.html">お問い合わせ</a><a href="terms.html">サービス利用条件</a><a href="privacy.html">プライバシー</a></nav>
+  <nav class="foot-links" aria-label="サイト内のページ"><a href="blog.html">地域ニュース・ブログ</a><a href="works.html">実績</a><a href="#koho-plans">月額プラン</a><a href="#ai-price">AI CM料金</a><button type="button" data-consult aria-haspopup="dialog">相談する</button><a href="privacy.html">プライバシー</a></nav>
 </footer>
 </div>
 </main>
@@ -962,8 +961,8 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
   <form class="dlg" method="dialog" id="dlg-form">
     <p class="dlg-tag">このページからは送信されません</p>
     <h3 id="dlg-h">相談メモをつくる</h3>
-    <p class="dlg-status" id="dlg-status"><b>このページからは送信されません。</b>下のメモをコピーして、公式LINEかお問い合わせページから送ってください。</p>
-    <div class="dlg-links"><a href="https://line.me/R/ti/p/%40699bksee" target="_blank" rel="noopener">公式LINEを開く</a><a href="contact.html" target="_blank" rel="noopener">お問い合わせページを開く</a></div>
+    <p class="dlg-status" id="dlg-status"><b>このページからは送信されません。</b>下のメモをコピーして、公式LINEかメールから送ってください。</p>
+    <div class="dlg-links"><a href="https://line.me/R/ti/p/%40699bksee" target="_blank" rel="noopener">公式LINEを開く</a><a href="mailto:sora.grip@gmail.com">メールで相談する</a></div>
     <fieldset class="dlg-kind"><legend>メモの種類</legend>
       <label><input type="radio" name="kind" value="a"> 広報担当さん（実写・企画）</label>
       <label><input type="radio" name="kind" value="b"> AI千葉PR大使（AI CM）</label>
@@ -1488,6 +1487,7 @@ const TPL = {
 ■使う場所（YouTube／Instagram／TikTok／公式LINE／店頭 など）：
 ■撮影したい時期・場所：
 ■手元にある素材（写真・動画・ロゴ など）：
+■気になる月額プラン（55,000円／88,000円／132,000円／165,000円・税込）：
 ■ご予算の目安：
 ■そのほか：`,
   b: () => `【AI千葉PR大使（AI CM）への相談メモ】
@@ -1522,7 +1522,7 @@ async function copyMemo() {
   const txt = dtext.value; let ok = false;
   try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); ok = true; } } catch (err) { ok = false; }
   if (!ok) { try { dtext.focus(); dtext.select(); ok = document.execCommand('copy'); } catch (err) { ok = false; } }
-  if (ok) dlive.textContent = 'コピーしました。公式LINEかお問い合わせページに貼り付けて送ってください。';
+  if (ok) dlive.textContent = 'コピーしました。公式LINEかメールに貼り付けて送ってください。';
   else { tryDo(() => { dtext.focus(); dtext.select(); }); dlive.textContent = 'この画面ではコピーが許可されていません。メモ全体を選択したので、手動でコピーしてください（Ctrl+C / 長押し）。'; }
   return ok;
 }
