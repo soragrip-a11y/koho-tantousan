@@ -53,7 +53,7 @@ test('homepage identifies the maker, shows both faces and offers consultation ro
  assert.match(document.querySelector('#world-b h1').textContent,/AI千葉PR大使/);
  assert.deepEqual([...document.querySelectorAll('.switch [data-go]')].map(b=>b.getAttribute('data-go')),['a','b']);
  const hrefs=[...document.querySelectorAll('a[href]')].map(a=>a.getAttribute('href'));
- for(const h of ['works.html','contact.html','blog.html','pricing.html','terms.html','privacy.html','https://line.me/R/ti/p/%40699bksee'])assert.ok(hrefs.includes(h),h);
+ for(const h of ['works.html','blog.html','privacy.html','mailto:sora.grip@gmail.com','https://line.me/R/ti/p/%40699bksee'])assert.ok(hrefs.includes(h),h);
  assert.ok(document.querySelectorAll('[data-consult]').length>=4);
  assert.doesNotMatch(document.body.textContent,/公認されました|任命されました|県内一|最強|No\.?1/);
 });
@@ -93,10 +93,11 @@ test('genuine works stay on the works page, and the homepage shows only confirme
  const {document}=parseHTML(read('index.html'));
  assert.ok(document.querySelector('#world-a a[href="works.html"]'));
  const plans=document.querySelector('#koho-plans').textContent;
- for(const t of ['55,000円','88,000円','132,000円','165,000円','税込','当月のみ','繰越不可','個別相談','最低2か月','翌々月末','交通費は別途'])assert.ok(plans.includes(t),t);
+ for(const t of ['55,000円','88,000円','132,000円','165,000円','税込','月4本','月8本','月12本','半日撮影','ロング動画','17,000円','交通費は別途'])assert.ok(plans.includes(t),t);
  assert.equal(document.querySelectorAll('#koho-plans .k-plan-list li').length,4);
- assert.ok(document.querySelector('#koho-plans a[href="pricing.html#monthly"]'));
- assert.doesNotMatch(plans,/ちょこっと|アニメーションCM|初回お試し|11,000|27,500|月\d+本/);
+ assert.ok(document.querySelector('#koho-plans [data-consult="a"]'));
+ assert.doesNotMatch(plans,/制作枠|繰越|最低2か月|翌々月末|毎月、ショート1本または撮影1回が無料/);
+ for(const old of ['pricing.html','one-off.html','contract.html','terms.html','contact.html'])assert.equal(document.querySelector(`a[href^="${old}"]`),null,old);
  const ai=document.querySelector('#world-b').textContent;
  assert.doesNotMatch(ai,/55,000|88,000|132,000|165,000|月額パック|10,000|先着/);
  assert.match(document.querySelector('#ai-price').textContent,/33,000/);
@@ -138,6 +139,6 @@ test('contact keeps inquiry functionality without retired one-off promotions',()
  const {document}=parseHTML(read('contact.html'));
  assert.ok(document.querySelector('#contact-form'));
  assert.ok(document.querySelector('#client-line'));
- assert.ok(document.querySelector('a[href^="contract.html"]'));
+ assert.equal(document.querySelector('a[href^="contract.html"]'),null);
  assert.doesNotMatch(document.body.textContent,/ONE-OFF SUPPORT|初回お試し|Web・SNSの小修正/);
 });
