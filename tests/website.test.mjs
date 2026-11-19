@@ -109,7 +109,11 @@ test('homepage keeps legacy anchors and labels placeholder media honestly',()=>{
  assert.equal(document.querySelector('meta[name="robots"][content*="noindex"]'),null);
  const badges=[...document.querySelectorAll('#world-b .fbadge,#world-b .badge,#world-b .tagf')];assert.ok(badges.length>=4);
  for(const b of badges)assert.match(b.textContent,/演出案|演出デモ|素材/);
- for(const c of document.querySelectorAll('#world-a .k-cap'))assert.match(c.textContent,/素材待ち/);
+ for(const c of document.querySelectorAll('#world-a .k-frame .k-cap'))assert.match(c.textContent,/素材待ち/);
+ const offer=document.querySelector('#koho-top .k-subscription');assert.ok(offer);
+ assert.equal(document.querySelector('#koho-top [data-media="kohoHero"]'),null);
+ assert.match(offer.textContent,/月33,000円/);assert.match(offer.textContent,/1か月で卒業OK/);
+ assert.equal(offer.querySelector('button').getAttribute('data-consult'),'a');
  assert.equal(document.querySelectorAll('video[autoplay]:not([muted]),audio[autoplay]').length,0);
 });
 test('published prices and new document guidance agree',()=>{
