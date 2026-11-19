@@ -652,6 +652,22 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
 @media (max-width:350px){.k-plan-list li{grid-template-columns:1fr}}
 #service{position:absolute;top:0;left:0;scroll-margin-top:var(--bar)}
 
+
+/* 写真枠内の新プラン。既存の色・書体・ポラロイド形状を使用 */
+.k-subscription .k-subscription-body{background:var(--a-bg);aspect-ratio:auto;height:auto;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:14px;text-align:left;padding:clamp(16px,2vw,28px);overflow:visible}
+.k-subscription-label{margin:0;color:var(--a-sub);font-size:13px;font-weight:700;line-height:1.6}
+.k-subscription h2{margin:0;font:700 clamp(26px,2.4vw,36px)/1.5 var(--maru);letter-spacing:0;color:var(--a-ink)}
+.k-subscription h2 small{display:inline-block;font:700 12px/1.5 var(--jp);color:var(--a-sub)}
+.k-subscription h2>span{display:block;font-size:.72em}
+.k-subscription-details{padding:0;margin:0;list-style:none;font-size:15px;font-weight:500;line-height:1.8}
+.k-subscription-details li{position:relative;padding-left:16px}
+.k-subscription-details li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:6px;background:var(--a-mint);border-radius:50%}
+.k-subscription-graduate{margin:0;font:700 18px/1.7 var(--maru);letter-spacing:0}
+.k-subscription-graduate span{background:linear-gradient(transparent 64%,var(--a-butter) 64%)}
+.k-subscription-note{margin:0;font-size:12px;line-height:1.7;color:var(--a-sub)}
+.k-subscription .k-btn{justify-content:center;width:100%;padding:10px 16px;font-size:15px;margin:0 0 6px;white-space:normal}
+.k-subscription>.k-cap{margin:0}
+@media(max-width:760px){.k-subscription .k-subscription-body{gap:10px;padding:16px}.k-subscription h2{font-size:28px}.k-subscription h2>span{font-size:.75em}.k-subscription-details{font-size:14px}.k-subscription-graduate{font-size:17px}}
 </style>
 </head>
 <body>
@@ -690,10 +706,17 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
       <p class="k-lead">対面で話して、撮って、編集する。お店や事業の「何を、誰に、どう伝えるか」を一緒に整理するところから、動画とSNSでの発信をお手伝いします。</p>
       <div class="k-actions"><button class="k-btn" type="button" data-consult="a" aria-haspopup="dialog">相談してみる <span aria-hidden="true">→</span></button><a class="k-link" href="#koho-can">何を頼めるか見る ↓</a></div>
     </div>
-    <figure class="k-polaroid">
-      <div class="k-media" data-media="kohoHero"><div class="k-ph"><b>実写写真の差し替え口</b>撮影した写真・本人写真を<br>受け取ったら差し替えます</div></div>
-      <figcaption class="k-cap">実写サンプル｜素材待ち</figcaption>
-    </figure>
+    <aside class="k-polaroid k-subscription" aria-labelledby="k-subscription-title">
+      <div class="k-media k-subscription-body">
+        <p class="k-subscription-label">作って、学べる動画サブスク</p>
+        <h2 id="k-subscription-title">月33,000円<small>（税込）</small><span>で、動画4本。</span></h2>
+        <ul class="k-subscription-details"><li>毎月4本・各30秒</li><li>撮影1回込み</li><li>月1回の動画作成レクチャー</li></ul>
+        <p class="k-subscription-graduate">作り方を覚えたら、<br><span>1か月で卒業OK。</span></p>
+        <p class="k-subscription-note">初月で終了できるのは、この新プランの条件です。</p>
+        <button class="k-btn" type="button" data-consult="a" aria-haspopup="dialog">無料相談する <span aria-hidden="true">→</span></button>
+      </div>
+      <p class="k-cap">動画づくりの、はじめの一歩に。</p>
+    </aside>
   </section>
 
   <section class="k-sec" id="koho-can" aria-labelledby="k-h-can">
