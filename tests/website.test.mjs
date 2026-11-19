@@ -109,7 +109,17 @@ test('homepage keeps legacy anchors and labels placeholder media honestly',()=>{
  assert.equal(document.querySelector('meta[name="robots"][content*="noindex"]'),null);
  const badges=[...document.querySelectorAll('#world-b .fbadge,#world-b .badge,#world-b .tagf')];assert.ok(badges.length>=4);
  for(const b of badges)assert.match(b.textContent,/演出案|演出デモ|素材/);
- for(const c of document.querySelectorAll('#world-a .k-frame .k-cap'))assert.match(c.textContent,/素材待ち/);
+ const videos=[['wide','eVAUjYSfPJM'],['tall','DnwxlmDEyCg']];
+ for(const [shape,id] of videos){
+  const frame=document.querySelector('#koho-sample .k-frame.'+shape);assert.ok(frame);
+  const player=frame.querySelector('iframe');assert.ok(player);
+  assert.equal(player.getAttribute('src'),'https://www.youtube-nocookie.com/embed/'+id);
+  assert.equal(player.getAttribute('loading'),'lazy');
+  assert.equal(player.getAttribute('referrerpolicy'),'strict-origin-when-cross-origin');
+  assert.ok(player.getAttribute('title'));
+  assert.equal(frame.querySelector('figcaption a').getAttribute('href'),'https://www.youtube.com/watch?v='+id);
+  assert.doesNotMatch(frame.textContent,/素材待ち|差し替え口/);
+ }
  const offer=document.querySelector('#koho-top .k-subscription');assert.ok(offer);
  assert.equal(document.querySelector('#koho-top [data-media="kohoHero"]'),null);
  assert.match(offer.textContent,/月33,000円/);assert.match(offer.textContent,/1か月で卒業OK/);
@@ -125,7 +135,7 @@ test('published prices and new document guidance agree',()=>{
  assert.doesNotMatch(document.querySelector('.k-plan-list').textContent,/80,000|120,000/);
 });
 
-test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,0);assert.doesNotMatch(document.body.textContent,/20人限定/);});
+test('homepage has no autoplay or campaign video with an unconfirmed participant limit',()=>{const {document}=parseHTML(read('index.html'));assert.equal(document.querySelectorAll('iframe').length,2);assert.equal(document.querySelectorAll('#koho-sample iframe').length,2);assert.doesNotMatch(document.body.textContent,/20人限定/);});
 test('active pages and FAQ do not advertise retired video tariffs',()=>{
  for(const file of readdirSync(new URL('../dist/',import.meta.url)).filter(x=>x.endsWith('.html')&&!x.startsWith('google'))){
  const {document}=parseHTML(read(file));const text=document.body.textContent;
