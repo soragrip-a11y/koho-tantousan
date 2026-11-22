@@ -669,6 +669,17 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
 .k-subscription .k-btn{justify-content:center;width:100%;padding:10px 16px;font-size:15px;margin:0 0 6px;white-space:normal}
 .k-subscription>.k-cap{margin:0}
 @media(max-width:760px){.k-subscription .k-subscription-body{gap:10px;padding:16px}.k-subscription h2{font-size:28px}.k-subscription h2>span{font-size:.75em}.k-subscription-details{font-size:14px}.k-subscription-graduate{font-size:17px}}
+
+.ai-journal { border-block-start:1px solid var(--tealf); }
+.ai-journal h2 { margin:0 0 1.1em; font-size:clamp(25px,4vw,46px); line-height:1.35; }
+.ai-journal-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(16px,3vw,32px); list-style:none; padding:0; margin:0; }
+.ai-journal-list a { height:100%; display:block; background:#101818; border:1px solid #38514f; text-decoration:none; }
+.ai-journal-list a:hover, .ai-journal-list a:focus-visible { border-color:var(--teal); }
+.ai-journal-list img { display:block; width:100%; height:auto; aspect-ratio:1.91; object-fit:cover; }
+.ai-journal-list .journal-info { display:block; padding:16px 18px 20px; }
+.ai-journal-list time { color:var(--teal); font:12px/1.5 var(--mono); }
+.ai-journal-list strong { display:block; margin-top:6px; font-size:clamp(17px,2vw,22px); line-height:1.55; overflow-wrap:anywhere; }
+@media (max-width:640px) { .ai-journal-list { grid-template-columns:minmax(0,1fr); } }
 </style>
 </head>
 <body>
@@ -680,7 +691,7 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
   <a class="brand" href="#ai-top" data-for="b">AI千葉<b>PR</b>大使</a>
   <span class="rec" aria-hidden="true">REC <span class="tc" id="tc">00:00:00:00</span></span>
   <nav aria-label="ページ内（広報担当さん）" data-for="a"><a href="#koho-can">頼めること</a><a href="#koho-flow">進め方</a><a href="#koho-sample">実写</a><a href="#koho-plans">月額</a><a href="#koho-contact">相談</a></nav>
-  <nav aria-label="ページ内（AI千葉PR大使）" data-for="b"><a href="#ai-can">CAN DO</a><a href="#ai-tech">TECH</a><a href="#ai-ref">REFERENCE</a><a href="#ai-price">PRICE</a><a href="#ai-contact">CONTACT</a></nav>
+  <nav aria-label="ページ内（AI千葉PR大使）" data-for="b"><a href="#ai-journal">BLOG</a><a href="#ai-can">CAN DO</a><a href="#ai-tech">TECH</a><a href="#ai-ref">REFERENCE</a><a href="#ai-price">PRICE</a><a href="#ai-contact">CONTACT</a></nav>
   <div class="bar-r">
   <button class="bar-cta" type="button" data-consult="" aria-haspopup="dialog">相談する</button>
   <button class="motion-btn" id="motion" type="button" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span class="lbl">演出を停止</span></button></div>
@@ -811,6 +822,14 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
       <div class="hero-cta"><button class="cta" type="button" data-consult="b" aria-haspopup="dialog">AI CMを相談する <span aria-hidden="true">→</span></button><a class="hero-more" href="#ai-can">できることを見る ↓</a></div>
       <p class="disc">「AI千葉PR大使」は個人クリエイターの活動名です。千葉県・自治体・観光団体などから任命・公認されたものではありません。</p>
     </div>
+  </section>
+
+  <section class="wrap ai-journal" id="ai-journal" aria-labelledby="ai-journal-title">
+    <h2 id="ai-journal-title">AI千葉PR大使のブログ</h2>
+    <ul class="ai-journal-list">
+      <li><a href="blog-higgsfield-kling-4-start-frame.html"><img src="assets/blog/higgsfield-kling-4-start-frame/header.jpg" alt="" loading="lazy"><span class="journal-info"><time datetime="2026-11-22">2026.11.22</time><strong>Higgsfieldで写真を動画の最初に使うには？Kling 4.0「開始フレーム」の設定とリファレンスの違い</strong></span></a></li>
+      <li><a href="blog-higgsfield-vertical-video-9-16.html"><img src="assets/blog/higgsfield-9-16/header.jpg" alt="" loading="lazy"><span class="journal-info"><time datetime="2026-11-21">2026.11.21</time><strong>Higgsfieldで縦動画を作るには？ 9:16の設定場所を実画面で解説</strong></span></a></li>
+    </ul>
   </section>
 
   <!-- 02 何ができるか -->
@@ -970,13 +989,12 @@ html[data-world="a"] .bar{background:#fbf6ee;border-bottom:1px solid rgba(45,42,
     <p class="note-s">このページ内で相談メモを作れます。送るときだけ公式LINEかメールをご自身で開いてください。自動送信はしません。</p>
     <p class="note-s">対面での企画相談・実写の撮影や編集は <a href="#koho-contact">広報担当さんの面</a> へ。</p>
   </section>
-<footer id="ai-journal">
+<footer>
   <div class="foot">
-    <div><h4>JOURNAL</h4><p><a href="blog-higgsfield-kling-4-start-frame.html">Higgsfieldで写真を動画の最初に使うには？Kling 4.0「開始フレーム」の設定とリファレンスの違い</a></p><p><a href="blog-higgsfield-vertical-video-9-16.html">Higgsfieldで縦動画を作る方法｜9:16の設定を実画面で解説</a></p></div>
     <div><h4>活動名について</h4><p>「AI千葉PR大使」は須永空和（ソラグリップ）個人の活動名です。公的機関・団体による任命や公認を示すものではありません。</p></div>
     <div><h4>このページについて</h4><p>「広報担当さん」と「AI千葉PR大使」は、同じ制作者による2つの表現です。店舗・商品の映像枠は演出案（素材待ち）、AI CMの条件（税・尺・修正回数・広告配信費）は確認中です。この面の映像は実績ではありません。</p></div>
   </div>
-  <nav class="foot-links" aria-label="サイト内のページ"><a href="blog.html">地域ニュース・ブログ</a><a href="works.html">実績</a><a href="#koho-plans">月額プラン</a><a href="#ai-price">AI CM料金</a><button type="button" data-consult aria-haspopup="dialog">相談する</button><a href="privacy.html">プライバシー</a></nav>
+  <nav class="foot-links" aria-label="サイト内のページ"><a href="#ai-journal">AI千葉PR大使のブログ</a><a href="works.html">実績</a><a href="#koho-plans">月額プラン</a><a href="#ai-price">AI CM料金</a><button type="button" data-consult aria-haspopup="dialog">相談する</button><a href="privacy.html">プライバシー</a></nav>
 </footer>
 </div>
 </main>
