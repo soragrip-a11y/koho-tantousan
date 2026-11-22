@@ -1,0 +1,62 @@
+<!doctype html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Higgsfieldで写真を動画の最初に使うには？Kling 4.0「開始フレーム」の設定とリファレンスの違い</title><meta name="description" content="HiggsfieldのKling 4.0で写真を動画の最初に使う方法を日本語画面で解説。開始フレームとリファレンスの違い、プロンプト、生成前の確認ポイントが分かります。"><link rel="canonical" href="https://local-koho.com/blog-higgsfield-kling-4-start-frame.html"><meta property="og:type" content="article"><meta property="og:title" content="Higgsfieldで写真を動画の最初に使うには？Kling 4.0「開始フレーム」の設定とリファレンスの違い"><meta property="og:description" content="HiggsfieldのKling 4.0で写真を動画の最初に使う方法を日本語画面で解説。開始フレームとリファレンスの違い、プロンプト、生成前の確認ポイントが分かります。"><meta property="og:image" content="https://local-koho.com/assets/blog/higgsfield-kling-4-start-frame/header.jpg"><meta property="og:url" content="https://local-koho.com/blog-higgsfield-kling-4-start-frame.html"><meta name="twitter:card" content="summary_large_image"><style>*{box-sizing:border-box}body{margin:0;color:#182a32;background:#f9fbfb;font-family:system-ui,"Noto Sans CJK JP",sans-serif;overflow-wrap:anywhere;}article{max-width:760px;margin:auto;padding:24px clamp(16px,4vw,40px) 70px;background:white}h1{font-size:clamp(25px,5.9vw,40px);line-height:1.42;letter-spacing:-.02em;margin:1rem 0}h2{font-size:1.33rem;line-height:1.5;margin-top:2.3rem;padding-left:11px;border-left:5px solid #26b3b5}h3{font-size:1.1rem;margin-top:1.5rem}p,li{font-size:17px;line-height:1.85}strong{color:#0b2a3b}figure{margin:25px 0}figure img{display:block;width:100%;height:auto;border-radius:9px}figcaption{font-size:12px;color:#627682;line-height:1.5;margin-top:6px}a{color:#02677e;text-decoration:underline}blockquote{background:#eef6f7;padding:6px 14px;border-left:4px solid #27acb2;margin:1rem 0}blockquote p{font-size:15px}@media (max-width:420px){article{padding:20px 16px 60px}p,li{font-size:16px;line-height:1.8}h2{font-size:1.22rem}figure{margin-left:0;margin-right:0}}</style></head><body><article><nav><a href="https://local-koho.com/blog.html">ブログ一覧へ</a></nav><h1>Higgsfieldで写真を動画の最初に使うには？Kling 4.0「開始フレーム」の設定とリファレンスの違い</h1>
+<p>著者：AI千葉PR大使<br />
+確認日：2026年11月22日（日本時間）</p>
+<p><strong>PR：この記事にはアフィリエイトリンクが含まれます。リンク経由の申し込みで、運営者に報酬が入る場合があります。</strong></p>
+<p>「お気に入りの商品写真を、AIで少しだけ動かして動画にしたい」。そんなとき、Higgsfield内のKling 4.0では、<strong>最初に見せたい写真を「開始フレーム」として指定する</strong>方法があります。画面に表示される「フレーム数」と「リファレンス」は役割が違います。まずはこの違いを押さえましょう。</p>
+<figure><img alt="写真から始まる動画をイメージしたイラスト" src="assets/blog/higgsfield-kling-4-start-frame/header.jpg" width="1280" height="670"><figcaption>写真から始まる動画をイメージしたイラスト</figcaption></figure>
+
+<h2>HiggsfieldとKling 4.0は別の名前</h2>
+<p>Higgsfieldは複数のAIモデルや制作機能を使えるサービスです。その中の動画生成モデルの一つが「Kling 4.0」。操作画面で選ぶモデルによって、使える入力方法や設定は変わります。</p>
+<p>2026年11月22日に確認したHiggsfield公式案内では、Kling 4.0は画像から動画を作る機能のほか、開始・終了フレーム、複数のキーフレーム、参照素材を使った生成に対応しています。ただし、表示内容や利用条件はプラン・機能の更新などによって変わる場合があります。</p>
+<h2>「開始フレーム」は動画の最初の1枚</h2>
+<p>開始フレームは、動画が始まる瞬間の見た目を指定する画像です。例えば、香水瓶を机の中央に置いた写真を最初の一枚にすれば、構図・色・被写体を考える出発点になります。</p>
+<p>写真に写っているものは画像がすでに説明しているため、プロンプトでは「何がどう動くか」「カメラがどう動くか」を中心に書くと整理しやすくなります。元の画像を指定すれば必ず完全に同じ状態が続く、という保証ではありません。完成動画は必ず確認しましょう。</p>
+<figure><img alt="開始フレームで動画の最初の1枚を決める仕組み（説明図）" src="assets/blog/higgsfield-kling-4-start-frame/figure-concept.jpg" width="1080" height="1390"><figcaption>開始フレームで動画の最初の1枚を決める仕組み（説明図）</figcaption></figure>
+
+<h2>日本語画面で見る開始フレームの入口</h2>
+<p>ここでは、2026年11月22日に取得されたKling 4.0の<strong>生成前の日本語画面</strong>を紹介します。アップロードや有料生成の実行・成功は確認していません。</p>
+<h3>手順1：Kling 4.0を選ぶ</h3>
+<p>Higgsfield公式の手順では、Video（動画）のCreate Video（動画作成）を開き、モデル選択でKling 4.0を選びます。UIの日本語表記は利用環境で変わる可能性があるため、まずモデル名が一致しているかを確認してください。</p>
+<h3>手順2：「フレーム数」に切り替える</h3>
+<p>今回の日本語画面では、プロンプト欄の上に「リファレンス」「フレーム数」「動画を編集」の切り替えが表示されています。開始画像を使う場合は「フレーム数」を選びます。中央の「フレームを追加」が、画像を入れる入口です。</p>
+<figure><img alt="「フレーム数」タブを選ぶと「フレームを追加」が表示されます。" src="assets/blog/higgsfield-kling-4-start-frame/screen-01-frame.jpg" width="1080" height="1010"><figcaption>「フレーム数」タブを選ぶと「フレームを追加」が表示されます。</figcaption></figure>
+
+<h3>手順3：最初の画像を配置する</h3>
+<p>「フレームを追加」から手元の画像を用意し、最初のフレームに使う位置へ割り当てる流れです。Higgsfield公式は、Framesモードを最初・最後・途中の重要な画面を決めるための機能として説明しています。どの素材が最初のフレームとして設定されたか、表示とプレビューを見て確かめます。</p>
+<p>Kling 4.0は複数のキーフレームにも対応しますが、初めてなら最初の1枚から始めると目的を絞れます。画面に複数の枠があるからといって、全部埋める必要はありません。</p>
+<h3>手順4：プロンプトでは「動き」を書く</h3>
+<p>以下は<strong>説明用の提案例</strong>です。実際にこの指示で生成を成功させたという意味ではありません。</p>
+<blockquote>
+<p>机に置かれた香水瓶は、最初の画像の構図を基準にする。瓶の内側を光がゆっくり通り、カメラは5秒かけて少しだけ近づく。背景の光は穏やかに変化する。字幕なし、BGMなし。</p>
+</blockquote>
+<p>商品写真を使うなら「瓶が突然移動しない」「カメラだけが少し寄る」といった、一度に確認できる動きを一つ選ぶ考え方が役立ちます。初回で思い通りにならなければ、画像と文章を同時にすべて変えるのではなく、まず一つの要素だけ見直します。</p>
+<h3>手順5：設定と費用を確認してから生成する</h3>
+<p>動画の長さ、縦横比、解像度、音声など、利用画面で選べる設定を確認します。Higgsfield公式は、Kling 4.0で3〜30秒、720p・1080pなどの設定を案内しています。ただし、選べる範囲はモードやプラン・更新時期で変わることがあります。</p>
+<p><strong>Generateを押す前に、表示されるクレジット消費や契約条件を必ず確認してください。</strong> この解説のために有料動画生成は行っていません。</p>
+<h2>「リファレンス」は何が違う？</h2>
+<p>「リファレンス」は、被写体の見た目、雰囲気、動きなどを参考素材として渡す入口です。日本語画面には「参照を追加」と表示され、画像や動画を登録する案内が見えます。</p>
+<figure><img alt="「リファレンス」タブでは「参照を追加」から参考素材を選びます。" src="assets/blog/higgsfield-kling-4-start-frame/screen-02-reference.jpg" width="1080" height="1010"><figcaption>「リファレンス」タブでは「参照を追加」から参考素材を選びます。</figcaption></figure>
+
+<p>両者の違いは、<strong>開始フレーム＝冒頭の画面を決める／リファレンス＝制作の参考素材を渡す</strong>と考えると分かりやすいでしょう。商品を最初の一秒から見せたいなら、まず開始フレーム。人物の服装や別角度の参考を渡したいなら、リファレンスの使い方を検討します。実際の対応素材数や選択可否は操作画面の表示を優先してください。</p>
+<h2>よくある疑問</h2>
+<h3>「最初の写真」があれば、必ずそのまま動画になる？</h3>
+<p>必ずではありません。開始画像は出発点を指定するためのものですが、被写体の形やカメラの動きが崩れる場合もあります。生成後の冒頭と全体を確認することが必要です。</p>
+<h3>リファレンスと開始フレームは同時に使える？</h3>
+<p>モードの組み合わせに制約がある場合があります。Kling公式ガイドでは独立したモードとして説明されているため、現在使える組み合わせはHiggsfieldの実画面で確認してください。</p>
+<h3>無料で試せる？</h3>
+<p>ログインや画面の閲覧と、動画生成に必要なクレジット・利用権限は別です。無料枠やUnlimitedの適用範囲をこの記事だけで断定せず、生成直前の公式表示を確認しましょう。</p>
+<h2>まずは「動きの少ない1枚」から</h2>
+<p>最初は商品一つを大きく写した写真など、構図がはっきりした素材がおすすめです。開始フレームを決め、プロンプトで動きを一つ指定し、生成直前の条件を確かめる。この順序なら、どの操作が何のために必要かを理解しやすくなります。</p>
+<figure><a rel="sponsored" href="https://higgsfield.ai?fpr=ai_cinema_lab9"><img alt="PR　Higgsfieldの機能と利用条件を公式サイトで確認" src="assets/blog/higgsfield-kling-4-start-frame/banner.jpg" width="1200" height="860"></a><figcaption>PR　Higgsfieldの機能と利用条件を公式サイトで確認</figcaption></figure>
+
+<p><strong>PR： <a rel="sponsored" href="https://higgsfield.ai?fpr=ai_cinema_lab9">Higgsfieldの機能と現在の利用条件を公式サイトで確認する</a></strong></p>
+<p>※上の見出し画像・PRバナー・説明図の映画的ビジュアルはChatGPTで作成したイメージです。Higgsfieldで実際に生成した動画の切り出しではありません。操作画面2点のみ、Higgsfieldの日本語UIを撮影した画像です。</p>
+<h2>公式出典・確認日</h2>
+<p>確認日：2026年11月22日（JST）</p>
+<ul>
+<li><a href="https://higgsfield.ai/blog/kling-4-0-on-higgsfield">Higgsfield公式：Kling 4.0の機能・設定・手順</a></li>
+<li><a href="https://kling.ai/ja/quickstart/kling-4-model-user-guide">Kling AI公式：Kling 4.0の日本語ガイド</a></li>
+<li><a href="https://higgsfield.ai/creator-hub/help-center/getting-started/how-do-i-create-my-first-generation">Higgsfield公式：初めての動画生成</a></li>
+<li><a href="https://open.higgsfield.ai/models/kling-video/v4.0/image-to-video/playground">Higgsfield公式：画像から動画のモデル説明</a></li>
+</ul>
+<p><a href="https://local-koho.com/blog-higgsfield-vertical-video-9-16.html">関連記事：Higgsfieldで縦動画を作るには？ 9:16の設定場所を実画面で解説</a></p></article></body></html>
